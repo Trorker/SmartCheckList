@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Check List Cantieri - Levratti</title>
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚧</text></svg>">
+
+  <!-- BeerCSS -->
+  <link href="https://cdn.jsdelivr.net/npm/beercss@3.12.11/dist/cdn/beer.min.css" rel="stylesheet">
+  <script type="module"
+    src="https://cdn.jsdelivr.net/npm/beercss@3.12.11/dist/cdn/beer.min.js"></script>
+  <script type="module"
+    src="https://cdn.jsdelivr.net/npm/material-dynamic-colors@1.1.2/dist/cdn/material-dynamic-colors.min.js"></script>
+
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+  <!-- Vue 3 -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+
+  <style>
+    body {
+      background: var(--background);
+      color: var(--on-background);
+      overflow-x: hidden;
+    }
+
+    header,
+    footer {
+      box-shadow: var(--elevate1);
+    }
+
+    .fab {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+
+    <!-- HEADER -->
+    <header class="fixed">
+      <nav>
+        <button class="circle transparent" @click="showToast('Indietro cliccato')">
+          <i>arrow_back</i>
+        </button>
+        <h6 class="max">Levratti</h6>
+        <button class="circle transparent" @click="showDialog = true">
+          <i>today</i>
+        </button>
+        <button class="circle transparent" @click="toggleTheme">
+          <i>{{ isDark ? 'light_mode' : 'dark_mode' }}</i>
+        </button>
+        <button class="circle transparent" @click="showToast('Altro menu...')">
+          <i>more_vert</i>
+        </button>
+      </nav>
+    </header>
+
+    <!-- MAIN -->
+    <main class="responsive">
+      <section>
+        <h3>Verifiche Ispettive</h3>
+
+        <!-- esempio cards -->
+        <div class="grid">
+          <div class="s12 m6 l3" v-for="n in 4" :key="n">
+            <article class="no-padding">
+              <img class="responsive small" src="https://www.beercss.com/beer-and-woman.svg" />
+              <div class="padding">
+                <h5>Cantiere {{ n }}</h5>
+                <p>Breve descrizione del cantiere n. {{ n }}</p>
+                <nav>
+                  <button @click="showToast('Aperto cantiere ' + n)">Apri</button>
+                </nav>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="fixed">
+      <nav>
+        <button class="circle transparent" @click="showToast('Controllo eseguito')">
+          <i>check_box</i>
+        </button>
+        <button class="circle transparent" @click="showToast('Disegna firma')">
+          <i>brush</i>
+        </button>
+        <button class="circle transparent" @click="showToast('Avvia microfono')">
+          <i>mic</i>
+        </button>
+        <button class="circle transparent" @click="showToast('Aggiungi immagine')">
+          <i>image</i>
+        </button>
+        <div class="max"></div>
+        <button class="square round extra" @click="showToast('Nuovo elemento')">
+          <i>add</i>
+        </button>
+      </nav>
+    </footer>
+
+    <!-- DIALOG -->
+    <dialog v-if="showDialog" open @click.self="showDialog = false">
+      <h5>Informazioni</h5>
+      <div>Questa è una finestra modale gestita da Vue + BeerCSS.</div>
+      <nav class="right-align no-space mt">
+        <button class="transparent link" @click="showDialog = false">Chiudi</button>
+        <button class="transparent link" @click="confirmAction">Conferma</button>
+      </nav>
+    </dialog>
+
+    <!-- SNACKBAR -->
+    <div class="snackbar" :class="{ show: showSnackbar }">
+      <div class="max">{{ snackbarText }}</div>
+    </div>
+
+  </div>
+
+  <!-- VUE SCRIPT -->
+  <script type="module">
+    const { createApp, ref, onMounted } = Vue;
+
+    createApp({
+      setup() {
+        const isDark = ref(false);
+        const showDialog = ref(false);
+        const showSnackbar = ref(false);
+        const snackbarText = ref('');
+
+        // 🔹 Tema: dark/light
+        onMounted(() => {
+          const saved = localStorage.getItem("theme");
+          if (saved === "dark") {
+            isDark.value = true;
+            document.body.classList.add("dark");
+          }
+        });
+
+        function toggleTheme() {
+          isDark.value = !isDark.value;
+          document.body.classList.toggle("dark", isDark.value);
+          localStorage.setItem("theme", isDark.value ? "dark" : "light");
+          showToast(isDark.value ? "Tema scuro attivato" : "Tema chiaro attivato");
+        }
+
+        // 🔹 Snackbar / Toast
+        function showToast(text) {
+          snackbarText.value = text;
+          showSnackbar.value = true;
+          setTimeout(() => (showSnackbar.value = false), 2500);
+        }
+
+        // 🔹 Dialog
+        function confirmAction() {
+          showDialog.value = false;
+          showToast("Azione confermata");
+        }
+
+        return {
+          isDark,
+          showDialog,
+          showSnackbar,
+          snackbarText,
+          toggleTheme,
+          showToast,
+          confirmAction
+        };
+      },
+    }).mount("#app");
+  </script>
+
+</body>
+</html>
