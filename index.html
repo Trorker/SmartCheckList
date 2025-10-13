@@ -177,10 +177,6 @@
                                 <i>design_services</i>
                                 <span>Guidelines</span>
                             </a>
-                            <a>
-                                <i>accessibility_new</i>
-                                <span>Acessibility</span>
-                            </a>
                         </nav>
                     </div>
                 </div>
@@ -191,12 +187,20 @@
                     <!-- CARD WORKSITE -->
                     <div class="s12 m6 l3" v-for="n in 4" :key="n">
                         <article class="no-padding">
+
+
+
+
                             <img class="responsive small" src="https://www.beercss.com/beer-and-woman.svg" />
                             <div class="padding">
                                 <h5>Cantiere {{ n }}</h5>
                                 <p>Breve descrizione del cantiere n. {{ n }}</p>
                                 <nav>
                                     <button @click="showToast('Aperto cantiere ' + n)">Apri</button>
+                                    <div class="max" bis_skin_checked="1"></div>
+                                    <button class="circle transparent">
+                                        <i>more_vert</i>
+                                    </button>
                                 </nav>
                             </div>
                         </article>
@@ -233,7 +237,8 @@
                 <button class="circle transparent" @click="addToast('Operazione completata')">
                     <i>mic</i>
                 </button>
-                <button class="circle transparent" @click="addToast('File caricato', 'default', {label:'Annulla', callback:()=>addToast('Annullato', 'error')})">
+                <button class="circle transparent"
+                    @click="addToast('File caricato', 'default', {label:'Annulla', callback:()=>addToast('Annullato', 'error')})">
                     <i>image</i>
                 </button>
                 <div class="max" bis_skin_checked="1"></div>
