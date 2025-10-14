@@ -173,7 +173,7 @@
                     <!-- Filter -->
                     <div class="s12 m12 l6">
                         <div class="row right-align">
-                            <nav class="tabbed small max">
+                            <nav class="tabbed small">
                                 <a v-for="tab in tabs" :key="tab.id" :class="{ active: activeTab === tab.id }"
                                     @click="activeTab = tab.id">
                                     <i>{{ tab.icon }}</i>
@@ -192,6 +192,12 @@
                         <article class="no-padding">
                             <img class="responsive"
                                 src="https://www.impresalevratti.it/wp-content/uploads/2021/12/20211123_092730.jpeg" />
+                            <div class="absolute top left right padding top-shadow white-text">
+                                <button class="chip medium large-elevate surface">
+                                    <i class="primary-text">check_box</i>
+                                    <span>Completati</span>
+                                </button>
+                            </div>
                             <div class="padding">
                                 <h5>Cantiere {{ n }}</h5>
                                 <p>Breve descrizione del cantiere n. {{ n }}</p>
@@ -205,6 +211,7 @@
                                         </button>
                                         <button class="circle transparent">
                                             <i>download</i>
+                                            <div class="badge no-round">New</div>
                                         </button>
                                         <button class="circle transparent"
                                             @click="addToast('Cantiere ' + n + ' eliminato', 'error', {label:'Annulla', callback:()=>addToast('Annullato', 'primary')})">
