@@ -191,22 +191,35 @@
                 <div class="grid">
 
                     <!-- CARD WORKSITE -->
-                    <div class="s12 m6 l3" v-for="n in 4" :key="n">
+                    <div class="s12 m6 l4" v-for="n in 4" :key="n">
                         <article class="no-padding">
 
 
 
 
-                            <img class="responsive small" src="https://www.beercss.com/beer-and-woman.svg" />
+                            <img class="responsive small"
+                                src="https://www.impresalevratti.it/wp-content/uploads/2021/12/20211123_092730.jpeg" />
                             <div class="padding">
                                 <h5>Cantiere {{ n }}</h5>
                                 <p>Breve descrizione del cantiere n. {{ n }}</p>
                                 <nav>
-                                    <button @click="showToast('Aperto cantiere ' + n)">Apri</button>
+                                    <button @click="addToast('Aperto cantiere ' + n, 'primary')">Apri</button>
                                     <div class="max"></div>
-                                    <button class="circle transparent">
+                                    <nav>
+                                        <button class="circle transparent">
+                                            <i>share</i>
+                                        </button>
+                                        <button class="circle transparent">
+                                            <i>download</i>
+                                        </button>
+                                        <button class="circle transparent"
+                                            @click="addToast('Cantiere ' + n + ' eliminato', 'error', {label:'Annulla', callback:()=>addToast('Annullato', 'primary')})">
+                                            <i>delete</i>
+                                        </button>
+                                    </nav>
+                                    <!--<button class="circle transparent">
                                         <i>more_vert</i>
-                                    </button>
+                                    </button>-->
                                 </nav>
                             </div>
                         </article>
@@ -247,24 +260,24 @@
                     @click="addToast('File caricato', 'default', {label:'Annulla', callback:()=>addToast('Annullato', 'error')})">
                     <i>image</i>
                 </button>
-                    <button class="s circle extra">
-                        <i>phone_android</i>
-                    </button>
-                    <button class="m l border circle extra">
-                        <i>phone_android</i>
-                    </button>
-                    <button class="m circle extra">
-                        <i>tablet_android</i>
-                    </button>
-                    <button class="s l border circle extra">
-                        <i>tablet_android</i>
-                    </button>
-                    <button class="l circle extra">
-                        <i>laptop_windows</i>
-                    </button>
-                    <button class="s m border circle extra">
-                        <i>laptop_windows</i>
-                    </button>
+                <button class="s circle extra">
+                    <i>phone_android</i>
+                </button>
+                <button class="m l border circle extra">
+                    <i>phone_android</i>
+                </button>
+                <button class="m circle extra">
+                    <i>tablet_android</i>
+                </button>
+                <button class="s l border circle extra">
+                    <i>tablet_android</i>
+                </button>
+                <button class="l circle extra">
+                    <i>laptop_windows</i>
+                </button>
+                <button class="s m border circle extra">
+                    <i>laptop_windows</i>
+                </button>
                 <div class="max"></div>
                 <button class="square round extra">
                     <i>add</i>
