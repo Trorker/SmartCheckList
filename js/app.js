@@ -1,23 +1,31 @@
 import {
-    getAllSites,
-    addSite,
-    deleteItem,
-    updateSite
+  getAllSites,
+  addSite,
+  deleteItem,
+  updateSite
 } from "./db.js";
 
-const { createApp, ref, reactive, onMounted } = Vue;
+
+const { createApp, ref, reactive, computed, onMounted } = Vue;
 
 createApp({
   setup() {
     const isDark = ref(false);
     const showDialog = ref(false);
     const toast = reactive({
-        active: false,
-        text: "",
-        type: "default",
-        action: null,
-        timer: null,
-      });
+      active: false,
+      text: "",
+      type: "default",
+      action: null,
+      timer: null,
+    });
+
+    const activeTab = ref("tutti");
+    const tabs = [
+      { id: "tutti", icon: "radio_button_unchecked", label: "Tutti" },
+      { id: "completati", icon: "check_box", label: "Completati" },
+      { id: "ncompleti", icon: "indeterminate_check_box", label: "Incompleti" }
+    ];
 
     // 🔹 Tema
     onMounted(() => {
@@ -37,24 +45,24 @@ createApp({
 
     // 🔹 Toast
     function addToast(text, type = "default", action = null) {
-        // Nasconde il toast precedente se presente
-        if (toast.timer) {
-          clearTimeout(toast.timer);
-          toast.timer = null;
-        }
-  
-        // Mostra il toast
-        toast.text = text;
-        toast.type = type;
-        toast.action = action;
-        toast.active = true;
-  
-        // Imposta il timer
-        toast.timer = setTimeout(() => {
-          toast.active = false;
-          toast.timer = null;
-        }, 5000);
+      // Nasconde il toast precedente se presente
+      if (toast.timer) {
+        clearTimeout(toast.timer);
+        toast.timer = null;
       }
+
+      // Mostra il toast
+      toast.text = text;
+      toast.type = type;
+      toast.action = action;
+      toast.active = true;
+
+      // Imposta il timer
+      toast.timer = setTimeout(() => {
+        toast.active = false;
+        toast.timer = null;
+      }, 5000);
+    }
 
     // 🔹 Dialog
     function openDialog() {
@@ -69,8 +77,17 @@ createApp({
       showDialog.value = false;
       addToast("Azione confermata", "primary");
     }
+    const random = computed(() => {
+      return Math.floor(Math.random() * 100);
+    });
+
+    const Random = () => {
+      return Math.floor(Math.random() * 100);
+    };
 
     return {
+      activeTab, tabs,
+
       isDark,
       showDialog,
       toast,
@@ -78,7 +95,9 @@ createApp({
       addToast,
       openDialog,
       closeDialog,
-      confirmAction
-    };
+      confirmAction,
+      Random,
+      random
+    }
   },
 }).mount("#app");
