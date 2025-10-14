@@ -290,7 +290,7 @@
 
         <!-- DIALOG -->
         <div class="overlay blur" :class="{ active: showDialog }"></div>
-        <dialog :class="{ active: showDialog }" :open="showDialog">
+        <dialog :open="showDialog">
             <h5>Informazioni</h5>
             <div>Questa è una finestra modale gestita con Vue + BeerCSS.</div>
             <article class="medium middle-align center-align">
@@ -307,6 +307,33 @@
             <nav class="right-align no-space mt">
                 <button class="transparent link" @click="closeDialog">Chiudi</button>
                 <button class="transparent link" @click="confirmAction">Conferma</button>
+            </nav>
+        </dialog>
+
+        <div class="overlay blur"></div>
+        <dialog style="min-width: 75vw">
+            <h5>Impostazioni Verificatore</h5>
+            <div class="field label border">
+                <input placeholder="Nome verificatore">
+                <label>Nome verificatore</label>
+            </div>
+
+            <div class="field label border">
+                <input placeholder="Azienda">
+                <label>Azienda</label>
+            </div>
+
+            <div>
+                <label style="display:block; margin-bottom:4px;">Firma:</label>
+                <canvas ref="canvas" style="border:1px solid var(--outline); width:100%; height:150px;"></canvas>
+                <nav class="right-align no-space mt">
+                    <button class="transparent small">Pulisci</button>
+                </nav>
+            </div>
+
+            <nav class="right-align no-space mt">
+                <button class="transparent link">Chiudi</button>
+                <button class="primary">Salva</button>
             </nav>
         </dialog>
 
