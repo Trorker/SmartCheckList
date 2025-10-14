@@ -115,6 +115,7 @@
                 <button class="circle transparent">
                     <i>arrow_back</i>
                 </button>
+                <div class="shape loading-indicator tiny"></div>
                 <h6 class="max">Levratti</h6>
                 <button class="circle transparent" @click="openDialog">
                     <i>today</i>
@@ -130,7 +131,7 @@
         <main class="responsive">
 
             <!-- HOME -->
-            <section>
+            <section v-show="currentSection === 'home'">
 
 
                 <nav>
@@ -249,12 +250,37 @@
 
 
             </section>
+
+
             <!-- WORKSITE  -->
-            <section>
+            <section v-show="currentSection === 'worksite'">
+                <h3>Verifica Cantiere</h3>
+                <p>Dettagli del cantiere selezionato</p>
 
             </section>
+
+
             <!-- CHECK-LIST -->
-            <section>
+            <section v-show="currentSection === 'chechklist'">
+
+                <nav>
+                    <div class="center-align">
+                        <button class="circle small">
+                            <i>done</i>
+                        </button>
+                        <div class="small-margin">Previous</div>
+                    </div>
+                    <hr class="max">
+                    <div class="center-align">
+                        <button class="circle small">2</button>
+                        <div class="small-margin">Current</div>
+                    </div>
+                    <hr class="max">
+                    <div class="center-align">
+                        <button class="circle small" disabled>3</button>
+                        <div class="small-margin">Next</div>
+                    </div>
+                </nav>
 
             </section>
 
