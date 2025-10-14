@@ -21,6 +21,8 @@ createApp({
       timer: null,
     });
 
+    const currentSection = ref("home");
+
     const activeTab = ref("tutti");
     const tabs = [
       { id: "tutti", icon: "radio_button_unchecked", label: "Tutti" },
@@ -92,6 +94,7 @@ createApp({
       isDark,
       showDialog,
       toast,
+      currentSection,
       toggleTheme,
       addToast,
       openDialog,
