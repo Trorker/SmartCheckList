@@ -133,6 +133,26 @@
             <section>
 
 
+                <nav>
+                    <button class="s circle extra">
+                        <i>phone_android</i>
+                    </button>
+                    <button class="m l border circle extra">
+                        <i>phone_android</i>
+                    </button>
+                    <button class="m circle extra">
+                        <i>tablet_android</i>
+                    </button>
+                    <button class="s l border circle extra">
+                        <i>tablet_android</i>
+                    </button>
+                    <button class="l circle extra">
+                        <i>laptop_windows</i>
+                    </button>
+                    <button class="s m border circle extra">
+                        <i>laptop_windows</i>
+                    </button>
+                </nav>
                 <h3>Verifiche Ispettiva</h3>
 
                 <!-- Navigation tabbed -->
@@ -192,16 +212,14 @@
                         <article class="no-padding">
                             <img class="responsive"
                                 src="https://www.impresalevratti.it/wp-content/uploads/2021/12/20211123_092730.jpeg" />
-                            <div class="absolute top left right padding top-shadow white-text">
-                                <button class="chip medium large-elevate surface">
-                                    <i class="primary-text">check_box</i>
-                                    <span>Completati</span>
-                                </button>
-                            </div>
                             <div class="padding">
                                 <h5>Cantiere {{ n }}</h5>
                                 <p>Breve descrizione del cantiere n. {{ n }}</p>
-                                <progress value="45" max="100"></progress>
+                                <div class="row">
+                                    <label>Incompleto</label>
+                                    <progress value="45" max="100"></progress>
+                                    <label>3/<strong>8</strong></label>
+                                </div>
                                 <nav>
                                     <button @click="addToast('Aperto cantiere ' + n, 'primary')">Apri</button>
                                     <div class="max"></div>
@@ -262,24 +280,6 @@
                     @click="addToast('File caricato', 'default', {label:'Annulla', callback:()=>addToast('Annullato', 'error')})">
                     <i>image</i>
                 </button>
-                <button class="s circle extra">
-                    <i>phone_android</i>
-                </button>
-                <button class="m l border circle extra">
-                    <i>phone_android</i>
-                </button>
-                <button class="m circle extra">
-                    <i>tablet_android</i>
-                </button>
-                <button class="s l border circle extra">
-                    <i>tablet_android</i>
-                </button>
-                <button class="l circle extra">
-                    <i>laptop_windows</i>
-                </button>
-                <button class="s m border circle extra">
-                    <i>laptop_windows</i>
-                </button>
                 <div class="max"></div>
                 <button class="square round extra">
                     <i>add</i>
@@ -293,6 +293,17 @@
         <dialog :class="{ active: showDialog }" :open="showDialog">
             <h5>Informazioni</h5>
             <div>Questa è una finestra modale gestita con Vue + BeerCSS.</div>
+            <article class="medium middle-align center-align">
+                <div>
+                    <i class="extra">mail</i>
+                    <h5>You have no new messages</h5>
+                    <p>Click the button to start a conversation</p>
+                    <div class="space"></div>
+                    <nav class="center-align">
+                        <button>Send a message</button>
+                    </nav>
+                </div>
+            </article>
             <nav class="right-align no-space mt">
                 <button class="transparent link" @click="closeDialog">Chiudi</button>
                 <button class="transparent link" @click="confirmAction">Conferma</button>
