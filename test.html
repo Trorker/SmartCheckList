@@ -10,54 +10,78 @@
 
   <!-- BeerCSS -->
   <link href="https://cdn.jsdelivr.net/npm/beercss@3.12.11/dist/cdn/beer.min.css" rel="stylesheet">
-  <script type="module"
-    src="https://cdn.jsdelivr.net/npm/beercss@3.12.11/dist/cdn/beer.min.js"></script>
-  <script type="module"
-    src="https://cdn.jsdelivr.net/npm/material-dynamic-colors@1.1.2/dist/cdn/material-dynamic-colors.min.js"></script>
+  <script type="module" src="https://cdn.jsdelivr.net/npm/beercss@3.12.11/dist/cdn/beer.min.js"></script>
 
   <!-- Material Icons -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
   <!-- Vue 3 -->
-  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 
   <style>
-    body {
-      background: var(--background);
-      color: var(--on-background);
-      overflow-x: hidden;
+    :root {
+      --primary: #006e1c;
+      --on-primary: #ffffff;
+      --primary-container: #94f990;
+      --on-primary-container: #002204;
+      --background: #fcfdf6;
+      --on-background: #1a1c19;
     }
 
-    header,
-    footer {
-      box-shadow: var(--elevate1);
+    body.dark {
+      --primary: #78dc77;
+      --on-primary: #00390a;
+      --background: #1a1c19;
+      --on-background: #e2e3dd;
     }
 
-    .fab {
+    [v-cloak] {
+      display: none;
+    }
+
+    .toast-container {
       position: fixed;
+      bottom: 80px;
       right: 20px;
-      bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 9999;
+    }
+
+    .slide-fade-enter-active,
+    .slide-fade-leave-active {
+      transition: all 0.25s ease;
+    }
+
+    .slide-fade-enter-from {
+      opacity: 0;
+      transform: translateX(10px);
+    }
+
+    .slide-fade-leave-to {
+      opacity: 0;
+      transform: translateX(-10px);
     }
   </style>
 </head>
 
 <body>
-  <div id="app">
-
+  <div id="app" v-cloak>
     <!-- HEADER -->
-    <header class="fixed">
+    <header class="fixed" style="box-shadow: var(--elevate1);">
       <nav>
-        <button class="circle transparent" @click="showToast('Indietro cliccato')">
+        <button class="circle transparent" @click="goBack">
           <i>arrow_back</i>
         </button>
         <h6 class="max">Levratti</h6>
-        <button class="circle transparent" @click="showDialog = true">
+        <button class="circle transparent" @click="openDialog">
           <i>today</i>
         </button>
         <button class="circle transparent" @click="toggleTheme">
           <i>{{ isDark ? 'light_mode' : 'dark_mode' }}</i>
         </button>
-        <button class="circle transparent" @click="showToast('Altro menu...')">
+        <button class="circle transparent">
           <i>more_vert</i>
         </button>
       </nav>
@@ -65,78 +89,154 @@
 
     <!-- MAIN -->
     <main class="responsive">
-      <section>
-        <h3>Verifiche Ispettive</h3>
+      <transition name="slide-fade" mode="out-in">
 
-        <!-- esempio cards -->
-        <div class="grid">
-          <div class="s12 m6 l3" v-for="n in 4" :key="n">
-            <article class="no-padding">
-              <img class="responsive small" src="https://www.beercss.com/beer-and-woman.svg" />
-              <div class="padding">
-                <h5>Cantiere {{ n }}</h5>
-                <p>Breve descrizione del cantiere n. {{ n }}</p>
-                <nav>
-                  <button @click="showToast('Aperto cantiere ' + n)">Apri</button>
-                </nav>
-              </div>
-            </article>
+        <!-- 🏠 HOME -->
+        <section v-if="currentSection === 'home'" key="home">
+          <h3>Verifiche Ispettive</h3>
+
+          <!-- Filtri -->
+          <div class="row right-align">
+            <nav class="tabbed small">
+              <a v-for="tab in tabs" :key="tab.id" :class="{ active: activeTab === tab.id }"
+                @click="activeTab = tab.id">
+                <i>{{ tab.icon }}</i>
+                <span>{{ tab.label }}</span>
+              </a>
+            </nav>
           </div>
-        </div>
-      </section>
+
+          <!-- Cantieri -->
+          <div class="grid">
+            <div class="s12 m6 l4" v-for="c in worksites" :key="c.id">
+              <article class="no-padding">
+                <img class="responsive"
+                  src="https://www.impresalevratti.it/wp-content/uploads/2021/12/20211123_092730.jpeg" />
+                <div class="padding">
+                  <h5>{{ c.nome }}</h5>
+                  <p>{{ c.descr }}</p>
+                  <div class="row">
+                    <label>{{ c.progress < 100 ? 'Incompleto' : 'Completato' }}</label>
+                    <progress :value="c.progress" max="100"></progress>
+                    <label>{{ c.progress }}%</label>
+                  </div>
+                  <nav>
+                    <button @click="openWorksite(c)">Apri</button>
+                    <div class="max"></div>
+                    <button class="circle transparent" @click="addToast('Eliminato', 'error')">
+                      <i>delete</i>
+                    </button>
+                  </nav>
+                </div>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <!-- 🏗️ WORKSITE -->
+        <section v-else-if="currentSection === 'worksite'" key="worksite">
+          <h3>{{ selectedWorksite?.nome }}</h3>
+          <p>{{ selectedWorksite?.descr }}</p>
+          <div class="row">
+            <button class="filled" @click="openChecklist()">Compila Check List</button>
+            <button class="outline" @click="goBack()">Torna alla Home</button>
+          </div>
+        </section>
+
+        <!-- ✅ CHECKLIST -->
+        <section v-else key="checklist">
+          <h3>Checklist – {{ selectedWorksite?.nome }}</h3>
+          <nav>
+            <button class="circle small" @click="goBack()">
+              <i>arrow_back</i>
+            </button>
+            <div class="max"></div>
+            <button class="circle small" @click="addToast('Salvato!', 'primary')">
+              <i>save</i>
+            </button>
+          </nav>
+          <div class="padding">
+            <p>Qui andranno le sezioni 1–7 della checklist.</p>
+          </div>
+        </section>
+      </transition>
     </main>
 
     <!-- FOOTER -->
-    <footer class="fixed">
+    <footer class="fixed" style="box-shadow: 0 -0.125rem .125rem 0 rgb(0 0 0 / .32);">
       <nav>
-        <button class="circle transparent" @click="showToast('Controllo eseguito')">
+        <button class="circle transparent" @click="addToast('Cantiere salvato!', 'primary')">
           <i>check_box</i>
         </button>
-        <button class="circle transparent" @click="showToast('Disegna firma')">
+        <button class="circle transparent" @click="addToast('Errore durante il salvataggio', 'error')">
           <i>brush</i>
         </button>
-        <button class="circle transparent" @click="showToast('Avvia microfono')">
+        <button class="circle transparent" @click="addToast('Operazione completata')">
           <i>mic</i>
         </button>
-        <button class="circle transparent" @click="showToast('Aggiungi immagine')">
+        <button class="circle transparent"
+          @click="addToast('File caricato', 'default', {label:'Annulla', callback:()=>addToast('Annullato', 'error')})">
           <i>image</i>
         </button>
         <div class="max"></div>
-        <button class="square round extra" @click="showToast('Nuovo elemento')">
+        <button class="square round extra" @click="addToast('Nuovo cantiere', 'primary')">
           <i>add</i>
         </button>
       </nav>
     </footer>
 
     <!-- DIALOG -->
-    <dialog v-if="showDialog" open @click.self="showDialog = false">
+    <div class="overlay blur" :class="{ active: showDialog }"></div>
+    <dialog :open="showDialog" :class="{ active: showDialog }">
       <h5>Informazioni</h5>
-      <div>Questa è una finestra modale gestita da Vue + BeerCSS.</div>
+      <p>Questa è una finestra modale gestita da Vue + BeerCSS.</p>
       <nav class="right-align no-space mt">
-        <button class="transparent link" @click="showDialog = false">Chiudi</button>
+        <button class="transparent link" @click="closeDialog">Chiudi</button>
         <button class="transparent link" @click="confirmAction">Conferma</button>
       </nav>
     </dialog>
 
-    <!-- SNACKBAR -->
-    <div class="snackbar" :class="{ show: showSnackbar }">
-      <div class="max">{{ snackbarText }}</div>
+    <!-- TOASTS -->
+    <div class="toast-container">
+      <transition-group name="fade" tag="div">
+        <div v-for="t in toasts" :key="t.id" class="snackbar active" :class="t.type">
+          <div class="max">{{ t.text }}</div>
+          <a v-if="t.action" class="inverse-link" @click="t.action.callback">
+            {{ t.action.label }}
+          </a>
+        </div>
+      </transition-group>
     </div>
-
   </div>
 
-  <!-- VUE SCRIPT -->
+  <!-- Vue Script -->
   <script type="module">
-    const { createApp, ref, onMounted } = Vue;
+    const { createApp, ref, reactive, onMounted } = Vue;
 
     createApp({
       setup() {
         const isDark = ref(false);
         const showDialog = ref(false);
-        const showSnackbar = ref(false);
-        const snackbarText = ref('');
+        const currentSection = ref("home");
+        const selectedWorksite = ref(null);
 
-        // 🔹 Tema: dark/light
+        const tabs = [
+          { id: "tutti", icon: "radio_button_unchecked", label: "Tutti" },
+          { id: "completati", icon: "check_box", label: "Completati" },
+          { id: "incompleti", icon: "indeterminate_check_box", label: "Incompleti" }
+        ];
+        const activeTab = ref("tutti");
+
+        const worksites = reactive([
+          { id: 1, nome: "Mirandola ENEL", descr: "Linea BT 12kV - tratto A", progress: 70 },
+          { id: 2, nome: "Carpi - Via Fossa", descr: "Sostituzione quadro MT", progress: 40 },
+          { id: 3, nome: "Modena Nord", descr: "Manutenzione pali", progress: 100 },
+          { id: 4, nome: "Camposanto", descr: "Ispezione cabine ENEL", progress: 20 },
+        ]);
+
+        const toasts = reactive([]);
+
+        // ---- Gestione tema
         onMounted(() => {
           const saved = localStorage.getItem("theme");
           if (saved === "dark") {
@@ -149,34 +249,71 @@
           isDark.value = !isDark.value;
           document.body.classList.toggle("dark", isDark.value);
           localStorage.setItem("theme", isDark.value ? "dark" : "light");
-          showToast(isDark.value ? "Tema scuro attivato" : "Tema chiaro attivato");
+          addToast(isDark.value ? "Tema scuro attivato" : "Tema chiaro attivato", "primary");
         }
 
-        // 🔹 Snackbar / Toast
-        function showToast(text) {
-          snackbarText.value = text;
-          showSnackbar.value = true;
-          setTimeout(() => (showSnackbar.value = false), 2500);
+        // ---- Gestione sezioni
+        function goBack() {
+          if (currentSection.value === "checklist") currentSection.value = "worksite";
+          else if (currentSection.value === "worksite") currentSection.value = "home";
         }
 
-        // 🔹 Dialog
+        function openWorksite(w) {
+          selectedWorksite.value = w;
+          currentSection.value = "worksite";
+        }
+
+        function openChecklist() {
+          currentSection.value = "checklist";
+        }
+
+        // ---- Toast multipli
+        function addToast(text, type = "default", action = null) {
+          const id = Date.now();
+          if (toasts.length >= 3) toasts.shift();
+          const toast = { id, text, type, action };
+          toasts.push(toast);
+          setTimeout(() => removeToast(id), 500000);
+        }
+
+        function removeToast(id) {
+          const index = toasts.findIndex(t => t.id === id);
+          if (index !== -1) toasts.splice(index, 1);
+        }
+
+        // ---- Dialog
+        function openDialog() {
+          showDialog.value = true;
+        }
+        function closeDialog() {
+          showDialog.value = false;
+        }
         function confirmAction() {
           showDialog.value = false;
-          showToast("Azione confermata");
+          addToast("Azione confermata", "primary");
         }
 
         return {
           isDark,
           showDialog,
-          showSnackbar,
-          snackbarText,
+          currentSection,
+          selectedWorksite,
+          worksites,
+          tabs,
+          activeTab,
           toggleTheme,
-          showToast,
-          confirmAction
+          goBack,
+          openWorksite,
+          openChecklist,
+          addToast,
+          toasts,
+          openDialog,
+          closeDialog,
+          confirmAction,
         };
       },
     }).mount("#app");
   </script>
-
 </body>
+
 </html>
