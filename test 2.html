@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Check List Cantieri - Levratti</title>
+
+  <!-- BeerCSS -->
+  <link href="https://cdn.jsdelivr.net/npm/beercss@3.12.11/dist/cdn/beer.min.css" rel="stylesheet">
+  <script type="module" src="https://cdn.jsdelivr.net/npm/beercss@3.12.11/dist/cdn/beer.min.js"></script>
+
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+  <!-- Vue 3 -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+  <!-- Signature pad -->
+  <script type="module" src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+
+  <style>
+    :root { --primary:#006e1c; --background:#fcfdf6; --on-background:#1a1c19; }
+    body.dark { --primary:#78dc77; --background:#1a1c19; --on-background:#e2e3dd; }
+    [v-cloak]{display:none;}
+    main{padding:80px 1rem 120px;}
+    .toast-pos{position:fixed; right:18px; bottom:88px; z-index:9999;}
+    .toast-fade-enter-active,.toast-fade-leave-active{transition:all .25s ease}
+    .toast-fade-enter-from,.toast-fade-leave-to{opacity:0; transform:translateY(8px)}
+    .overlay-clickable.active{pointer-events:auto}
+    .photo-thumb{width:120px;height:80px;object-fit:cover;border-radius:6px;border:1px solid var(--outline)}
+    .sig-canvas{width:100%;height:140px;border:1px dashed var(--outline);touch-action:none}
+    .file-small{font-size:.85rem}
+  </style>
+</head>
+<body>
+  <div id="app" v-cloak>
+
+    <!-- Header -->
+    <header class="fixed">
+      <nav>
+        <button class="circle transparent" @click="goBack"><i>arrow_back</i></button>
+        <h6 class="max">{{ title }}</h6>
+        <button class="circle transparent" @click="openConfig"><i>settings</i></button>
+        <button class="circle transparent" @click="toggleTheme"><i>{{ isDark ? 'light_mode' : 'dark_mode' }}</i></button>
+      </nav>
+    </header>
+
+    <!-- Main SPA -->
+    <main class="responsive">
+      <transition name="slide-fade" mode="out-in">
+
+        <!-- HOME -->
+        <section v-if="view==='home'" key="home">
+          <h3>Verifiche Ispettive</h3>
+
+          <!-- controls -->
+          <div class="row">
+            <div class="field prefix round fill max">
+              <i class="front">search</i>
+              <input v-model="q" placeholder="Cerca cantiere..." @input="applyFilters" />
+            </div>
+            <div class="ml-s"></div>
+            <div>
+              <button class="primary" @click="newWorksite">+ Nuovo Cantiere</button>
+            </div>
+          </div>
+
+          <!-- tabs -->
+          <div class="row right-align">
+            <nav class="tabbed small">
+              <a v-for="t in filterTabs" :key="t.id" :class="{ active: filter===t.id }" @click="setFilter(t.id)">
+                <i>{{ t.icon }}</i><span>{{ t.label }}</span>
+              </a>
+            </nav>
+          </div>
+
+          <!-- list -->
+          <div class="grid">
+            <div class="s12 m6 l4" v-for="site in filtered" :key="site.id">
+              <article class="no-padding">
+                <img class="responsive" :src="site.cover || placeholder" />
+                <div class="padding">
+                  <h5>{{ site.name }}</h5>
+                  <p>{{ site.descr }}</p>
+                  <div class="row">
+                    <label>{{ site.status === 'completed' ? 'Completato' : 'In corso' }}</label>
+                    <progress :value="site.progress || 0" max="100"></progress>
+                    <label>{{ site.progress || 0 }}%</label>
+                  </div>
+                  <nav>
+                    <button @click="openSite(site)">Apri</button>
+                    <div class="max"></div>
+                    <button class="circle transparent" @click.stop="downloadSite(site)"><i>download</i></button>
+                    <button class="circle transparent" @click.stop="shareSite(site)"><i>share</i></button>
+                    <button class="circle transparent" @click.stop="confirmDelete(site)"><i>delete</i></button>
+                  </nav>
+                </div>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <!-- WORKSITE DETAIL -->
+        <section v-else-if="view==='worksite'" key="worksite">
+          <h3>Dettaglio Cantiere</h3>
+          <div class="card">
+            <h6>{{ current.name }}</h6>
+            <p class="small-muted">Creato: {{ formatDate(current.created) }}</p>
+            <p>{{ current.descr }}</p>
+
+            <div class="divider"></div>
+
+            <div class="row">
+              <div class="max">
+                <label>Verificatore</label>
+                <div>{{ current.verificatore || defaultVerificatore || '-' }}</div>
+                <label>Progress</label>
+                <progress :value="current.progress || 0" max="100"></progress>
+              </div>
+              <div style="width:140px">
+                <button class="fill" @click="openChecklist">Compila Checklist</button>
+                <button class="outline" @click="openConfig">Config</button>
+              </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <h6>Foto</h6>
+            <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+              <img v-for="p in photos" :src="p.data" :key="p.id" class="photo-thumb" />
+              <label class="file-small">
+                <input type="file" accept="image/*" capture="environment" @change="onPhoto" style="display:none" ref="photoInput"/>
+                <button @click="$refs.photoInput.click()">Aggiungi Foto</button>
+              </label>
+            </div>
+
+            <div class="divider"></div>
+
+            <h6>Firme</h6>
+            <div v-if="signatures.length===0" class="small-muted">Nessuna firma presente</div>
+            <div v-for="s in signatures" :key="s.id" style="margin-top:.5rem">
+              <div><strong>{{ s.role }}</strong> - {{ formatDate(s.created) }}</div>
+              <img :src="s.dataUrl" style="max-width:320px; display:block; margin-top:.25rem" />
+            </div>
+
+            <div class="divider"></div>
+            <nav class="right-align">
+              <button class="flat" @click="goHome">Chiudi</button>
+              <button class="primary" @click="markCompleted">Segna come completato</button>
+            </nav>
+          </div>
+        </section>
+
+        <!-- CHECKLIST -->
+        <section v-else-if="view==='checklist'" key="checklist">
+          <h3>Checklist - Sezione {{ checklistIndex + 1 }} / 7</h3>
+
+          <div class="card">
+            <div class="section-header" style="display:flex;align-items:center;justify-content:space-between">
+              <div>
+                <strong>{{ section.title }}</strong>
+                <div class="small-muted">{{ section.subtitle }}</div>
+              </div>
+              <div style="min-width:160px;text-align:right">
+                <progress :value="progress" max="100"></progress>
+                <div class="small-muted">{{ doneSections }} / 7 completate</div>
+              </div>
+            </div>
+
+            <div style="margin-top:.8rem">
+              <!-- questions list (simplified: one sample question per section) -->
+              <div v-for="(q, i) in section.questions" :key="q.id" class="card" style="margin-bottom:.6rem">
+                <div><strong>{{ q.id }}</strong> {{ q.text }}</div>
+                <div style="margin-top:.6rem;display:flex;gap:.5rem">
+                  <button :class="['large', answerClass(i,'C')]" @click="setAnswer(i,'C')">C</button>
+                  <button :class="['large', answerClass(i,'NC')]" @click="setAnswer(i,'NC')">NC</button>
+                  <button :class="['large', answerClass(i,'NA')]" @click="setAnswer(i,'NA')">NA</button>
+                </div>
+                <div style="margin-top:.6rem">
+                  <label>Note</label>
+                  <textarea v-model="answers[i]" rows="2"></textarea>
+                </div>
+              </div>
+
+              <div class="divider"></div>
+
+              <div>
+                <label>Foto della sezione</label>
+                <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.5rem">
+                  <img v-for="(p,idx) in sectionPhotos" :src="p.data" :key="p.id" class="photo-thumb" />
+                  <label class="file-small">
+                    <input type="file" accept="image/*" capture="environment" @change="onSectionPhoto" style="display:none" ref="sectionPhoto"/>
+                    <button @click="$refs.sectionPhoto.click()">Aggiungi Foto</button>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <nav style="display:flex;justify-content:space-between;margin-top:1rem">
+              <button class="flat" @click="prevSection" :disabled="checklistIndex===0">← Indietro</button>
+              <div>
+                <button class="flat" @click="saveSection">Salva</button>
+                <button class="primary" @click="nextSection">{{ checklistIndex===6 ? 'Fine' : 'Avanti →' }}</button>
+              </div>
+            </nav>
+
+          </div>
+        </section>
+
+      </transition>
+    </main>
+
+    <!-- Footer -->
+    <footer class="fixed">
+      <nav>
+        <button class="circle transparent" @click="saveAll"><i>save</i></button>
+        <button class="circle transparent" @click="openSignatureDialog"><i>edit</i></button>
+        <div class="max"></div>
+        <button class="square round extra" @click="newWorksite"><i>add</i></button>
+      </nav>
+    </footer>
+
+    <!-- Overlay/Dialog base -->
+    <div class="overlay blur overlay-clickable" :class="{ active: dialog.open }" @click="dialogClose"></div>
+    <dialog :class="{ active: dialog.open }" :open="dialog.open">
+      <header>
+        <h5 v-text="dialog.title"></h5>
+      </header>
+      <div v-html="dialog.content"></div>
+      <nav class="right-align no-space mt">
+        <button v-for="(a, idx) in dialog.actions" :key="idx" class="transparent link" @click="a.handler">
+          {{ a.label }}
+        </button>
+      </nav>
+    </dialog>
+
+    <!-- Config modal (separate because includes signature canvas) -->
+    <div class="overlay blur" :class="{ active: configOpen }"></div>
+    <dialog :class="{ active: configOpen }" :open="configOpen" style="min-width:80vw">
+      <header><h5>Impostazioni Verificatore</h5></header>
+      <div class="field label border">
+        <input v-model="config.verificatore" placeholder="Nome verificatore" />
+        <label>Nome verificatore</label>
+      </div>
+      <div style="margin-top:.6rem">
+        <label>Firma (salvata per default come immagine)</label>
+        <canvas ref="configSig" class="sig-canvas"></canvas>
+        <div class="row">
+          <button class="flat" @click="clearConfigSig">Pulisci</button>
+          <div class="max"></div>
+          <button class="primary" @click="saveConfig">Salva</button>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- Signature dialog (for final sign) -->
+    <div class="overlay blur" :class="{ active: sigOpen }"></div>
+    <dialog :class="{ active: sigOpen }" :open="sigOpen" style="min-width:80vw">
+      <header><h5>Firma documento</h5></header>
+      <div>
+        <label>Ruolo</label>
+        <select v-model="sigRole">
+          <option value="Verificatore">Verificatore</option>
+          <option value="Preposto">Preposto</option>
+        </select>
+        <canvas ref="sigCanvas" class="sig-canvas" style="margin-top:.5rem"></canvas>
+        <nav class="right-align no-space mt">
+          <button class="transparent link" @click="clearSig">Pulisci</button>
+          <button class="transparent link" @click="saveSig">Salva firma</button>
+        </nav>
+      </div>
+    </dialog>
+
+    <!-- Toast (single) -->
+    <div class="toast-pos">
+      <transition-group name="toast-fade" tag="div">
+        <div v-if="toast.active" :key="toast.id" class="snackbar active" :class="toast.type">
+          <div class="max">{{ toast.text }}</div>
+          <a v-if="toast.action" class="inverse-link" @click="toast.action.callback">{{ toast.action.label }}</a>
+        </div>
+      </transition-group>
+    </div>
+
+  </div>
+
+  <!-- App script -->
+  <script type="module">
+    import {
+      getAllWorksites,
+      addWorksite,
+      updateWorksite,
+      deleteWorksite,
+      addPhoto,
+      getPhotosBySite,
+      addSignature,
+      getSignaturesBySite,
+      setSetting,
+      getSetting
+    } from './js/db.js';
+
+    const { createApp, ref, reactive, computed, onMounted, nextTick } = Vue;
+    createApp({
+      setup(){
+        const view = ref('home'); // home | worksite | checklist
+        const title = ref('Levratti - Check List');
+        const isDark = ref(false);
+
+        // list & filter
+        const sites = ref([]);
+        const filtered = ref([]);
+        const q = ref('');
+        const filter = ref('all'); // all | in_progress | completed
+        const filterTabs = [
+          {id:'all', label:'Tutti', icon:'list'},
+          {id:'in_progress', label:'In corso', icon:'hourglass_top'},
+          {id:'completed', label:'Completati', icon:'check_circle'}
+        ];
+        const placeholder = 'https://www.impresalevratti.it/wp-content/uploads/2021/12/20211123_092730.jpeg';
+
+        // current site and detail
+        const current = ref(null);
+        const photos = ref([]);
+        const signatures = ref([]);
+
+        // dialog base
+        const dialog = reactive({ open:false, title:'', content:'', actions:[] });
+        function dialogOpen(title, contentHtml, actions){
+          dialog.title = title;
+          dialog.content = contentHtml;
+          dialog.actions = actions || [{ label:'Chiudi', handler: dialogClose }];
+          dialog.open = true;
+        }
+        function dialogClose(){ dialog.open = false; }
+
+        // config modal
+        const configOpen = ref(false);
+        const config = reactive({ verificatore:'', signatureDataUrl: null });
+        const configSigPad = ref(null);
+
+        // signature finalize dialog
+        const sigOpen = ref(false);
+        const sigCanvas = ref(null);
+        const sigPad = ref(null);
+        const sigRole = ref('Verificatore');
+
+        // checklist
+        const checklistIndex = ref(0);
+        // sample sections/questions - replace with full JSON if needed
+        const sections = [
+          { id:1, title:'VERIFICA PERSONALE', subtitle:'Personale presente', questions:[ {id:'1.1', text:'Il preposto è presente?'} ] },
+          { id:2, title:'FORMAZIONE', subtitle:'Formazione e addestramento', questions:[ {id:'2.1', text:'Formazione aggiornata?'} ] },
+          { id:3, title:'ALLESTIMENTO', subtitle:'Segnaletica e recinzioni', questions:[ {id:'3.1', text:'Segnaletica corretta?'} ] },
+          { id:4, title:'ORGANIZZAZIONE', subtitle:'Organizzazione dei lavori', questions:[ {id:'4.1', text:'POS disponibile?'} ] },
+          { id:5, title:'AUTOMEZZI', subtitle:'Verifica mezzi', questions:[ {id:'5.1', text:'Mezzi revisionati?'} ] },
+          { id:6, title:'SICUREZZA', subtitle:'Controllo DPI', questions:[ {id:'6.1', text:'DPI presenti?'} ] },
+          { id:7, title:'AMBIENTE', subtitle:'Protezione ambientale', questions:[ {id:'7.1', text:'Smaltimento rifiuti OK?'} ] }
+        ];
+        const answers = reactive([]); // per sezione, array of objects question->answer
+        const sectionPhotos = ref([]);
+
+        // toast single
+        const toast = reactive({ active:false, id:null, text:'', type:'default', action:null, timer:null });
+
+        // helpers: toast
+        function showToast(text, type='default', action=null){
+          if (toast.timer) { clearTimeout(toast.timer); toast.timer = null; }
+          toast.id = Date.now();
+          toast.text = text;
+          toast.type = type;
+          toast.action = action;
+          toast.active = true;
+          toast.timer = setTimeout(()=> { toast.active = false; toast.timer = null; }, 4500);
+        }
+
+        // load settings and sites
+        async function loadSettings(){
+          const v = await getSetting('verificatore');
+          if (v) config.verificatore = v;
+        }
+
+        async function loadSites(){
+          sites.value = await getAllWorksites();
+          applyFilters();
+        }
+
+        function applyFilters(){
+          const qv = q.value.trim().toLowerCase();
+          filtered.value = sites.value.filter(s=>{
+            if (filter.value==='in_progress' && s.status==='completed') return false;
+            if (filter.value==='completed' && s.status!=='completed') return false;
+            if (qv && !( (s.name||'').toLowerCase().includes(qv) || (s.descr||'').toLowerCase().includes(qv) )) return false;
+            return true;
+          });
+        }
+        function setFilter(f){ filter.value = f; applyFilters(); }
+
+        // new site
+        function newWorksite(){
+          const html = `
+            <div class="field label border"><input id="nw_name"/><label>Nome cantiere</label></div>
+            <div class="field label border"><input id="nw_descr"/><label>Descrizione</label></div>`;
+          dialogOpen('Nuovo Cantiere', html, [
+            { label:'Annulla', handler: dialogClose },
+            { label:'Salva', handler: async ()=>{
+                const name = document.getElementById('nw_name').value.trim();
+                const descr = document.getElementById('nw_descr').value.trim();
+                if (!name) { showToast('Nome obbligatorio','error'); return; }
+                const site = {
+                  name, descr,
+                  created: new Date().toISOString(),
+                  status: 'in_progress',
+                  progress: 0,
+                  checklist: Array(7).fill(false),
+                  cover: placeholder
+                };
+                await addWorksite(site);
+                await loadSites();
+                dialogClose();
+                showToast('Cantiere creato','primary');
+              } }
+          ]);
+        }
+
+        // open site detail
+        async function openSite(site){
+          current.value = site;
+          // load photos & signatures
+          photos.value = await getPhotosBySite(site.id);
+          signatures.value = await getSignaturesBySite(site.id);
+          view.value = 'worksite';
+          title.value = site.name;
+        }
+
+        // wrapper to call openSite from template
+        function openSiteWrapper(site){ openSite(site); }
+
+        // open site via click
+        async function openSiteClicked(site){ await openSite(site); }
+
+        // small helpers
+        function goBack(){
+          if (view.value==='checklist') { view.value='worksite'; title.value = current.value?.name || 'Levratti'; return; }
+          if (view.value==='worksite') { view.value='home'; title.value='Levratti'; return; }
+        }
+        function goHome(){ view.value='home'; title.value='Levratti'; }
+
+        // mark completed
+        async function markCompleted(){
+          if (!current.value) return;
+          current.value.status = 'completed';
+          current.value.progress = 100;
+          await updateWorksite(current.value);
+          await loadSites();
+          showToast('Cantiere marcato come completato','primary');
+        }
+
+        // delete confirm
+        function confirmDelete(site){
+          dialogOpen('Elimina cantiere', `<p>Eliminare cantiere <strong>${site.name}</strong>?</p>`, [
+            { label:'Annulla', handler: dialogClose },
+            { label:'Elimina', handler: async ()=>{
+                await deleteWorksite(site.id);
+                await loadSites();
+                dialogClose();
+                showToast('Cantiere eliminato','primary');
+              } }
+          ]);
+        }
+
+        // download/export JSON
+        function downloadSite(site){
+          const data = JSON.stringify(site, null, 2);
+          const blob = new Blob([data], { type:'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `${(site.name||'cantiere').replace(/\s+/g,'_')}.json`;
+          a.click();
+          URL.revokeObjectURL(url);
+          showToast('Esportato JSON','primary');
+        }
+
+        // share site via native share (if available)
+        async function shareSite(site){
+          if (navigator.share) {
+            try {
+              await navigator.share({ title: site.name, text: site.descr || '', url: location.href });
+              showToast('Condiviso','primary');
+            } catch(e){ showToast('Condivisione annullata','default'); }
+          } else {
+            downloadSite(site);
+          }
+        }
+
+        // photos in detail
+        async function onPhoto(e){
+          const f = e.target.files && e.target.files[0];
+          if (!f) return;
+          const reader = new FileReader();
+          reader.onload = async () => {
+            await addPhoto(current.value.id, reader.result);
+            photos.value = await getPhotosBySite(current.value.id);
+            showToast('Foto salvata','primary');
+          };
+          reader.readAsDataURL(f);
+        }
+
+        // checklist logic
+        //const view = ref('home');
+        //const current = ref(null);
+        // reusing current as reactive alias for current.value? keep current.value used
+        // But for template convenience bind to current
+        // checklist state
+        //const checklistIndex = ref(0);
+        function openChecklist(){
+          if (!current.value) {
+            // if called from no current, try set current from first filtered
+            current.value = filtered.value[0] || sites.value[0];
+          }
+          // prepare answers array for section
+          answers.length = 0;
+          for (let i=0;i<sections.length;i++){
+            answers[i] = {}; // map questionId->answer
+          }
+          // load section photos for first section
+          loadSectionPhotos();
+          view.value = 'checklist';
+          title.value = current.value.name + ' — Checklist';
+        }
+        const section = computed(()=> sections[checklistIndex.value]);
+        const progress = computed(()=>{
+          if (!current.value) return 0;
+          const done = (current.value.checklist || []).filter(Boolean).length;
+          return Math.round((done / sections.length) * 100);
+        });
+        const doneSections = computed(()=> (current.value && current.value.checklist) ? current.value.checklist.filter(Boolean).length : 0);
+
+        function answerClass(qidx, val){
+          return (answers[qidx] && answers[qidx].choice === val) ? 'primary' : 'outline';
+        }
+        function setAnswer(qidx, val){
+          answers[qidx].choice = val;
+        }
+        async function saveSection(){
+          // mark section complete if at least one answer
+          const hasAnswers = Object.keys(answers[checklistIndex.value] || {}).length>0;
+          current.value.checklist = current.value.checklist || Array(7).fill(false);
+          current.value.checklist[checklistIndex.value] = !!hasAnswers;
+          // update progress numeric
+          const done = current.value.checklist.filter(Boolean).length;
+          current.value.progress = Math.round((done / sections.length) * 100);
+          await updateWorksite(current.value);
+          await loadSites();
+          showToast('Sezione salvata','primary');
+        }
+        function nextSection(){
+          if (checklistIndex.value < sections.length - 1) {
+            checklistIndex.value++;
+            loadSectionPhotos();
+          } else {
+            // finish
+            showToast('Checklist completata (puoi firmare)','primary');
+          }
+        }
+        function prevSection(){ if (checklistIndex.value>0) checklistIndex.value--; }
+        async function loadSectionPhotos(){
+          // load photos for this site (we keep general photos; for per-section you would filter by meta.section)
+          if (!current.value) return;
+          sectionPhotos.value = await getPhotosBySite(current.value.id);
+        }
+        async function onSectionPhoto(e){
+          const f = e.target.files && e.target.files[0];
+          if (!f) return;
+          const reader = new FileReader();
+          reader.onload = async () => {
+            // save photo with meta.section = checklistIndex
+            await addPhoto(current.value.id, reader.result, { section: checklistIndex.value+1 });
+            sectionPhotos.value = await getPhotosBySite(current.value.id);
+            showToast('Foto sezione salvata','primary');
+          };
+          reader.readAsDataURL(f);
+        }
+
+        // signatures: open signature dialog
+        async function openSignatureDialog(){
+          sigOpen.value = true;
+          await nextTick();
+          const canvas = document.querySelector('canvas[ref="sigCanvas"]') || document.querySelector('canvas.sig-canvas');
+          const c = document.querySelector('dialog .sig-canvas') || document.querySelector('canvas.sig-canvas');
+          // prefer ref if available
+          const dom = document.querySelector('canvas[ref="sigCanvas"]') || document.querySelector('canvas.sig-canvas');
+          // create signature pad for dialog-only
+          const canvasEl = document.querySelector('dialog .sig-canvas');
+          if (canvasEl) {
+            sigPad.value = new SignaturePad(canvasEl);
+          }
+        }
+        function clearSig(){
+          if (sigPad.value) sigPad.value.clear();
+        }
+        async function saveSig(){
+          if (!sigPad.value || sigPad.value.isEmpty()) { showToast('Firma vuota','error'); return; }
+          const dataUrl = sigPad.value.toDataURL();
+          await addSignature(current.value.id, sigRole.value, dataUrl);
+          signatures.value = await getSignaturesBySite(current.value.id);
+          sigOpen.value = false;
+          showToast('Firma salvata','primary');
+        }
+
+        // config modal
+        async function openConfig(){
+          // load saved verificatore from settings
+          const v = await getSetting('verificatore');
+          if (v) config.verificatore = v;
+          configOpen.value = true;
+          await nextTick();
+          const canvasEl = document.querySelector('dialog[style*="Impostazioni"]') || document.querySelector('dialog .sig-canvas');
+          // init signature pad for config canvas (use specific selector)
+          const canvas = document.querySelector('canvas.sig-canvas');
+          if (canvas) {
+            configSigPad.value = new SignaturePad(canvas);
+            // if saved signature exists in settings, draw it
+            const savedSig = await getSetting('signature');
+            if (savedSig) {
+              const img = new Image();
+              img.onload = ()=> {
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+                ctx.drawImage(img,0,0,canvas.width,canvas.height);
+              };
+              img.src = savedSig;
+            }
+          }
+        }
+        function clearConfigSig(){ if (configSigPad.value) configSigPad.value.clear(); }
+        async function saveConfig(){
+          await setSetting('verificatore', config.verificatore);
+          if (configSigPad.value && !configSigPad.value.isEmpty()) {
+            const d = configSigPad.value.toDataURL();
+            await setSetting('signature', d);
+          }
+          configOpen.value = false;
+          showToast('Configurazione salvata','primary');
+        }
+
+        // save all (convenience)
+        async function saveAll(){
+          // push currently edited current to DB
+          if (current.value && current.value.id) await updateWorksite(current.value);
+          await loadSites();
+          showToast('Salvato','primary');
+        }
+
+        // lifecycle
+        onMounted(async ()=>{
+          const s = await getSetting('theme');
+          if (s === 'dark') { document.body.classList.add('dark'); isDark.value = true; }
+          await loadSettings();
+          await loadSites();
+        });
+
+        // expose template
+        return {
+          title,
+          view,
+          isDark,
+          toggleTheme: async ()=> {
+            isDark.value = !isDark.value;
+            document.body.classList.toggle('dark', isDark.value);
+            await setSetting('theme', isDark.value ? 'dark' : 'light');
+            showToast(isDark.value ? 'Tema scuro' : 'Tema chiaro','primary');
+          },
+
+          // search & list
+          q,
+          sites,
+          filtered,
+          placeholder,
+          filter,
+          filterTabs,
+          setFilter,
+          applyFilters,
+
+          openSite: openSiteWrapper,
+          openSiteClicked,
+          //openSiteClicked as openSiteWrapper, // both names available
+          openSite: openSiteClicked,
+          openSiteAndOpen: openSiteClicked,
+
+          // actions
+          newWorksite,
+          confirmDelete,
+          downloadSite,
+          shareSite,
+
+          // detail
+          view, current, photos, signatures,
+          openChecklist,
+          markCompleted,
+          onPhoto,
+
+          // checklist
+          checklistIndex,
+          sections,
+          section,
+          answers,
+          answerClass,
+          setAnswer,
+          saveSection,
+          nextSection,
+          prevSection,
+          sectionPhotos,
+          onSectionPhoto,
+
+          // dialog base
+          dialog, dialogOpen, dialogClose,
+
+          // config modal
+          configOpen, config, openConfig, saveConfig, clearConfigSig,
+
+          // signature dialog
+          sigOpen, openSignatureDialog, clearSig, saveSig, sigRole,
+
+          // toast
+          toast, showToast,
+
+          // misc
+          goBack, goHome, saveAll, formatDate: (s)=> new Date(s).toLocaleString()
+        };
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>
