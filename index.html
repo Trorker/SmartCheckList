@@ -131,39 +131,112 @@
 
                 <h3>Verifiche Ispettiva</h3>
 
-                <div class="snackbar primary" bis_skin_checked="1">Some text here</div>
+                <div class="grid">
+
+                    <div class="s12 m12 l4">
+                        <div class="row">
+                            <div class="field prefix round fill active max">
+                                <i class="front">search</i>
+                                <input>
+                                <menu class="min">
+                                    <li>
+                                        <div class="field large prefix">
+                                            <i class="front">arrow_back</i>
+                                            <input>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <i>history</i>
+                                        <div>Item 1</div>
+                                    </li>
+                                    <li>
+                                        <i>history</i>
+                                        <div>Item 2</div>
+                                    </li>
+                                    <li>
+                                        <i>history</i>
+                                        <div>Item 3</div>
+                                    </li>
+                                </menu>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="l l2"></div>
+
+                    <div class="s12 m12 l6">
+                        <div class="row right-align">
+                            <nav class="tabbed small max">
+                                <a class="active">
+                                    <i>info</i>
+                                    <span>Overview</span>
+                                </a>
+                                <a>
+                                    <i>style</i>
+                                    <span>Specs</span>
+                                </a>
+                                <a>
+                                    <i>design_services</i>
+                                    <span>Guidelines</span>
+                                </a>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+
+
+                <nav>
+                    <button class="s circle extra">
+                        <i>phone_android</i>
+                    </button>
+                    <button class="m l border circle extra">
+                        <i>phone_android</i>
+                    </button>
+                    <button class="m circle extra">
+                        <i>tablet_android</i>
+                    </button>
+                    <button class="s l border circle extra">
+                        <i>tablet_android</i>
+                    </button>
+                    <button class="l circle extra">
+                        <i>laptop_windows</i>
+                    </button>
+                    <button class="s m border circle extra">
+                        <i>laptop_windows</i>
+                    </button>
+                </nav>
 
                 <!-- Navigation tabbed -->
                 <div class="row">
 
-                    <div class="field prefix round fill active" bis_skin_checked="1">
+                    <div class="field prefix round fill active">
                         <i class="front">search</i>
                         <input>
                         <menu class="min">
                             <li>
-                                <div class="field small prefix" bis_skin_checked="1">
+                                <div class="field small prefix">
                                     <i class="front">arrow_back</i>
                                     <input>
                                 </div>
                             </li>
                             <li>
                                 <i>history</i>
-                                <div bis_skin_checked="1">Item 1</div>
+                                <div>Item 1</div>
                             </li>
                             <li>
                                 <i>history</i>
-                                <div bis_skin_checked="1">Item 2</div>
+                                <div>Item 2</div>
                             </li>
                             <li>
                                 <i>history</i>
-                                <div bis_skin_checked="1">Item 3</div>
+                                <div>Item 3</div>
                             </li>
                         </menu>
                     </div>
 
-                    <div class="max" bis_skin_checked="1"></div>
+                    <div class="max"></div>
 
-                    <div bis_skin_checked="1">
+                    <div>
                         <nav class="tabbed small">
                             <a class="active">
                                 <i>info</i>
@@ -182,7 +255,7 @@
                 </div>
 
 
-                <div class="grid" bis_skin_checked="1">
+                <div class="grid">
 
                     <!-- CARD WORKSITE -->
                     <div class="s12 m6 l3" v-for="n in 4" :key="n">
@@ -197,7 +270,7 @@
                                 <p>Breve descrizione del cantiere n. {{ n }}</p>
                                 <nav>
                                     <button @click="showToast('Aperto cantiere ' + n)">Apri</button>
-                                    <div class="max" bis_skin_checked="1"></div>
+                                    <div class="max"></div>
                                     <button class="circle transparent">
                                         <i>more_vert</i>
                                     </button>
@@ -241,7 +314,7 @@
                     @click="addToast('File caricato', 'default', {label:'Annulla', callback:()=>addToast('Annullato', 'error')})">
                     <i>image</i>
                 </button>
-                <div class="max" bis_skin_checked="1"></div>
+                <div class="max"></div>
                 <button class="square round extra">
                     <i>add</i>
                 </button>
