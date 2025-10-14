@@ -99,11 +99,15 @@
             --surface-container-high: #282b27;
             --surface-container-highest: #333531;
         }
+
+        [v-cloak] {
+            display: none;
+        }
     </style>
 </head>
 
 <body>
-    <div id="app">
+    <div id="app" v-cloak>
 
 
         <header class="fixed" style="box-shadow: var(--elevate1);">
@@ -170,17 +174,10 @@
                     <div class="s12 m12 l6">
                         <div class="row right-align">
                             <nav class="tabbed small max">
-                                <a class="active">
-                                    <i>info</i>
-                                    <span>Overview</span>
-                                </a>
-                                <a>
-                                    <i>style</i>
-                                    <span>Specs</span>
-                                </a>
-                                <a>
-                                    <i>design_services</i>
-                                    <span>Guidelines</span>
+                                <a v-for="tab in tabs" :key="tab.id" :class="{ active: activeTab === tab.id }"
+                                    @click="activeTab = tab.id">
+                                    <i>{{ tab.icon }}</i>
+                                    <span>{{ tab.label }}</span>
                                 </a>
                             </nav>
                         </div>
@@ -193,15 +190,12 @@
                     <!-- CARD WORKSITE -->
                     <div class="s12 m6 l4" v-for="n in 4" :key="n">
                         <article class="no-padding">
-
-
-
-
-                            <img class="responsive small"
+                            <img class="responsive"
                                 src="https://www.impresalevratti.it/wp-content/uploads/2021/12/20211123_092730.jpeg" />
                             <div class="padding">
                                 <h5>Cantiere {{ n }}</h5>
                                 <p>Breve descrizione del cantiere n. {{ n }}</p>
+                                <progress value="45" max="100"></progress>
                                 <nav>
                                     <button @click="addToast('Aperto cantiere ' + n, 'primary')">Apri</button>
                                     <div class="max"></div>
@@ -221,6 +215,7 @@
                                         <i>more_vert</i>
                                     </button>-->
                                 </nav>
+
                             </div>
                         </article>
                     </div>
@@ -309,6 +304,7 @@
     </div>
 
     <script type="module" src="./js/app.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
 </body>
 
 </html>
