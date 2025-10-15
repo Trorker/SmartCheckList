@@ -139,7 +139,7 @@
                 <button class="circle transparent" @click="toggleTheme">
                     <i>{{ isDark ? 'light_mode' : 'dark_mode' }}</i>
                 </button>
-                <button class="circle transparent" @click="openDialog('info')">
+                <button class="circle transparent" @click="openDialog">
                     <i>settings</i>
                 </button>
             </nav>
@@ -379,10 +379,9 @@
 
 
 
-        <footer v-if="currentSection === 'home'" class="fixed"
-            style="box-shadow: 0 -0.125rem .125rem 0 rgb(0 0 0 / .32);">
+        <footer v-if="currentSection === 'home'" class="transparent right-align fixed">
             <nav>
-                <button class="circle transparent" @click="addToast('Cantiere salvato!', 'primary')">
+                <!--<button class="circle transparent" @click="addToast('Cantiere salvato!', 'primary')">
                     <i>check_box</i>
                 </button>
                 <button class="circle transparent" @click="addToast('Errore durante il salvataggio', 'error')">
@@ -395,14 +394,14 @@
                     @click="addToast('File caricato', 'default', {label:'Annulla', callback:()=>addToast('Annullato', 'error')})">
                     <i>image</i>
                 </button>
-                <div class="max"></div>
-                <button class="square round extra">
+                <div class="max"></div>-->
+                <button class="square round extra" @click="openDialog">
                     <i>add</i>
                 </button>
             </nav>
         </footer>
 
-        <footer v-if="currentSection === 'worksite'" class="fixed">
+        <footer v-if="currentSection === 'worksite'" class="transparent center-align fixed">
             <div class="raw center-align">
                 <nav class="toolbar secondary-container large-elevate">
                     <button class="circle transparent" @click="goBack">
@@ -415,14 +414,14 @@
                         <i>attach_file</i>
                         <input type="file">
                     </button>
-                    <button class="circle transparent" @click="openDialog('info')">
+                    <button class="circle transparent" @click="openDialog">
                         <i>signature</i>
                     </button>
                 </nav>
             </div>
         </footer>
 
-        <footer v-if="currentSection === 'checklist'" class="fixed">
+        <footer v-if="currentSection === 'checklist'" class="transparent center-align fixed">
             <div class="raw center-align">
                 <nav class="toolbar secondary-container large-elevate">
                     <button class="circle transparent" @click="goBack">
