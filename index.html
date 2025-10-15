@@ -139,7 +139,7 @@
                 <button class="circle transparent" @click="toggleTheme">
                     <i>{{ isDark ? 'light_mode' : 'dark_mode' }}</i>
                 </button>
-                <button class="circle transparent" @click="openDialog">
+                <button class="circle transparent" @click="openDialog('info')">
                     <i>settings</i>
                 </button>
             </nav>
@@ -415,7 +415,7 @@
                         <i>attach_file</i>
                         <input type="file">
                     </button>
-                    <button class="circle transparent" @click="openDialog">
+                    <button class="circle transparent" @click="openDialog('info')">
                         <i>signature</i>
                     </button>
                 </nav>
@@ -440,8 +440,10 @@
         </footer>
 
 
+
+
         <!-- DIALOG -->
-        <div class="overlay blur" :class="{ active: showDialog }"></div>
+        <<div class="overlay blur" :class="{ active: showDialog }"></div>
         <dialog :open="showDialog">
             <h5>Informazioni</h5>
             <div>Questa è una finestra modale gestita con Vue + BeerCSS.</div>
