@@ -307,340 +307,82 @@
                             <div class="small-margin">Next</div>
                         </div>
                     </nav>
-                    <section>
+                    <div class="page padding active right">
+                        <h5>2– VERIFICA FORMAZIONE PERSONALE DI CANTIERE</h5>
+                        <article>
+                            <ul class="list border">
 
-                    </section>
-                    <div>
-                        <div class="tabs">
-                            <a class="active vertical">
-                                <i>home</i>
-                                <span>Tab 1</span>
-                            </a>
-                            <a class="vertical">
-                                <i>home</i>
-                                <span>Tab 2</span>
-                            </a>
-                            <a class="vertical">
-                                <i>home</i>
-                                <span>Tab 3</span>
-                            </a>
-                            <a class="vertical">
-                                <i>home</i>
-                                <span>Tab 4</span>
-                            </a>
-                            <a class="vertical">
-                                <i>home</i>
-                                <span>Tab 5</span>
-                            </a>
-                            <a class="vertical">
-                                <i>home</i>
-                                <span>Tab 6</span>
-                            </a>
-                            <a class="vertical">
-                                <i>home</i>
-                                <span>Tab 7</span>
-                            </a>
-                            <a class="vertical">
-                                <i>home</i>
-                                <span>Tab 8</span>
-                            </a>
-                            <a class="vertical">
-                                <i>home</i>
-                                <span>Tab 9</span>
-                            </a>
-                            <a class="vertical">
-                                <i>home</i>
-                                <span>Tab 10</span>
-                            </a>
-                        </div>
-                        <div class="page padding active right">
-                            <h5>2– VERIFICA FORMAZIONE PERSONALE DI CANTIERE</h5>
-                            <article>
-                                <ul class="list border">
-                                    <li>
-                                        <i>school</i>
-                                        <div class="max">
-                                            <h6 class="small text-wrap">Il preposto ai lavori nel cantiere è individuato e, per i
-                                                lavori elettrici, in possesso di attestazione PES</h6>
+                                <li v-for="(item, index) in checklist" :key="index">
+                                    <div class="grid">
+                                        <div class="s12 m9 l10">
+                                            <div class="row"> <i>{{ item.icon }}</i>
+                                                <h6 class="max small text-wrap">{{ item.text }}</h6>
+                                            </div>
                                         </div>
 
-                                        <div class="center-align">
-                                            <h6 class="small">C</h6>
-                                            <label class="radio icon">
-                                                <input type="radio" name="radio1_">
-                                                <span>
-                                                    <i>circle</i>
-                                                    <i>check_circle</i>
-                                                </span>
-                                            </label>
+                                        <div class="row s12 m3 l2 right-align">
+                                            <div class="center-align">
+                                                <h6 class="small">C</h6>
+                                                <label class="radio icon">
+                                                    <input type="radio" :name="'radio_' + index" v-model="item.value"
+                                                        value="C">
+                                                    <span>
+                                                        <i>circle</i>
+                                                        <i>check_circle</i>
+                                                    </span>
+                                                </label>
+                                            </div>
+
+                                            <div class="center-align">
+                                                <h6 class="small">N.C.</h6>
+                                                <label class="radio icon">
+                                                    <input type="radio" :name="'radio_' + index" v-model="item.value"
+                                                        value="N.C.">
+                                                    <span>
+                                                        <i>circle</i>
+                                                        <i class="error">error</i>
+                                                    </span>
+                                                </label>
+                                            </div>
+
+                                            <div class="center-align">
+                                                <h6 class="small">N.A.</h6>
+                                                <label class="radio icon">
+                                                    <input type="radio" :name="'radio_' + index" v-model="item.value"
+                                                        value="N.A.">
+                                                    <span>
+                                                        <i>circle</i>
+                                                        <i>do_not_disturb_on</i>
+                                                    </span>
+                                                </label>
+                                            </div>
                                         </div>
+                                    </div>
+                                </li>
 
-                                        <div class="center-align">
-                                            <h6 class="small">N.C.</h6>
-                                            <label class="radio icon">
-                                                <input type="radio" name="radio1_">
-                                                <span>
-                                                    <i>circle</i>
-                                                    <i class="error">error</i>
-                                                </span>
-                                            </label>
-                                        </div>
+                            </ul>
+                            <div class="field textarea label border round extra">
+                                <textarea></textarea>
+                                <label>Note:</label>
+                            </div>
+                        </article>
+                        <pre>{{ checklist }}</pre>
 
-                                        <div class="center-align">
-                                            <h6 class="small">N.A.</h6>
-                                            <label class="radio icon">
-                                                <input type="radio" name="radio1_">
-                                                <span>
-                                                    <i>circle</i>
-                                                    <i>do_not_disturb_on</i>
-                                                </span>
-                                            </label>
-                                        </div>
-
-                                    </li>
-
-                                    <li>
-                                        <i>school</i>
-                                        <div class="max">
-                                            <h6 class="small text-wrap">Il personale presente ha i profili Enel adeguati
-                                                all’attività che sta svolgendo o che andrà a svolgere</h6>
-                                        </div>
-
-                                        <div class="center-align">
-                                            <h6 class="small">C</h6>
-                                            <label class="radio icon">
-                                                <input type="radio" name="radio1_">
-                                                <span>
-                                                    <i>circle</i>
-                                                    <i>check_circle</i>
-                                                </span>
-                                            </label>
-                                        </div>
-
-                                        <div class="center-align">
-                                            <h6 class="small">N.C.</h6>
-                                            <label class="radio icon">
-                                                <input type="radio" name="radio1_">
-                                                <span>
-                                                    <i>circle</i>
-                                                    <i class="error">error</i>
-                                                </span>
-                                            </label>
-                                        </div>
-
-                                        <div class="center-align">
-                                            <h6 class="small">N.A.</h6>
-                                            <label class="radio icon">
-                                                <input type="radio" name="radio1_">
-                                                <span>
-                                                    <i>circle</i>
-                                                    <i>do_not_disturb_on</i>
-                                                </span>
-                                            </label>
-                                        </div>
-
-                                    </li>
-
-                                    <li>
-                                        <i>school</i>
-                                        <div class="max">
-                                            <h6 class="small text-wrap">In caso di lavori sotto tensione in BT, il personale è in
-                                                possesso dell’idoneità a svolgere tali lavori rilasciata dal datore di
-                                                lavoro</h6>
-                                        </div>
-
-                                        <div class="center-align">
-                                            <h6 class="small">C</h6>
-                                            <label class="radio icon">
-                                                <input type="radio" name="radio1_">
-                                                <span>
-                                                    <i>circle</i>
-                                                    <i>check_circle</i>
-                                                </span>
-                                            </label>
-                                        </div>
-
-                                        <div class="center-align">
-                                            <h6 class="small">N.C.</h6>
-                                            <label class="radio icon">
-                                                <input type="radio" name="radio1_">
-                                                <span>
-                                                    <i>circle</i>
-                                                    <i class="error">error</i>
-                                                </span>
-                                            </label>
-                                        </div>
-
-                                        <div class="center-align">
-                                            <h6 class="small">N.A.</h6>
-                                            <label class="radio icon">
-                                                <input type="radio" name="radio1_">
-                                                <span>
-                                                    <i>circle</i>
-                                                    <i>do_not_disturb_on</i>
-                                                </span>
-                                            </label>
-                                        </div>
-
-                                    </li>
-
-                                    <li>
-                                        <i>school</i>
-                                        <div class="max">
-                                            <h6 class="small text-wrap">Il personale presente ha la formazione adeguata per la
-                                                gestione emergenze (primo soccorso, prevenzione incendi, ecc.)</h6>
-                                        </div>
-
-                                        <div class="center-align">
-                                            <h6 class="small">C</h6>
-                                            <label class="radio icon">
-                                                <input type="radio" name="radio1_">
-                                                <span>
-                                                    <i>circle</i>
-                                                    <i>check_circle</i>
-                                                </span>
-                                            </label>
-                                        </div>
-
-                                        <div class="center-align">
-                                            <h6 class="small">N.C.</h6>
-                                            <label class="radio icon">
-                                                <input type="radio" name="radio1_">
-                                                <span>
-                                                    <i>circle</i>
-                                                    <i class="error">error</i>
-                                                </span>
-                                            </label>
-                                        </div>
-
-                                        <div class="center-align">
-                                            <h6 class="small">N.A.</h6>
-                                            <label class="radio icon">
-                                                <input type="radio" name="radio1_">
-                                                <span>
-                                                    <i>circle</i>
-                                                    <i>do_not_disturb_on</i>
-                                                </span>
-                                            </label>
-                                        </div>
-
-                                    </li>
-
-                                    <li>
-                                        <i>school</i>
-                                        <div class="max">
-                                            <h6 class="small text-wrap">Il personale presente ha la formazione adeguata
-                                                all’utilizzo delle macchine e attrezzatura (PLE, gru su autocarro,
-                                                escavatori, ecc.)</h6>
-                                        </div>
-
-                                        <div class="center-align">
-                                            <h6 class="small">C</h6>
-                                            <label class="radio icon">
-                                                <input type="radio" name="radio1_">
-                                                <span>
-                                                    <i>circle</i>
-                                                    <i>check_circle</i>
-                                                </span>
-                                            </label>
-                                        </div>
-
-                                        <div class="center-align">
-                                            <h6 class="small">N.C.</h6>
-                                            <label class="radio icon">
-                                                <input type="radio" name="radio1_">
-                                                <span>
-                                                    <i>circle</i>
-                                                    <i class="error">error</i>
-                                                </span>
-                                            </label>
-                                        </div>
-
-                                        <div class="center-align">
-                                            <h6 class="small">N.A.</h6>
-                                            <label class="radio icon">
-                                                <input type="radio" name="radio1_">
-                                                <span>
-                                                    <i>circle</i>
-                                                    <i>do_not_disturb_on</i>
-                                                </span>
-                                            </label>
-                                        </div>
-
-                                    </li>
-
-                                    <li>
-                                        <i>school</i>
-                                        <div class="max">
-                                            <h6 class="small text-wrap">Il personale presente ha la formazione adeguata per
-                                                addetti e preposti alle attività di pianificazione, controllo e
-                                                apposizione della
-                                                segnaletica stradale destinata alle attività lavorative che si svolgano
-                                                in presenza di traffico veicolare</h6>
-                                        </div>
-
-                                        <div class="center-align">
-                                            <h6 class="small">C</h6>
-                                            <label class="radio icon">
-                                                <input type="radio" name="radio1_">
-                                                <span>
-                                                    <i>circle</i>
-                                                    <i>check_circle</i>
-                                                </span>
-                                            </label>
-                                        </div>
-
-                                        <div class="center-align">
-                                            <h6 class="small">N.C.</h6>
-                                            <label class="radio icon">
-                                                <input type="radio" name="radio1_">
-                                                <span>
-                                                    <i>circle</i>
-                                                    <i class="error">error</i>
-                                                </span>
-                                            </label>
-                                        </div>
-
-                                        <div class="center-align">
-                                            <h6 class="small">N.A.</h6>
-                                            <label class="radio icon">
-                                                <input type="radio" name="radio1_">
-                                                <span>
-                                                    <i>circle</i>
-                                                    <i>do_not_disturb_on</i>
-                                                </span>
-                                            </label>
-                                        </div>
-
-                                    </li>
-
-
-                                </ul>
-                                <div class="field textarea label border round extra">
-                                    <textarea></textarea>
-                                    <label>Note:</label>
-                                </div>
-                            </article>
-
-                        </div>
-                        <div class="page padding right">
-                            <h5>Tab 2</h5>
-                        </div>
-                        <div class="page padding right">
-                            <h5>Tab 3</h5>
-                        </div>
+                    </div>
+                    <div class="page padding right">
+                        <h5>Tab 2</h5>
+                    </div>
+                    <div class="page padding right">
+                        <h5>Tab 3</h5>
                     </div>
 
                 </section>
-
-
             </transition>
         </main>
 
 
 
-        <!--<footer class="responsive|fixed">..</footer>-->
-        <footer v-show="currentSection === 'home'" class="fixed"
+        <footer v-if="currentSection === 'home'" class="fixed"
             style="box-shadow: 0 -0.125rem .125rem 0 rgb(0 0 0 / .32);">
             <nav>
                 <button class="circle transparent" @click="addToast('Cantiere salvato!', 'primary')">
@@ -663,8 +405,7 @@
             </nav>
         </footer>
 
-        <!--<footer class="responsive|fixed">..</footer>-->
-        <footer v-show="currentSection === 'worksite'" class="fixed">
+        <footer v-if="currentSection === 'worksite'" class="fixed">
             <div class="raw center-align">
                 <nav class="toolbar secondary-container large-elevate">
                     <button class="circle transparent" @click="goBack">
@@ -680,8 +421,7 @@
             </div>
         </footer>
 
-                <!--<footer class="responsive|fixed">..</footer>-->
-        <footer v-show="currentSection === 'checklist'" class="fixed">
+        <footer v-if="currentSection === 'checklist'" class="fixed">
             <div class="raw center-align">
                 <nav class="toolbar secondary-container large-elevate">
                     <button class="circle transparent" @click="goBack">
