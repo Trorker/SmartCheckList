@@ -56,12 +56,6 @@ createApp({
     }
 
     //test checklist
-    // 🔹 Opzioni radio generiche
-    const options = [
-      { label: "C", value: "C", icon: "✅", iconClass: "active" },
-      { label: "N.C.", value: "NC", icon: "❌", iconClass: "error" },
-      { label: "N.A.", value: "NA", icon: "🚫", iconClass: "" }
-    ]
     const checklist = ref([
       { icon: "engineering", text: "Il preposto ai lavori nel cantiere è individuato e, per i lavori elettrici, in possesso di attestazione PES", value: null },
       { icon: "recent_actors", text: "Il personale presente ha i profili Enel adeguati all’attività che sta svolgendo o che andrà a svolgere", value: null },
