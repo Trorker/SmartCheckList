@@ -42,6 +42,25 @@ createApp({
 
 
 
+    //test checklist
+    // 🔹 Opzioni radio generiche
+    const options = [
+      { label: "C", value: "C", icon: "✅", iconClass: "active" },
+      { label: "N.C.", value: "NC", icon: "❌", iconClass: "error" },
+      { label: "N.A.", value: "NA", icon: "🚫", iconClass: "" }
+    ]
+    const checklist = ref([
+      { icon: "🏗️", text: "Il preposto ai lavori nel cantiere è individuato e, per i lavori elettrici, in possesso di attestazione PES", value: null },
+      { icon: "⚡", text: "Il personale presente ha i profili Enel adeguati all’attività che sta svolgendo o che andrà a svolgere", value: null },
+      { icon: "🧯", text: "In caso di lavori sotto tensione in BT, il personale è in possesso dell’idoneità a svolgere tali lavori rilasciata dal datore di lavoro", value: null },
+      { icon: "🧯", text: "Il personale presente ha la formazione adeguata per la gestione emergenze (primo soccorso, prevenzione incendi, ecc.)", value: null },
+      { icon: "🏗️", text: "Il personale presente ha la formazione adeguata all’utilizzo delle macchine e attrezzatura (PLE, gru su autocarro, escavatori, ecc.)", value: null },
+      { icon: "🚧", text: "Il personale presente ha la formazione adeguata per addetti e preposti alle attività di pianificazione, controllo e apposizione della segnaletica stradale destinata alle attività lavorative che si svolgano in presenza di traffico veicolare", value: null }
+    ])
+
+
+
+
     // ---- Gestione sezioni
     function goBack() {
       if (currentSection.value === "checklist") currentSection.value = "worksite";
@@ -124,6 +143,7 @@ createApp({
       currentSection,
       selectedWorksite,
       worksites,
+      checklist,
       toggleTheme,
       addToast,
       openDialog,
