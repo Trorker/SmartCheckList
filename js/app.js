@@ -5,8 +5,6 @@ import {
   updateSite
 } from "../archive/db.js";
 
-
-
 const { createApp, ref, reactive, computed, onMounted } = Vue;
 
 createApp({
@@ -40,7 +38,22 @@ createApp({
     ]);
 
 
+    const cantiere = ref(null);
+    const loading = ref(true);
 
+    // Carica il JSON del tipo cantiere
+    async function loadCantiere() {
+      try {
+        const res = await fetch("./cantiere.json");
+        if (!res.ok) throw new Error("Impossibile caricare il file JSON");
+        cantiere.value = await res.json();
+        console.log("✅ Cantiere caricato:", cantiere.value);
+      } catch (err) {
+        alert("Errore: " + err.message);
+      } finally {
+        loading.value = false;
+      }
+    }
 
     //test checklist
     // 🔹 Opzioni radio generiche
@@ -57,9 +70,6 @@ createApp({
       { icon: "precision_manufacturing", text: "Il personale presente ha la formazione adeguata all’utilizzo delle macchine e attrezzatura (PLE, gru su autocarro, escavatori, ecc.)", value: null },
       { icon: "signpost", text: "Il personale presente ha la formazione adeguata per addetti e preposti alle attività di pianificazione, controllo e apposizione della segnaletica stradale destinata alle attività lavorative che si svolgano in presenza di traffico veicolare", value: null }
     ])
-
-
-
 
     // ---- Gestione sezioni
     function goBack() {
@@ -83,6 +93,8 @@ createApp({
         isDark.value = true;
         document.body.classList.add("dark");
       }
+
+      loadCantiere
     });
 
     function toggleTheme() {
