@@ -94,7 +94,7 @@ createApp({
         document.body.classList.add("dark");
       }
 
-      loadCantiere
+      loadCantiere();
     });
 
     function toggleTheme() {
