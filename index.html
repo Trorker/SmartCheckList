@@ -276,11 +276,11 @@
 
                 <!-- 🏗️ WORKSITE -->
                 <section v-else-if="currentSection === 'worksite'" key="worksite">
-                    <h3>{{ selectedWorksite?.nome }}</h3>
-                    <p>{{ selectedWorksite?.descr }}</p>
-                    <div class="row">
-                        <button class="filled" @click="openChecklist()">Compila Check List</button>
-                    </div>
+
+                    <article>
+                        <h3>{{ selectedWorksite?.nome }}</h3>
+                        <p>{{ selectedWorksite?.descr }}</p>
+                    </article>
 
 
                 </section>
@@ -366,6 +366,7 @@
                                 <label>Note:</label>
                             </div>
                         </article>
+
                         <pre>{{ checklist }}</pre>
 
                     </div>
