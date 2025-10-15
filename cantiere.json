@@ -1,6 +1,8 @@
 {
   "id": "CANT001",
   "data": "2025-10-15",
+  "progress": 50,
+  "version": "1.0",
   "luogo": {
     "comune": "",
     "provincia": "",
