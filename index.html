@@ -131,7 +131,7 @@
 
         <header class="fixed" style="box-shadow: var(--elevate1);">
             <nav>
-                <button class="circle transparent" @click="goBack">
+                <button class="circle transparent" @click="goBack" v-if="currentSection !== 'home'">
                     <i>arrow_back</i>
                 </button>
                 <div class="shape loading-indicator tiny"></div>
