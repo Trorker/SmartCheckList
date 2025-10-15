@@ -21,7 +21,9 @@ createApp({
       timer: null,
     });
 
-    const currentSection = ref("home");
+    const currentSection = ref("home"); // home | worksite | checklist
+    const selectedWorksite = ref(null);
+
 
     const activeTab = ref("tutti");
     const tabs = [
@@ -36,6 +38,24 @@ createApp({
       { id: 3, nome: "Modena Nord", descr: "Manutenzione pali", progress: 100 },
       { id: 4, nome: "Camposanto", descr: "Ispezione cabine ENEL", progress: 20 },
     ]);
+
+
+
+
+    // ---- Gestione sezioni
+    function goBack() {
+      if (currentSection.value === "checklist") currentSection.value = "worksite";
+      else if (currentSection.value === "worksite") currentSection.value = "home";
+    }
+
+    function openWorksite(w) {
+      selectedWorksite.value = w;
+      currentSection.value = "worksite";
+    }
+
+    function openChecklist() {
+      currentSection.value = "checklist";
+    }
 
     // 🔹 Tema
     onMounted(() => {
@@ -102,12 +122,16 @@ createApp({
       showDialog,
       toast,
       currentSection,
+      selectedWorksite,
       worksites,
       toggleTheme,
       addToast,
       openDialog,
       closeDialog,
       confirmAction,
+      goBack,
+      openWorksite,
+      openChecklist,
       Random,
       random
     }
