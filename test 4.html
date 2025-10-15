@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Check List Cantieri - Levratti</title>
+
+<!-- BeerCSS -->
+<link href="https://cdn.jsdelivr.net/npm/beercss@3.12.11/dist/cdn/beer.min.css" rel="stylesheet">
+<script type="module" src="https://cdn.jsdelivr.net/npm/beercss@3.12.11/dist/cdn/beer.min.js"></script>
+
+<!-- Material Icons -->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+<!-- Vue 3 -->
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+<!-- SignaturePad -->
+<script type="module" src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+
+<style>
+  :root{
+    --primary:#006e1c;
+    --background:#fbfdf6;
+    --on-background:#1a1c19;
+  }
+  body.dark{ --primary:#78dc77; --background:#121411; --on-background:#e2e3dd; }
+  body{ background:var(--background); color:var(--on-background); }
+  [v-cloak]{display:none;}
+  .sig-canvas{ width:100%; height:150px; border:1px dashed var(--outline); touch-action:none; }
+</style>
+</head>
+<body>
+<div id="app" v-cloak>
+
+  <header class="fixed">
+    <nav>
+      <h6>Firma Cantieri</h6>
+    </nav>
+  </header>
+
+  <main style="padding:5rem 1rem 1rem;">
+    <button class="primary" @click="openSignatureDialog('Verificatore')">Firma Verificatore</button>
+    <button class="primary" @click="openSignatureDialog('Preposto')">Firma Preposto</button>
+
+    <div style="margin-top:1rem;">
+      <h5>Firme salvate:</h5>
+      <div v-for="s in signatures" :key="s.id" style="margin-top:.5rem;">
+        <strong>{{ s.role }}</strong> — <small>{{ formatDate(s.created) }}</small><br/>
+        <img :src="s.dataUrl" style="max-width:300px; border:1px solid #ccc; margin-top:.25rem;">
+      </div>
+    </div>
+  </main>
+
+  <!-- Signature dialog -->
+  <div class="overlay" :class="{active: sigOpen }" @click="closeSigDlg"></div>
+  <dialog :class="{active: sigOpen}" :open="sigOpen" style="padding:1rem; max-width:500px; width:90%;">
+    <header><h5>Firma — {{ sigRole }}</h5></header>
+    <div style="margin-top:.5rem;">
+      <canvas ref="signCanvas" class="sig-canvas"></canvas>
+      <nav class="right-align" style="margin-top:.5rem;">
+        <button class="transparent link" @click="sigClear">Pulisci</button>
+        <button class="primary" @click="sigSave">Salva firma</button>
+      </nav>
+    </div>
+  </dialog>
+
+</div>
+
+<script type="module">
+const { createApp, ref, reactive, onMounted, nextTick } = Vue;
+
+createApp({
+  setup(){
+    const sigOpen = ref(false);
+    const sigRole = ref('Verificatore');
+    const sigPad = ref(null);
+    const signatures = ref([]);
+
+    // IndexedDB helper
+    const DB_NAME = 'levratti_checklist_db';
+    const DB_VER = 1;
+
+    function openDB(){
+      return new Promise((res, rej) => {
+        const r = indexedDB.open(DB_NAME, DB_VER);
+        r.onupgradeneeded = e => {
+          const db = e.target.result;
+          if(!db.objectStoreNames.contains('signatures')){
+            db.createObjectStore('signatures',{keyPath:'id',autoIncrement:true});
+          }
+        };
+        r.onsuccess = ()=> res(r.result);
+        r.onerror = e => rej(e.target.error);
+      });
+    }
+
+    async function addSignature(sig){
+      const db = await openDB();
+      return new Promise((res,rej)=>{
+        const tx = db.transaction('signatures','readwrite');
+        const store = tx.objectStore('signatures');
+        const req = store.add(sig);
+        req.onsuccess = ()=> res(req.result);
+        req.onerror = e => rej(e.target.error);
+      });
+    }
+
+    async function loadSignatures(){
+      const db = await openDB();
+      return new Promise((res,rej)=>{
+        const tx = db.transaction('signatures','readonly');
+        const store = tx.objectStore('signatures');
+        const req = store.getAll();
+        req.onsuccess = ()=> { signatures.value = req.result; res(req.result); };
+        req.onerror = e=>rej(e.target.error);
+      });
+    }
+
+    function openSignatureDialog(role){
+      sigRole.value = role;
+      sigOpen.value = true;
+      nextTick(()=> initSigPad());
+    }
+
+    function initSigPad(){
+      const canvas = document.querySelector('canvas.sig-canvas');
+      if(!canvas) return;
+      // resize canvas for device pixel ratio
+      const ratio = Math.max(window.devicePixelRatio || 1, 1);
+      canvas.width = canvas.offsetWidth * ratio;
+      canvas.height = canvas.offsetHeight * ratio;
+      canvas.getContext('2d').scale(ratio, ratio);
+      sigPad.value = new SignaturePad(canvas, { backgroundColor: 'rgb(255,255,255)' });
+      sigPad.value.clear();
+    }
+
+    function sigClear(){ if(sigPad.value) sigPad.value.clear(); }
+
+    async function sigSave(){
+      if(!sigPad.value || sigPad.value.isEmpty()){
+        alert('Firma vuota!');
+        return;
+      }
+      const dataUrl = sigPad.value.toDataURL();
+      await addSignature({ role: sigRole.value, dataUrl, created: new Date().toISOString() });
+      await loadSignatures();
+      sigOpen.value=false;
+    }
+
+    function closeSigDlg(){ sigOpen.value=false; }
+
+    onMounted(async()=>{ await loadSignatures(); });
+
+    function formatDate(s){ return new Date(s).toLocaleString(); }
+
+    return { sigOpen, sigRole, signatures, openSignatureDialog, sigClear, sigSave, closeSigDlg, formatDate };
+  }
+}).mount('#app');
+</script>
+</body>
+</html>
