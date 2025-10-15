@@ -209,17 +209,17 @@
                 <div class="grid">
 
                     <!-- CARD WORKSITE -->
-                    <div class="s12 m6 l4" v-for="n in 4" :key="n">
+                    <div class="s12 m6 l4" v-for="c in worksites" :key="c.id">
                         <article class="no-padding">
                             <img class="responsive"
                                 src="https://www.impresalevratti.it/wp-content/uploads/2021/12/20211123_092730.jpeg" />
                             <div class="padding">
-                                <h5>Cantiere {{ n }}</h5>
-                                <p>Breve descrizione del cantiere n. {{ n }}</p>
+                                <h5>{{ c.nome }}</h5>
+                                <p>{{ c.descr }}</p>
                                 <div class="row">
-                                    <label>Incompleto</label>
-                                    <progress value="45" max="100"></progress>
-                                    <label>3/<strong>8</strong></label>
+                                    <label>{{ c.progress < 100 ? 'Incompleto' : 'Completato' }}</label>
+                                    <progress :value="c.progress" max="100"></progress>
+                                    <label>{{ c.progress }}%</label>
                                 </div>
                                 <nav>
                                     <button @click="addToast('Aperto cantiere ' + n, 'primary')">Apri</button>
