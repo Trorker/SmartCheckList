@@ -256,6 +256,25 @@
                     <article>
                         <h3>{{ selectedWorksite?.nome }}</h3>
                         <p>{{ selectedWorksite?.descr }}</p>
+                        <fieldset>
+                            <legend>Fill all fields</legend>
+                            <div class="field border label">
+                                <input>
+                                <label>Contratto/LCL/Lavoro:</label>
+                            </div>
+                            <div class="field border label">
+                                <select>
+                                    <option>Item 1</option>
+                                    <option>Item 2</option>
+                                    <option>Item 3</option>
+                                </select>
+                                <label>Select</label>
+                            </div>
+                            <div class="field border label textarea">
+                                <textarea></textarea>
+                                <label>Attività svolta:</label>
+                            </div>
+                        </fieldset>
                     </article>
 
 
@@ -393,6 +412,7 @@
                     </button>
                     <button class="circle transparent">
                         <i>attach_file</i>
+                        <input type="file">
                     </button>
                     <button class="circle transparent" @click="openDialog">
                         <i>signature</i>
@@ -409,6 +429,7 @@
                     </button>
                     <button class="circle transparent">
                         <i>attach_file</i>
+                        <input type="file">
                     </button>
                     <button class="circle transparent">
                         <i>arrow_forward</i>
