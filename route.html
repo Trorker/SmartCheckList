@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPA Vue 3 Hash Router</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav {
+            background: #006e1c;
+            color: white;
+            padding: 1rem;
+        }
+
+        nav a {
+            color: white;
+            margin-right: 1rem;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        nav a.active {
+            text-decoration: underline;
+        }
+
+        main {
+            padding: 2rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <nav>
+            <a href="#/" :class="{active: currentHash==='#/'}" @click.prevent="go('#/')">Home</a>
+            <a href="#/about" :class="{active: currentHash==='#/about'}" @click.prevent="go('#/about')">About</a>
+            <a href="#/contact" :class="{active: currentHash==='#/contact'}"
+                @click.prevent="go('#/contact')">Contact</a>
+        </nav>
+
+        <main>
+            <component :is="currentView"></component>
+        </main>
+    </div>
+
+    <script>
+        // -----------------------
+        // COMPONENTS
+        // -----------------------
+        const Home = {
+            template: `<div>
+    <h1>Home</h1>
+    <p>Benvenuto nella Home della SPA senza server!</p>
+  </div>`
+        }
+
+        const About = {
+            template: `<div>
+    <h1>About</h1>
+    <p>Questa è la pagina About. Tutto è gestito dal router hash.</p>
+  </div>`
+        }
+
+        const Contact = {
+            template: `<div>
+    <h1>Contact</h1>
+    <p>Scrivici qui. Il tasto indietro del telefono funziona automaticamente!</p>
+  </div>`
+        }
+
+        // -----------------------
+        // ROUTES
+        // -----------------------
+        const routes = {
+            "#/": Home,
+            "#/about": About,
+            "#/contact": Contact
+        }
+
+        // -----------------------
+        // APP
+        // -----------------------
+        const app = Vue.createApp({
+            data() {
+                return {
+                    currentHash: location.hash || "#/"
+                }
+            },
+            computed: {
+                currentView() {
+                    return routes[this.currentHash] || Home
+                }
+            },
+            methods: {
+                go(hash) {
+                    location.hash = hash
+                    this.currentHash = hash
+                },
+                onHashChange() {
+                    this.currentHash = location.hash || "#/"
+                }
+            },
+            mounted() {
+                window.addEventListener('hashchange', this.onHashChange)
+            },
+            beforeUnmount() {
+                window.removeEventListener('hashchange', this.onHashChange)
+            }
+        })
+
+        app.mount('#app')
+    </script>
+</body>
+
+</html>
