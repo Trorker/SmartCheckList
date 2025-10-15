@@ -103,6 +103,21 @@
         [v-cloak] {
             display: none;
         }
+
+        .slide-fade-enter-active,
+        .slide-fade-leave-active {
+            transition: all 0.25s ease;
+        }
+
+        .slide-fade-enter-from {
+            opacity: 0;
+            transform: translateX(10px);
+        }
+
+        .slide-fade-leave-to {
+            opacity: 0;
+            transform: translateX(-10px);
+        }
     </style>
 </head>
 
@@ -112,7 +127,7 @@
 
         <header class="fixed" style="box-shadow: var(--elevate1);">
             <nav>
-                <button class="circle transparent">
+                <button class="circle transparent" @click="goBack">
                     <i>arrow_back</i>
                 </button>
                 <div class="shape loading-indicator tiny"></div>
@@ -128,170 +143,208 @@
                 </button>
             </nav>
         </header>
+
+
         <main class="responsive">
+            <transition name="slide-fade" mode="out-in">
 
-            <!-- HOME -->
-            <section v-show="currentSection === 'home'">
+                <!-- 🏠 HOME -->
+                <section v-if="currentSection === 'home'" key="home">
 
 
-                <nav>
-                    <button class="s circle extra">
-                        <i>phone_android</i>
-                    </button>
-                    <button class="m l border circle extra">
-                        <i>phone_android</i>
-                    </button>
-                    <button class="m circle extra">
-                        <i>tablet_android</i>
-                    </button>
-                    <button class="s l border circle extra">
-                        <i>tablet_android</i>
-                    </button>
-                    <button class="l circle extra">
-                        <i>laptop_windows</i>
-                    </button>
-                    <button class="s m border circle extra">
-                        <i>laptop_windows</i>
-                    </button>
-                </nav>
-                <h3>Verifiche Ispettiva</h3>
+                    <nav>
+                        <button class="s circle extra">
+                            <i>phone_android</i>
+                        </button>
+                        <button class="m l border circle extra">
+                            <i>phone_android</i>
+                        </button>
+                        <button class="m circle extra">
+                            <i>tablet_android</i>
+                        </button>
+                        <button class="s l border circle extra">
+                            <i>tablet_android</i>
+                        </button>
+                        <button class="l circle extra">
+                            <i>laptop_windows</i>
+                        </button>
+                        <button class="s m border circle extra">
+                            <i>laptop_windows</i>
+                        </button>
+                    </nav>
+                    <h3>Verifiche Ispettiva</h3>
 
-                <!-- Navigation tabbed -->
-                <div class="grid">
+                    <!-- Navigation tabbed -->
+                    <div class="grid">
 
-                    <!-- Search -->
-                    <div class="s12 m12 l4">
-                        <div class="row">
-                            <div class="field prefix round fill active max">
-                                <i class="front">search</i>
-                                <input>
-                                <menu class="min">
-                                    <li>
-                                        <div class="field large prefix">
-                                            <i class="front">arrow_back</i>
-                                            <input>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <i>history</i>
-                                        <div>Item 1</div>
-                                    </li>
-                                    <li>
-                                        <i>history</i>
-                                        <div>Item 2</div>
-                                    </li>
-                                    <li>
-                                        <i>history</i>
-                                        <div>Item 3</div>
-                                    </li>
-                                </menu>
+                        <!-- Search -->
+                        <div class="s12 m12 l4">
+                            <div class="row">
+                                <div class="field prefix round fill active max">
+                                    <i class="front">search</i>
+                                    <input>
+                                    <menu class="min">
+                                        <li>
+                                            <div class="field large prefix">
+                                                <i class="front">arrow_back</i>
+                                                <input>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <i>history</i>
+                                            <div>Item 1</div>
+                                        </li>
+                                        <li>
+                                            <i>history</i>
+                                            <div>Item 2</div>
+                                        </li>
+                                        <li>
+                                            <i>history</i>
+                                            <div>Item 3</div>
+                                        </li>
+                                    </menu>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="l l2"></div>
+
+                        <!-- Filter -->
+                        <div class="s12 m12 l6">
+                            <div class="row right-align">
+                                <nav class="tabbed small">
+                                    <a v-for="tab in tabs" :key="tab.id" :class="{ active: activeTab === tab.id }"
+                                        @click="activeTab = tab.id">
+                                        <i>{{ tab.icon }}</i>
+                                        <span>{{ tab.label }}</span>
+                                    </a>
+                                </nav>
                             </div>
                         </div>
                     </div>
 
-                    <div class="l l2"></div>
 
-                    <!-- Filter -->
-                    <div class="s12 m12 l6">
-                        <div class="row right-align">
-                            <nav class="tabbed small">
-                                <a v-for="tab in tabs" :key="tab.id" :class="{ active: activeTab === tab.id }"
-                                    @click="activeTab = tab.id">
-                                    <i>{{ tab.icon }}</i>
-                                    <span>{{ tab.label }}</span>
-                                </a>
-                            </nav>
-                        </div>
-                    </div>
-                </div>
+                    <div class="grid">
 
-
-                <div class="grid">
-
-                    <!-- CARD WORKSITE -->
-                    <div class="s12 m6 l4" v-for="c in worksites" :key="c.id">
-                        <article class="no-padding">
-                            <img class="responsive"
-                                src="https://www.impresalevratti.it/wp-content/uploads/2021/12/20211123_092730.jpeg" />
-                            <div class="padding">
-                                <h5>{{ c.nome }}</h5>
-                                <p>{{ c.descr }}</p>
-                                <div class="row">
-                                    <label>{{ c.progress < 100 ? 'Incompleto' : 'Completato' }}</label>
-                                    <progress :value="c.progress" max="100"></progress>
-                                    <label>{{ c.progress }}%</label>
-                                </div>
-                                <nav>
-                                    <button @click="addToast('Aperto cantiere ' + n, 'primary')">Apri</button>
-                                    <div class="max"></div>
+                        <!-- CARD WORKSITE -->
+                        <div class="s12 m6 l4" v-for="c in worksites" :key="c.id">
+                            <article class="no-padding">
+                                <img class="responsive"
+                                    src="https://www.impresalevratti.it/wp-content/uploads/2021/12/20211123_092730.jpeg" />
+                                <div class="padding">
+                                    <h5>{{ c.nome }}</h5>
+                                    <p>{{ c.descr }}</p>
+                                    <div class="row">
+                                        <label>{{ c.progress < 100 ? 'Incompleto' : 'Completato' }}</label>
+                                                <progress :value="c.progress" max="100"></progress>
+                                                <label>{{ c.progress }}%</label>
+                                    </div>
                                     <nav>
-                                        <button class="circle transparent">
-                                            <i>share</i>
-                                        </button>
-                                        <button class="circle transparent">
-                                            <i>download</i>
-                                            <div class="badge no-round">New</div>
-                                        </button>
-                                        <button class="circle transparent"
-                                            @click="addToast('Cantiere ' + n + ' eliminato', 'error', {label:'Annulla', callback:()=>addToast('Annullato', 'primary')})">
-                                            <i>delete</i>
-                                        </button>
-                                    </nav>
-                                    <!--<button class="circle transparent">
+                                        <button @click="openWorksite(c)">Apri</button>
+                                        <div class="max"></div>
+                                        <nav>
+                                            <button class="circle transparent">
+                                                <i>share</i>
+                                            </button>
+                                            <button class="circle transparent">
+                                                <i>download</i>
+                                                <div class="badge no-round">New</div>
+                                            </button>
+                                            <button class="circle transparent"
+                                                @click="addToast('Cantiere ' + n + ' eliminato', 'error', {label:'Annulla', callback:()=>addToast('Annullato', 'primary')})">
+                                                <i>delete</i>
+                                            </button>
+                                        </nav>
+                                        <!--<button class="circle transparent">
                                         <i>more_vert</i>
                                     </button>-->
-                                </nav>
+                                    </nav>
 
-                            </div>
-                        </article>
+                                </div>
+                            </article>
+                        </div>
+
                     </div>
 
-                </div>
+
+                </section>
 
 
-            </section>
-
-
-            <!-- WORKSITE  -->
-            <section v-show="currentSection === 'worksite'">
-                <h3>Verifica Cantiere</h3>
-                <p>Dettagli del cantiere selezionato</p>
-
-            </section>
-
-
-            <!-- CHECK-LIST -->
-            <section v-show="currentSection === 'chechklist'">
-
-                <nav>
-                    <div class="center-align">
-                        <button class="circle small">
-                            <i>done</i>
-                        </button>
-                        <div class="small-margin">Previous</div>
+                <!-- 🏗️ WORKSITE -->
+                <section v-else-if="currentSection === 'worksite'" key="worksite">
+                    <h3>{{ selectedWorksite?.nome }}</h3>
+                    <p>{{ selectedWorksite?.descr }}</p>
+                    <div class="row">
+                        <button class="filled" @click="openChecklist()">Compila Check List</button>
                     </div>
-                    <hr class="max">
-                    <div class="center-align">
-                        <button class="circle small">2</button>
-                        <div class="small-margin">Current</div>
-                    </div>
-                    <hr class="max">
-                    <div class="center-align">
-                        <button class="circle small" disabled>3</button>
-                        <div class="small-margin">Next</div>
-                    </div>
-                </nav>
-
-            </section>
 
 
+                </section>
 
+
+                <!-- ✅ CHECKLIST -->
+                <section v-else-if="currentSection === 'checklist'" key="checklist">
+
+                    <nav>
+                        <div class="center-align">
+                            <button class="circle small">
+                                <i>done</i>
+                            </button>
+                            <div class="small-margin">Previous</div>
+                        </div>
+                        <hr class="max">
+                        <div class="center-align">
+                            <button class="circle small">2</button>
+                            <div class="small-margin">Current</div>
+                        </div>
+                        <hr class="max">
+                        <div class="center-align">
+                            <button class="circle small" disabled>3</button>
+                            <div class="small-margin">Next</div>
+                        </div>
+                        <hr class="max">
+                        <div class="center-align">
+                            <button class="circle small" disabled>4</button>
+                            <div class="small-margin">Next</div>
+                        </div>
+                        <hr class="max">
+                        <div class="center-align">
+                            <button class="circle small" disabled>5</button>
+                            <div class="small-margin">Next</div>
+                        </div>
+                        <hr class="max">
+                        <div class="center-align">
+                            <button class="circle small" disabled>6</button>
+                            <div class="small-margin">Next</div>
+                        </div>
+                        <hr class="max">
+                        <div class="center-align">
+                            <button class="circle small" disabled>7</button>
+                            <div class="small-margin">Next</div>
+                        </div>
+                                                <hr class="max">
+                        <div class="center-align">
+                            <button class="circle small" disabled>8</button>
+                            <div class="small-margin">Next</div>
+                        </div>
+                                                <hr class="max">
+                        <div class="center-align">
+                            <button class="circle small" disabled>9</button>
+                            <div class="small-margin">Next</div>
+                        </div>
+                    </nav>
+
+                </section>
+
+
+            </transition>
         </main>
 
 
 
         <!--<footer class="responsive|fixed">..</footer>-->
-        <footer class="fixed" style="box-shadow: 0 -0.125rem .125rem 0 rgb(0 0 0 / .32);">
+        <footer v-show="currentSection === 'home'" class="fixed"
+            style="box-shadow: 0 -0.125rem .125rem 0 rgb(0 0 0 / .32);">
             <nav>
                 <button class="circle transparent" @click="addToast('Cantiere salvato!', 'primary')">
                     <i>check_box</i>
@@ -311,6 +364,26 @@
                     <i>add</i>
                 </button>
             </nav>
+        </footer>
+
+        <!--<footer class="responsive|fixed">..</footer>-->
+        <footer v-show="currentSection === 'worksite'" class="fixed">
+            <div class="raw center-align">
+                <nav class="toolbar secondary-container large-elevate">
+                    <a>
+                        <i>videocam_off</i>
+                    </a>
+                    <a>
+                        <i>mic</i>
+                    </a>
+                    <a>
+                        <i>front_hand</i>
+                    </a>
+                    <a>
+                        <i>more_vert</i>
+                    </a>
+                </nav>
+            </div>
         </footer>
 
 
