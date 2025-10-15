@@ -30,6 +30,13 @@ createApp({
       { id: "ncompleti", icon: "indeterminate_check_box", label: "Incompleti" }
     ];
 
+    const worksites = reactive([
+      { id: 1, nome: "Mirandola ENEL", descr: "Linea BT 12kV - tratto A", progress: 70 },
+      { id: 2, nome: "Carpi - Via Fossa", descr: "Sostituzione quadro MT", progress: 40 },
+      { id: 3, nome: "Modena Nord", descr: "Manutenzione pali", progress: 100 },
+      { id: 4, nome: "Camposanto", descr: "Ispezione cabine ENEL", progress: 20 },
+    ]);
+
     // 🔹 Tema
     onMounted(() => {
       const saved = localStorage.getItem("theme");
@@ -95,6 +102,7 @@ createApp({
       showDialog,
       toast,
       currentSection,
+      worksites,
       toggleTheme,
       addToast,
       openDialog,
