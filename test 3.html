@@ -1,0 +1,654 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Check List Cantieri - Levratti</title>
+
+<!-- BeerCSS -->
+<link href="https://cdn.jsdelivr.net/npm/beercss@3.12.11/dist/cdn/beer.min.css" rel="stylesheet">
+<script type="module" src="https://cdn.jsdelivr.net/npm/beercss@3.12.11/dist/cdn/beer.min.js"></script>
+
+<!-- Material Icons -->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+<!-- Vue 3 -->
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+<!-- SignaturePad -->
+<script type="module" src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+
+<style>
+  :root{
+    --primary:#006e1c;
+    --background:#fbfdf6;
+    --on-background:#1a1c19;
+  }
+  body.dark{ --primary:#78dc77; --background:#121411; --on-background:#e2e3dd; }
+  body{ background:var(--background); color:var(--on-background); }
+  [v-cloak]{display:none;}
+  main{padding:80px 1rem 120px;}
+  header.fixed, footer.fixed{ box-shadow:var(--elevate1); background:var(--surface); }
+  .card img.responsive{ height:160px; object-fit:cover; }
+  .photo-thumb{ width:120px; height:80px; object-fit:cover; border-radius:6px; border:1px solid var(--outline); }
+  .sig-canvas{ width:100%; height:140px; border:1px dashed var(--outline); touch-action:none; }
+  .toast-pos{ position:fixed; right:18px; bottom:88px; z-index:9999; display:flex; flex-direction:column; gap:8px; }
+  .toast-fade-enter-active,.toast-fade-leave-active{ transition:all .25s ease; }
+  .toast-fade-enter-from,.toast-fade-leave-to{ opacity:0; transform:translateY(10px); }
+  dialog{ max-width:720px; width:90%; border-radius:10px; padding:1rem; }
+  .overlay-click{ position:fixed; inset:0; background:rgba(0,0,0,.32); z-index:900; opacity:0; pointer-events:none; transition:opacity .18s; }
+  .overlay-click.active{ opacity:1; pointer-events:auto; }
+  .small-muted{ color:var(--on-surface-variant); font-size:.9rem; }
+  .grid-center{ display:grid; gap:1rem; grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); }
+  .progress-small{ width:120px; height:6px; border-radius:6px; overflow:hidden; background:var(--surface-container-low); }
+  .progress-small > div{ height:100%; background:var(--primary); }
+</style>
+</head>
+<body>
+<div id="app" v-cloak>
+
+  <!-- HEADER -->
+  <header class="fixed">
+    <nav>
+      <button class="circle transparent" @click="goBack"><i>arrow_back</i></button>
+      <h6 class="max">{{ pageTitle }}</h6>
+      <button class="circle transparent" @click="openConfig"><i>settings</i></button>
+      <button class="circle transparent" @click="toggleTheme"><i>{{ isDark ? 'light_mode' : 'dark_mode' }}</i></button>
+    </nav>
+  </header>
+
+  <!-- MAIN (SPA) -->
+  <main class="responsive">
+    <transition name="slide-fade" mode="out-in">
+
+      <!-- HOME -->
+      <section v-if="view==='home'" key="home">
+        <div class="row" style="align-items:center; gap:.5rem;">
+          <div class="field prefix round fill max">
+            <i class="front">search</i>
+            <input v-model="q" placeholder="Cerca cantiere..." @input="applyFilters" />
+          </div>
+          <button class="primary" @click="newSite">+ Nuovo</button>
+        </div>
+
+        <div class="row right-align" style="margin-top:.5rem">
+          <nav class="tabbed small">
+            <a :class="{active:filter==='all'}" @click="setFilter('all')"><i>list</i><span>Tutti</span></a>
+            <a :class="{active:filter==='in_progress'}" @click="setFilter('in_progress')"><i>hourglass_top</i><span>In corso</span></a>
+            <a :class="{active:filter==='completed'}" @click="setFilter('completed')"><i>check_circle</i><span>Completati</span></a>
+          </nav>
+        </div>
+
+        <div class="grid-center" style="margin-top:1rem;">
+          <article class="card" v-for="s in filtered" :key="s.id" style="overflow:hidden;">
+            <img class="responsive" :src="s.cover || placeholder" alt="cover" />
+            <div class="padding">
+              <h5>{{ s.name }}</h5>
+              <p class="small-muted">{{ s.descr }}</p>
+
+              <div class="row" style="align-items:center;">
+                <div class="progress-small">
+                  <div :style="{width: (s.progress||0) + '%'}"></div>
+                </div>
+                <div style="min-width:56px;text-align:right"><small>{{ s.progress || 0 }}%</small></div>
+              </div>
+
+              <nav style="margin-top:.5rem;">
+                <button @click="openSite(s)">Apri</button>
+                <div class="max"></div>
+                <button class="circle transparent" @click.stop="downloadSite(s)"><i>download</i></button>
+                <button class="circle transparent" @click.stop="shareSite(s)"><i>share</i></button>
+                <button class="circle transparent" @click.stop="confirmDelete(s)"><i>delete</i></button>
+              </nav>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- WORKSITE DETAIL -->
+      <section v-if="view==='worksite'" key="worksite">
+        <div class="card">
+          <div style="display:flex; gap:1rem; align-items:flex-start;">
+            <div style="flex:1;">
+              <h5>{{ current.name }}</h5>
+              <div class="small-muted">Creato: {{ formatDate(current.created) }}</div>
+              <p style="margin-top:.5rem">{{ current.descr }}</p>
+            </div>
+            <div style="width:160px; text-align:right;">
+              <button class="fill" @click="openChecklist">Compila checklist</button>
+              <button class="outline" @click="openConfig" style="margin-top:.5rem">Config</button>
+            </div>
+          </div>
+
+          <div class="divider" style="margin:1rem 0"></div>
+
+          <h6>Foto</h6>
+          <div style="display:flex; gap:.5rem; flex-wrap:wrap; align-items:center;">
+            <img v-for="p in photos" :src="p.data" :key="p.id" class="photo-thumb" />
+            <label class="file-small">
+              <input ref="photoInput" type="file" accept="image/*" capture="environment" style="display:none" @change="onPhoto">
+              <button @click="$refs.photoInput.click()">Aggiungi</button>
+            </label>
+          </div>
+
+          <div class="divider" style="margin:1rem 0"></div>
+
+          <h6>Firme</h6>
+          <div v-if="signatures.length===0" class="small-muted">Nessuna firma</div>
+          <div v-for="s in signatures" :key="s.id" style="margin-top:.5rem;">
+            <div><strong>{{ s.role }}</strong> — <small class="small-muted">{{ formatDate(s.created) }}</small></div>
+            <img :src="s.dataUrl" style="max-width:320px; display:block; margin-top:.25rem;">
+          </div>
+
+          <div class="divider" style="margin:1rem 0"></div>
+
+          <nav class="right-align">
+            <button class="flat" @click="goHome">Chiudi</button>
+            <button class="primary" @click="markCompleted">Segna completato</button>
+          </nav>
+        </div>
+      </section>
+
+      <!-- CHECKLIST -->
+      <section v-if="view==='checklist'" key="checklist">
+        <div class="card">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <h5>Checklist — {{ current.name }}</h5>
+              <div class="small-muted">{{ sections[currentSectionIndex].title }}</div>
+            </div>
+            <div style="min-width:160px; text-align:right;">
+              <div class="small-muted">Sezione {{ currentSectionIndex + 1 }} / 7</div>
+              <div class="progress-small" style="margin-top:.4rem"><div :style="{width: progress + '%'}"></div></div>
+            </div>
+          </div>
+
+          <div style="margin-top:1rem;">
+            <!-- list of questions (simplified) -->
+            <div v-for="(q, idx) in sections[currentSectionIndex].questions" :key="q.id" class="card" style="margin-bottom:.6rem;">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div><strong>{{ q.id }}</strong> — {{ q.text }}</div>
+                <div style="display:flex; gap:.4rem;">
+                  <button :class="answers[currentSectionIndex][q.id] === 'C' ? 'primary' : 'outline'" @click="setAnswer(q.id,'C')">C</button>
+                  <button :class="answers[currentSectionIndex][q.id] === 'NC' ? 'error' : 'outline'" @click="setAnswer(q.id,'NC')">NC</button>
+                  <button :class="answers[currentSectionIndex][q.id] === 'NA' ? '' : 'outline'" @click="setAnswer(q.id,'NA')">NA</button>
+                </div>
+              </div>
+              <div style="margin-top:.6rem">
+                <label>Note</label>
+                <textarea v-model="notes[currentSectionIndex][q.id]" rows="2"></textarea>
+              </div>
+            </div>
+
+            <div style="margin-top:.8rem">
+              <label>Foto sezione</label>
+              <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.5rem">
+                <img v-for="p in sectionPhotos" :src="p.data" :key="p.id" class="photo-thumb" />
+                <label class="file-small">
+                  <input ref="sectionPhoto" type="file" accept="image/*" capture="environment" style="display:none" @change="onSectionPhoto">
+                  <button @click="$refs.sectionPhoto.click()">Aggiungi foto</button>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <nav style="display:flex;justify-content:space-between;margin-top:1rem">
+            <button class="flat" @click="prevSection" :disabled="currentSectionIndex===0">← Indietro</button>
+            <div>
+              <button class="flat" @click="saveSection">Salva</button>
+              <button class="primary" @click="nextSection">{{ currentSectionIndex===6 ? 'Completa' : 'Avanti →' }}</button>
+            </div>
+          </nav>
+        </div>
+      </section>
+
+    </transition>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="fixed">
+    <nav>
+      <button class="circle transparent" @click="saveAll"><i>save</i></button>
+      <button class="circle transparent" @click="openSignatureDialog"><i>edit</i></button>
+      <div class="max"></div>
+      <button class="square round extra" @click="newSite"><i>add</i></button>
+    </nav>
+  </footer>
+
+  <!-- Overlay + Dialog base (BeerCSS style: overlay .active + dialog.active[open]) -->
+  <div class="overlay" :class="{active: dialog.open}" @click="dialogClose"></div>
+  <dialog :class="{active: dialog.open}" :open="dialog.open">
+    <header><h5>{{ dialog.title }}</h5></header>
+    <div v-html="dialog.html"></div>
+    <nav class="right-align no-space mt">
+      <button v-for="(a, i) in dialog.actions" :key="i" class="transparent link" @click="a.handler">{{ a.label }}</button>
+    </nav>
+  </dialog>
+
+  <!-- Config modal -->
+  <div class="overlay" :class="{active: configOpen}" @click="closeConfig"></div>
+  <dialog :class="{active: configOpen}" :open="configOpen">
+    <header><h5>Impostazioni Verificatore</h5></header>
+    <div class="field label border"><input v-model="config.verificatore"><label>Nome verificatore</label></div>
+    <div style="margin-top:.6rem"><label>Firma (salvata come immagine)</label>
+      <canvas ref="cfgCanvas" class="sig-canvas cfgCanvas"></canvas>
+      <div class="row" style="margin-top:.5rem">
+        <button class="flat" @click="cfgClear">Pulisci</button>
+        <div class="max"></div>
+        <button class="primary" @click="cfgSave">Salva</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Signature dialog -->
+  <div class="overlay" :class="{active: sigOpen}" @click="closeSigDlg"></div>
+  <dialog :class="{active: sigOpen}" :open="sigOpen">
+    <header><h5>Firma</h5></header>
+    <div>
+      <label>Ruolo</label>
+      <select v-model="sigRole">
+        <option>Verificatore</option><option>Preposto</option>
+      </select>
+      <canvas ref="signCanvas" class="sig-canvas signCanvas" style="margin-top:.5rem"></canvas>
+      <nav class="right-align no-space mt">
+        <button class="transparent link" @click="sigClear">Pulisci</button>
+        <button class="transparent link" @click="sigSave">Salva firma</button>
+      </nav>
+    </div>
+  </dialog>
+
+  <!-- Toast (single) -->
+  <div class="toast-pos">
+    <transition-group name="toast-fade" tag="div">
+      <div v-if="toast.active" :key="toast.id" class="snackbar active" :class="toast.type">
+        <div class="max">{{ toast.text }}</div>
+        <a v-if="toast.action" class="inverse-link" @click="toast.action.callback">{{ toast.action.label }}</a>
+      </div>
+    </transition-group>
+  </div>
+
+</div>
+
+<!-- APP SCRIPT: Vue + IndexedDB (self-contained) -->
+<script type="module">
+const { createApp, ref, reactive, computed, onMounted, nextTick } = Vue;
+
+/* ---------------------------
+   Minimal IndexedDB helper
+   --------------------------- */
+const DB_NAME = 'levratti_checklist_db';
+const DB_VER = 1;
+
+function openDB(){
+  return new Promise((res, rej) => {
+    const r = indexedDB.open(DB_NAME, DB_VER);
+    r.onupgradeneeded = e => {
+      const db = e.target.result;
+      if(!db.objectStoreNames.contains('worksites')){
+        const s = db.createObjectStore('worksites',{keyPath:'id',autoIncrement:true});
+        s.createIndex('status','status',{unique:false});
+      }
+      if(!db.objectStoreNames.contains('photos')){
+        const p = db.createObjectStore('photos',{keyPath:'id',autoIncrement:true});
+        p.createIndex('siteId','siteId',{unique:false});
+      }
+      if(!db.objectStoreNames.contains('signatures')){
+        const sg = db.createObjectStore('signatures',{keyPath:'id',autoIncrement:true});
+        sg.createIndex('siteId','siteId',{unique:false});
+      }
+      if(!db.objectStoreNames.contains('settings')){
+        db.createObjectStore('settings',{keyPath:'key'});
+      }
+    };
+    r.onsuccess = () => res(r.result);
+    r.onerror = e => rej(e.target.error);
+  });
+}
+
+async function withStore(store, mode, cb){
+  const db = await openDB();
+  return new Promise((res,rej)=>{
+    const tx = db.transaction(store, mode);
+    const st = tx.objectStore(store);
+    try{ const result = cb(st); tx.oncomplete = ()=>res(result); tx.onerror = e => rej(e.target.error); } catch(err){ rej(err); }
+  });
+}
+
+async function getAll(store){
+  const db = await openDB();
+  return new Promise((res,rej)=>{
+    const tx = db.transaction(store,'readonly');
+    const req = tx.objectStore(store).getAll();
+    req.onsuccess = ()=> res(req.result || []);
+    req.onerror = e => rej(e.target.error);
+  });
+}
+async function add(store, obj){ return withStore(store,'readwrite', s=> s.add(obj)); }
+async function put(store,obj){ return withStore(store,'readwrite', s=> s.put(obj)); }
+async function del(store,key){ return withStore(store,'readwrite', s=> s.delete(key)); }
+async function getByIndex(store, indexName, val){
+  const db = await openDB();
+  return new Promise((res,rej)=>{
+    const tx = db.transaction(store,'readonly');
+    const idx = tx.objectStore(store).index(indexName);
+    const req = idx.getAll(val);
+    req.onsuccess = ()=> res(req.result || []);
+    req.onerror = e => rej(e.target.error);
+  });
+}
+async function get(store,key){
+  const db = await openDB();
+  return new Promise((res,rej)=>{
+    const tx = db.transaction(store,'readonly');
+    const req = tx.objectStore(store).get(key);
+    req.onsuccess = ()=> res(req.result || null);
+    req.onerror = e=> rej(e.target.error);
+  });
+}
+
+/* ---------------------------
+   Vue app
+   --------------------------- */
+createApp({
+  setup(){
+    // UI state
+    const isDark = ref(false);
+    const pageTitle = ref('Levratti');
+    const view = ref('home'); // home | worksite | checklist
+
+    // list/filter
+    const q = ref('');
+    const filter = ref('all');
+    const sites = ref([]);
+    const filtered = computed(()=> {
+      const txt = q.value.trim().toLowerCase();
+      return sites.value.filter(s=>{
+        if(filter.value==='in_progress' && s.status==='completed') return false;
+        if(filter.value==='completed' && s.status!=='completed') return false;
+        if(txt && !((s.name||'').toLowerCase().includes(txt) || (s.descr||'').toLowerCase().includes(txt))) return false;
+        return true;
+      });
+    });
+
+    // current site detail
+    const current = ref(null);
+    const photos = ref([]);
+    const signatures = ref([]);
+
+    // dialog base
+    const dialog = reactive({ open:false, title:'', html:'', actions:[] });
+    function dialogOpen(title, html, actions){ dialog.title=title; dialog.html=html; dialog.actions=actions||[{label:'Chiudi', handler:dialogClose}]; dialog.open=true; }
+    function dialogClose(){ dialog.open=false; }
+
+    // config modal
+    const configOpen = ref(false);
+    const config = reactive({ verificatore:'', signature:null });
+    let cfgPad = null;
+
+    // signature dialog
+    const sigOpen = ref(false);
+    const sigRole = ref('Verificatore');
+    let sigPad = null;
+
+    // checklist structure
+    const sections = [
+      { id:1, title:'VERIFICA PERSONALE', questions:[{id:'1.1', text:'Il personale è presente e corretto?'}]},
+      { id:2, title:'FORMAZIONE', questions:[{id:'2.1', text:'Formazione aggiornata?'}]},
+      { id:3, title:'ALLESTIMENTO', questions:[{id:'3.1', text:'Segnaletica corretta?'}]},
+      { id:4, title:'ORGANIZZAZIONE', questions:[{id:'4.1', text:'POS/PSC disponibili?'}]},
+      { id:5, title:'AUTOMEZZI', questions:[{id:'5.1', text:'Mezzi in regola?'}]},
+      { id:6, title:'SICUREZZA', questions:[{id:'6.1', text:'DPI usati correttamente?'}]},
+      { id:7, title:'AMBIENTE', questions:[{id:'7.1', text:'Rifiuti smaltiti correttamente?'}]}
+    ];
+    const currentSectionIndex = ref(0);
+    const answers = reactive(Array.from({length:7}).map(()=> ({})));
+    const notes = reactive(Array.from({length:7}).map(()=> ({})));
+    const sectionPhotos = ref([]);
+
+    // toast single
+    const toast = reactive({ active:false, id:null, text:'', type:'default', action:null, timer:null });
+    function showToast(text, type='default', action=null){
+      if(toast.timer) clearTimeout(toast.timer);
+      toast.id = Date.now(); toast.text=text; toast.type=type; toast.action=action; toast.active=true;
+      toast.timer = setTimeout(()=> { toast.active=false; toast.timer=null; }, 4500);
+    }
+
+    // helpers
+    function formatDate(s){ if(!s) return ''; return new Date(s).toLocaleString(); }
+
+    // DB actions
+    async function loadSites(){ sites.value = await getAll('worksites'); }
+    async function newSite(){
+      dialogOpen('Nuovo cantiere', `
+        <div class="field label border"><input id="nw_name"><label>Nome</label></div>
+        <div class="field label border" style="margin-top:.6rem"><input id="nw_descr"><label>Descrizione</label></div>
+      `, [
+        { label:'Annulla', handler: dialogClose },
+        { label:'Salva', handler: async ()=>{
+            const name = document.getElementById('nw_name').value.trim();
+            const descr = document.getElementById('nw_descr').value.trim();
+            if(!name){ showToast('Nome obbligatorio','error'); return; }
+            await add('worksites', { name, descr, created:new Date().toISOString(), status:'in_progress', progress:0, checklist:Array(7).fill(false), cover: "https://www.impresalevratti.it/wp-content/uploads/2021/12/20211123_092730.jpeg" });
+            await loadSites(); dialogClose(); showToast('Cantiere creato','primary');
+        } }
+      ]);
+    }
+
+    function setFilter(f){ filter.value = f; }
+
+    // open detail
+    async function openSite(site){
+      current.value = await get('worksites', site.id);
+      if(!current.value) current.value = site;
+      pageTitle.value = current.value.name;
+      photos.value = await getByIndex('photos','siteId', current.value.id);
+      signatures.value = await getByIndex('signatures','siteId', current.value.id);
+      view.value = 'worksite';
+    }
+
+    function goHome(){ view.value='home'; pageTitle.value = 'Levratti'; current.value=null; }
+    function goBack(){
+      if(view.value==='checklist'){ view.value='worksite'; pageTitle.value = current.value?.name || 'Levratti'; return; }
+      if(view.value==='worksite'){ goHome(); return; }
+    }
+
+    // delete site
+    function confirmDelete(site){
+      dialogOpen('Elimina cantiere', `<p>Eliminare <strong>${site.name}</strong>?</p>`, [
+        { label:'Annulla', handler: dialogClose },
+        { label:'Elimina', handler: async ()=>{ await del('worksites', site.id); await loadSites(); dialogClose(); showToast('Cantiere eliminato','primary'); } }
+      ]);
+    }
+
+    // download/export JSON
+    function downloadSite(site){
+      const data = JSON.stringify(site, null, 2);
+      const blob = new Blob([data], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `${(site.name||'cantiere').replace(/\s+/g,'_')}.json`;
+      a.click(); URL.revokeObjectURL(url); showToast('Esportato JSON','primary');
+    }
+
+    // share
+    async function shareSite(site){
+      if(navigator.share){
+        try{ await navigator.share({ title: site.name, text: site.descr||'', url: location.href }); showToast('Condiviso','primary'); }
+        catch(e){ showToast('Condivisione annullata','default'); }
+      } else downloadSite(site);
+    }
+
+    // photo upload for detail
+    async function onPhoto(e){
+      const f = e.target.files && e.target.files[0]; if(!f) return;
+      const r = new FileReader();
+      r.onload = async ()=> { await add('photos', { siteId: current.value.id, data: r.result, meta:{}, created:new Date().toISOString() }); photos.value = await getByIndex('photos','siteId', current.value.id); showToast('Foto salvata','primary'); };
+      r.readAsDataURL(f);
+    }
+
+    // checklist flow
+    function openChecklist(){
+      if(!current.value){ showToast('Seleziona un cantiere','error'); return; }
+      // populate answers/notes from current.checklistAnswers if present
+      if(current.value.checklistAnswers){
+        for(let i=0;i<7;i++){ answers[i] = current.value.checklistAnswers[i] || {}; notes[i] = current.value.checklistNotes ? (current.value.checklistNotes[i]||{}) : {}; }
+      } else {
+        for(let i=0;i<7;i++){ answers[i] = {}; notes[i] = {}; }
+      }
+      currentSectionIndex.value = 0;
+      sectionPhotos.value = (async ()=> await getByIndex('photos','siteId', current.value.id))(); // load in background
+      view.value='checklist';
+      pageTitle.value = current.value.name + ' — Checklist';
+    }
+
+    const currentSection = computed(()=> sections[currentSectionIndex.value]);
+    const progress = computed(()=> {
+      if(!current.value) return 0;
+      const done = (current.value.checklist || []).filter(Boolean).length;
+      return Math.round((done / 7) * 100);
+    });
+
+    async function saveSection(){
+      // if at least one answer set mark section done
+      const has = Object.keys(answers[currentSectionIndex.value]||{}).length>0;
+      current.value.checklist = current.value.checklist || Array(7).fill(false);
+      current.value.checklist[currentSectionIndex.value] = !!has;
+      // persist answers & notes
+      current.value.checklistAnswers = current.value.checklistAnswers || Array(7).fill(null);
+      current.value.checklistAnswers[currentSectionIndex.value] = JSON.parse(JSON.stringify(answers[currentSectionIndex.value] || {}));
+      current.value.checklistNotes = current.value.checklistNotes || Array(7).fill(null);
+      current.value.checklistNotes[currentSectionIndex.value] = JSON.parse(JSON.stringify(notes[currentSectionIndex.value] || {}));
+      // update progress numeric
+      current.value.progress = Math.round((current.value.checklist.filter(Boolean).length / 7) * 100);
+      await put('worksites', current.value);
+      await loadSites();
+      showToast('Sezione salvata','primary');
+    }
+
+    function setAnswer(qid,val){ answers[currentSectionIndex.value][qid] = val; }
+    async function nextSection(){
+      if(currentSectionIndex.value < 6){ currentSectionIndex.value++; sectionPhotos.value = await getByIndex('photos','siteId', current.value.id); }
+      else { await saveSection(); showToast('Checklist completata','primary'); }
+    }
+    function prevSection(){ if(currentSectionIndex.value>0) currentSectionIndex.value--; }
+
+    // section photos
+    //const sectionPhotos = ref([]);
+    async function onSectionPhoto(e){
+      const f = e.target.files && e.target.files[0]; if(!f) return;
+      const r = new FileReader();
+      r.onload = async ()=> {
+        await add('photos', { siteId: current.value.id, data: r.result, meta:{section: currentSectionIndex.value+1}, created:new Date().toISOString() });
+        sectionPhotos.value = await getByIndex('photos','siteId', current.value.id);
+        showToast('Foto sezione salvata','primary');
+      };
+      r.readAsDataURL(f);
+    }
+
+    // signatures
+    function openSignatureDialog(){ sigOpen.value = true; nextTick(()=> initSigPad()); }
+    function initSigPad(){
+      const canvas = document.querySelector('canvas[ref="signCanvas"]') || document.querySelector('canvas.sig-canvas.signCanvas');
+      console.log(canvas);
+      
+      if(!canvas) return;
+      // resize canvas to device pixel ratio
+      const ratio = Math.max(window.devicePixelRatio || 1, 1);
+      canvas.width = canvas.offsetWidth * ratio;
+      canvas.height = canvas.offsetHeight * ratio;
+      canvas.getContext('2d').scale(ratio, ratio);
+      sigPad = new SignaturePad(canvas);
+    }
+    function sigClear(){ if(sigPad) sigPad.clear(); }
+    async function sigSave(){
+      if(!sigPad || sigPad.isEmpty()){ showToast('Firma vuota','error'); return; }
+      const dataUrl = sigPad.toDataURL();
+      await add('signatures', { siteId: current.value.id, role: sigRole.value, dataUrl, created: new Date().toISOString() });
+      signatures.value = await getByIndex('signatures','siteId', current.value.id);
+      sigOpen.value = false; showToast('Firma salvata','primary');
+    }
+    function closeSigDlg(){ sigOpen.value=false; }
+
+    // config modal actions
+    async function openConfig(){
+      // load saved
+      const s = await get('settings','verificatore'); if(s) config.verificatore = s.value;
+      const sigSavedObj = await get('settings','signature'); if(sigSavedObj) config.signature = sigSavedObj.value;
+      configOpen.value = true;
+      await nextTick();
+      const canvas = document.querySelector('dialog[open] canvas.sig-canvas') || document.querySelector('canvas.sig-canvas.cfgCanvas');
+      console.log(canvas);
+      if(canvas){
+        // prepare size
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        canvas.width = canvas.offsetWidth * ratio;
+        canvas.height = canvas.offsetHeight * ratio;
+        canvas.getContext('2d').scale(ratio, ratio);
+        cfgPad = new SignaturePad(canvas);
+        if(config.signature){
+          const img = new Image();
+          img.onload = ()=> { canvas.getContext('2d').drawImage(img,0,0,canvas.width/ratio,canvas.height/ratio); };
+          img.src = config.signature;
+        }
+      }
+    }
+    function closeConfig(){ configOpen.value=false; }
+    function cfgClear(){ if(cfgPad) cfgPad.clear(); }
+    async function cfgSave(){
+      await put('settings', { key:'verificatore', value: config.verificatore });
+      if(cfgPad && !cfgPad.isEmpty()){
+        const d = cfgPad.toDataURL();
+        await put('settings', { key:'signature', value:d });
+      }
+      configOpen.value=false; showToast('Configurazione salvata','primary');
+    }
+
+    // mark completed
+    async function markCompleted(){
+      current.value.status='completed'; current.value.progress=100; await put('worksites', current.value); await loadSites(); showToast('Cantiere completato','primary');
+    }
+
+    // saveAll convenience
+    async function saveAll(){ if(current.value && current.value.id) await put('worksites', current.value); await loadSites(); showToast('Salvataggio eseguito','primary'); }
+
+    // theme toggle + persist
+    async function toggleTheme(){
+      isDark.value = !isDark.value;
+      document.body.classList.toggle('dark', isDark.value);
+      await put('settings',{ key:'theme', value:isDark.value ? 'dark' : 'light' });
+      showToast(isDark.value ? 'Tema scuro' : 'Tema chiaro','primary');
+    }
+
+    // lifecycle load
+    onMounted(async ()=>{
+      // load theme setting
+      try{ const t = await get('settings','theme'); if(t && t.value==='dark'){ isDark.value=true; document.body.classList.add('dark'); } }catch(e){}
+      await loadSites();
+    });
+
+    // utility wrappers
+    function formatDateShort(s){ return formatDate(s); }
+
+    // expose to template
+    return {
+      pageTitle, view, isDark, toggleTheme,
+      q, filtered, setFilter, filter,
+      newSite, openSite, /*openSite as openSiteWrapper, openSite as openSiteClicked,*/
+      downloadSite, shareSite, confirmDelete,
+      openChecklist, goBack, goHome,
+      current, photos, signatures, onPhoto, markCompleted,
+      sections, currentSectionIndex, currentSection, answers, notes, /*notes as sectionNotes,*/ setAnswer,
+      saveSection, nextSection, prevSection, onSectionPhoto, sectionPhotos,
+      dialog, dialogOpen, dialogClose,
+      configOpen, config, openConfig, closeConfig, cfgClear, cfgSave,
+      sigOpen, sigRole, openSignatureDialog, sigClear, sigSave, closeSigDlg,
+      toast, showToast,
+      saveAll, downloadSite,
+      pageTitle: pageTitle,
+      formatDate: formatDateShort
+    };
+  }
+}).mount('#app');
+</script>
+</body>
+</html>
