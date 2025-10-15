@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checklist dinamica Vue 3</title>
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<style>
+  body { font-family: sans-serif; padding: 1rem; }
+  ul.list { list-style: none; padding: 0; margin: 0; }
+  ul.list li { display: flex; align-items: center; padding: 1rem; border-bottom: 1px solid #ccc; gap: 1rem; }
+  ul.list li:last-child { border-bottom: none; }
+  .max { flex: 1; }
+  .center-align { text-align: center; min-width: 70px; }
+  .radio.icon input { display: none; }
+  .radio.icon i { vertical-align: middle; }
+  .radio.icon i.error { color: red; }
+  .radio.icon i.active { color: green; }
+  .radio.icon input:checked + span i:first-child { display: none; }
+  .radio.icon input:checked + span i:last-child { display: inline; }
+  textarea { width: 100%; height: 100px; border: 1px solid #ccc; border-radius: 8px; padding: 8px; resize: none; }
+  .field.label { margin-top: 1rem; display: block; }
+  label { font-weight: bold; }
+  pre { background: #f5f5f5; padding: 10px; border-radius: 8px; overflow: auto; }
+</style>
+</head>
+<body>
+<div id="app">
+  <h2>Checklist del Cantiere</h2>
+
+  <ul class="list border">
+    <li v-for="(item, index) in checklist" :key="index">
+      <i>{{ item.icon }}</i>
+      <div class="max">
+        <h6 class="small text-wrap">{{ item.text }}</h6>
+      </div>
+
+      <div class="center-align" v-for="option in options" :key="option.value">
+        <h6 class="small">{{ option.label }}</h6>
+        <label class="radio icon">
+          <input
+            type="radio"
+            :name="'radio_' + index"
+            :value="option.value"
+            v-model="item.value"
+          >
+          <span>
+            <i>circle</i>
+            <i :class="option.iconClass">{{ option.icon }}</i>
+          </span>
+        </label>
+      </div>
+    </li>
+  </ul>
+
+  <div class="field textarea label border round extra">
+    <label>Note:</label>
+    <textarea v-model="note"></textarea>
+  </div>
+
+  <pre>{{ checklist }}</pre>
+</div>
+
+<script>
+const { createApp, ref, watch } = Vue
+
+createApp({
+  setup() {
+    // 🔹 Opzioni radio generiche
+    const options = [
+      { label: "C", value: "C", icon: "✅", iconClass: "active" },
+      { label: "N.C.", value: "NC", icon: "❌", iconClass: "error" },
+      { label: "N.A.", value: "NA", icon: "🚫", iconClass: "" }
+    ]
+
+    // 🔹 Checklist dinamica
+    const checklist = ref([
+      { icon: "🏗️", text: "Il preposto ai lavori è individuato e qualificato", value: null },
+      { icon: "⚡", text: "Il personale è in possesso di profili Enel adeguati", value: null },
+      { icon: "🧯", text: "Il personale ha formazione per emergenze e antincendio", value: null },
+      { icon: "🏗️", text: "Il personale è formato per l’uso di macchine e attrezzature", value: null },
+      { icon: "🚧", text: "Formazione adeguata alla segnaletica stradale", value: null }
+    ])
+
+    // 🔹 Note
+    const note = ref(localStorage.getItem('note') || '')
+
+    // 🔹 Salvataggio automatico in localStorage
+    watch(checklist, (newVal) => {
+      localStorage.setItem('checklist', JSON.stringify(newVal))
+    }, { deep: true })
+
+    watch(note, (newVal) => {
+      localStorage.setItem('note', newVal)
+    })
+
+    // 🔹 Carica da localStorage (se esiste)
+    const savedChecklist = localStorage.getItem('checklist')
+    if (savedChecklist) checklist.value = JSON.parse(savedChecklist)
+
+    return { checklist, options, note }
+  }
+}).mount('#app')
+</script>
+</body>
+</html>
