@@ -680,6 +680,23 @@
             </div>
         </footer>
 
+                <!--<footer class="responsive|fixed">..</footer>-->
+        <footer v-show="currentSection === 'checklist'" class="fixed">
+            <div class="raw center-align">
+                <nav class="toolbar secondary-container large-elevate">
+                    <button class="circle transparent" @click="goBack">
+                        <i>arrow_back</i>
+                    </button>
+                    <button class="circle transparent" @click="openChecklist">
+                        <i>checklist</i>
+                    </button>
+                    <button class="circle transparent">
+                        <i>arrow_forward</i>
+                    </button>
+                </nav>
+            </div>
+        </footer>
+
 
         <!-- DIALOG -->
         <div class="overlay blur" :class="{ active: showDialog }"></div>
