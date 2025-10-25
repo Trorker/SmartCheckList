@@ -13,7 +13,7 @@ createApp({
     const showDialog = ref(false);
 
     const showDialogNewWorksite = ref(false);
-    const newCantiere = ref({ nome: '', descr: '', version: '' });
+    const newCantiere = ref({ nome: '', descr: '', file: '' });
     const prototypes = ref([
       { nome: 'Prototipo ENEL', version: '1.0', file: 'cantiere_enel.json' },
       { nome: 'Prototipo TERNA', version: '1.1', file: 'cantiere_terna.json' },
@@ -26,11 +26,11 @@ createApp({
       }
 
       let prototypeData = {};
-      if (newCantiere.value.version) {
+      if (newCantiere.value.file) {
         // Cerca il file del prototipo selezionato
-        const proto = prototypes.value.find(p => p.version === newCantiere.value.version);
+        const proto = prototypes.value.find(p => p.file === newCantiere.value.file);
         if (proto) {
-          const res = await fetch(`./prototypes/${proto.version}`);
+          const res = await fetch(`./prototypes/${proto.file}`);
           if (res.ok) prototypeData = await res.json();
         }
       }
@@ -40,11 +40,10 @@ createApp({
         id: crypto.randomUUID(),
         nome: newCantiere.value.nome,
         descr: newCantiere.value.descr || '',
-        version: newCantiere.value.version || '1.0',
+        version: newCantiere.value.file || '',
         data: new Date().toISOString().slice(0, 10),
         progress: 0,
-        sections: prototypeData.sections || []
-      };
+      };      
 
       // Inserimento DB
       await db.worksites.put(cantiere);
