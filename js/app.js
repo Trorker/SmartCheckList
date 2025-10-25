@@ -2,8 +2,62 @@ const { createApp, ref, reactive, computed, onMounted } = Vue;
 
 createApp({
   setup() {
+
+    const db = new Dexie("SmartCheckListDB");
+    db.version(1).stores({
+      worksites: 'id, nome, descr, version, data, progress, status',
+    });
+
+    const title = ref('Levratti');
     const isDark = ref(false);
     const showDialog = ref(false);
+
+    const showDialogNewWorksite = ref(false);
+    const newCantiere = ref({ nome: '', descr: '', version: '' });
+    const prototypes = ref([
+      { nome: 'Prototipo ENEL', version: '1.0', file: 'cantiere_enel.json' },
+      { nome: 'Prototipo TERNA', version: '1.1', file: 'cantiere_terna.json' },
+    ]);
+    // ----- Aggiungi un nuovo cantiere
+    async function addCantiere() {
+      if (!newCantiere.value.nome.trim()) {
+        alert('Il nome del cantiere è obbligatorio!');
+        return;
+      }
+
+      let prototypeData = {};
+      if (newCantiere.value.version) {
+        // Cerca il file del prototipo selezionato
+        const proto = prototypes.value.find(p => p.version === newCantiere.value.version);
+        if (proto) {
+          const res = await fetch(`./prototypes/${proto.version}`);
+          if (res.ok) prototypeData = await res.json();
+        }
+      }
+
+      const cantiere = {
+        ...prototypeData,
+        id: crypto.randomUUID(),
+        nome: newCantiere.value.nome,
+        descr: newCantiere.value.descr || '',
+        version: newCantiere.value.version || '1.0',
+        data: new Date().toISOString().slice(0, 10),
+        progress: 0,
+        sections: prototypeData.sections || []
+      };
+
+      // Inserimento DB
+      await db.worksites.put(cantiere);
+
+      // Aggiorno reactive
+      worksites.value.push(cantiere);
+
+      // Reset form
+      newCantiere.value = { nome: '', descr: '', version: '' };
+      showDialogNewWorksite.value = false;
+      console.log("Nuovo cantiere aggiunto:", cantiere);
+    }
+
     const toast = reactive({
       active: false,
       text: "",
@@ -23,35 +77,17 @@ createApp({
       { id: "ncompleti", icon: "indeterminate_check_box", label: "Incompleti" }
     ];
 
-    const worksites = ref(null);
-
-
-    /*
-[
-      { id: 1, nome: "Mirandola ENEL", descr: "Linea BT 12kV - tratto A", progress: 70 },
-      { id: 2, nome: "Carpi - Via Fossa", descr: "Sostituzione quadro MT", progress: 40 },
-      { id: 3, nome: "Modena Nord", descr: "Manutenzione pali", progress: 100 },
-      { id: 4, nome: "Camposanto", descr: "Ispezione cabine ENEL", progress: 20 },
-    ]
-    */
+    const worksites = ref([]);
 
 
     const cantiere = ref(null);
     const loading = ref(true);
 
-    // Carica il JSON del tipo cantiere
-    async function loadCantiere() {
-      try {
-        const res = await fetch("./cantiere.json");
-        if (!res.ok) throw new Error("Impossibile caricare il file JSON");
-        //cantiere.value = await res.json();
-        worksites.value = await res.json();
-        console.log("✅ Cantiere caricato:", worksites.value);
-      } catch (err) {
-        alert("Errore: " + err.message);
-      } finally {
-        loading.value = false;
-      }
+    const loadWorksites = async () => {
+      loading.value = true;
+
+      worksites.value = await db.worksites.toArray();
+
     }
 
     //test checklist
@@ -88,7 +124,7 @@ createApp({
         document.body.classList.add("dark");
       }
 
-      loadCantiere();
+      loadWorksites();
     });
 
     function toggleTheme() {
@@ -143,8 +179,17 @@ createApp({
     return {
       activeTab, tabs,
 
+      title,
+
       isDark,
       showDialog,
+
+      showDialogNewWorksite,
+      addCantiere,
+      newCantiere,
+      prototypes,
+
+
       toast,
       currentSection,
       selectedWorksite,
