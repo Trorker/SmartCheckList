@@ -1,3 +1,11 @@
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('Service Worker registrato', reg))
+      .catch(err => console.error('Service Worker errore', err));
+  });
+}
+
 const { createApp, ref, reactive, computed, onMounted } = Vue;
 
 createApp({
@@ -43,7 +51,7 @@ createApp({
         version: newCantiere.value.file || '',
         data: new Date().toISOString().slice(0, 10),
         progress: 0,
-      };      
+      };
 
       // Inserimento DB
       await db.worksites.put(cantiere);
