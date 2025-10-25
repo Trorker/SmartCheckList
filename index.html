@@ -264,10 +264,7 @@
             <section v-else-if="currentSection === 'worksite'" key="worksite">
 
                 <article>
-                    <div class="row">
-                        <h5 class="m-none">Dettagli Cantiere</h5>
-                        <span class="chip small primary">ID: {{ selectedWorksite?.id }}</span>
-                    </div>
+                    <h5 class="m-none">Dettagli Cantiere</h5>
 
                     <form @submit.prevent="saveWorksite()">
                         <fieldset>
@@ -331,7 +328,10 @@
                                 <label>Verificatore</label>
                             </div>
                         </fieldset>
+
+
                     </form>
+                    <span class="chip small margin center">ID: {{ selectedWorksite?.id }}</span>
                 </article>
 
 
