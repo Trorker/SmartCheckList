@@ -523,7 +523,7 @@
 
         <!-- DIALOG NUOVO CANTIERE -->
         <div class="overlay blur" :class="{ active: showDialogNewWorksite }"></div>
-        <dialog :open="showDialogNewWorksite" style="min-width: 50vw; max-width: 600px;">
+        <dialog :open="showDialogNewWorksite" class="responsive">
             <h5>Nuovo Cantiere</h5>
 
             <form @submit.prevent="addCantiere">
