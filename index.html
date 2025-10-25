@@ -611,7 +611,7 @@
 
                 <!-- Versione / file JSON prototipo -->
                 <div class="field label border">
-                    <select v-model="newCantiere.version">
+                    <select v-model="newCantiere.file" required>
                         <option disabled value="">Seleziona prototipo</option>
                         <option v-for="proto in prototypes" :key="proto.version" :value="proto.file">
                             {{ proto.version }} - {{ proto.nome }}
