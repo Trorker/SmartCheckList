@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check List Cantieri - Levratti</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚧</text></svg>">
+
+    <!-- BeerCSS -->
+    <link href="https://cdn.jsdelivr.net/npm/beercss@3.12.11/dist/cdn/beer.min.css" rel="stylesheet">
+    <script type="module" src="https://cdn.jsdelivr.net/npm/beercss@3.12.11/dist/cdn/beer.min.js"></script>
+    <script type="module"
+        src="https://cdn.jsdelivr.net/npm/material-dynamic-colors@1.1.2/dist/cdn/material-dynamic-colors.min.js"></script>
+
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <!-- Vue 3 -->
+    <!--<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>-->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+    <style>
+        :root {
+            --primary: #006e1c;
+            --on-primary: #ffffff;
+            --primary-container: #94f990;
+            --on-primary-container: #002204;
+            --secondary: #52634f;
+            --on-secondary: #ffffff;
+            --secondary-container: #d5e8cf;
+            --on-secondary-container: #111f0f;
+            --tertiary: #38656a;
+            --on-tertiary: #ffffff;
+            --tertiary-container: #bcebf0;
+            --on-tertiary-container: #002023;
+            --error: #ba1a1a;
+            --on-error: #ffffff;
+            --error-container: #ffdad6;
+            --on-error-container: #410002;
+            --background: #fcfdf6;
+            --on-background: #1a1c19;
+            --surface: #f9faf4;
+            --on-surface: #1a1c19;
+            --surface-variant: #dee5d8;
+            --on-surface-variant: #424940;
+            --outline: #72796f;
+            --outline-variant: #c2c9bd;
+            --shadow: #000000;
+            --scrim: #000000;
+            --inverse-surface: #2f312d;
+            --inverse-on-surface: #f0f1eb;
+            --inverse-primary: #78dc77;
+            --surface-dim: #dadad4;
+            --surface-bright: #f9faf4;
+            --surface-container-lowest: #ffffff;
+            --surface-container-low: #f3f4ee;
+            --surface-container: #eeeee8;
+            --surface-container-high: #e8e9e2;
+            --surface-container-highest: #e2e3dd;
+        }
+
+        body.dark {
+            --primary: #78dc77;
+            --on-primary: #00390a;
+            --primary-container: #005313;
+            --on-primary-container: #94f990;
+            --secondary: #baccb3;
+            --on-secondary: #253423;
+            --secondary-container: #3b4b38;
+            --on-secondary-container: #d5e8cf;
+            --tertiary: #a0cfd4;
+            --on-tertiary: #00363b;
+            --tertiary-container: #1f4d52;
+            --on-tertiary-container: #bcebf0;
+            --error: #ffb4ab;
+            --on-error: #690005;
+            --error-container: #93000a;
+            --on-error-container: #ffb4ab;
+            --background: #1a1c19;
+            --on-background: #e2e3dd;
+            --surface: #121411;
+            --on-surface: #e2e3dd;
+            --surface-variant: #424940;
+            --on-surface-variant: #c2c9bd;
+            --outline: #8c9388;
+            --outline-variant: #424940;
+            --shadow: #000000;
+            --scrim: #000000;
+            --inverse-surface: #e2e3dd;
+            --inverse-on-surface: #2f312d;
+            --inverse-primary: #006e1c;
+            --surface-dim: #121411;
+            --surface-bright: #383a36;
+            --surface-container-lowest: #0c0f0c;
+            --surface-container-low: #1a1c19;
+            --surface-container: #1e201d;
+            --surface-container-high: #282b27;
+            --surface-container-highest: #333531;
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+
+        .text-wrap {
+            white-space: break-spaces;
+        }
+
+        .slide-fade-enter-active,
+        .slide-fade-leave-active {
+            transition: all 0.25s ease;
+        }
+
+        .slide-fade-enter-from {
+            opacity: 0;
+            transform: translateX(10px);
+        }
+
+        .slide-fade-leave-to {
+            opacity: 0;
+            transform: translateX(-10px);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app" v-cloak>
+
+
+        <header class="fixed" style="box-shadow: var(--elevate1);">
+            <nav>
+                <button class="circle transparent" @click="goBack" v-if="currentSection !== 'home'">
+                    <i>arrow_back</i>
+                </button>
+                <div class="shape loading-indicator tiny"></div>
+                <h6 class="max">Levratti</h6>
+                <button class="circle transparent" @click="toggleTheme">
+                    <i>{{ isDark ? 'light_mode' : 'dark_mode' }}</i>
+                </button>
+                <button class="circle transparent" @click="openDialog">
+                    <i>settings</i>
+                </button>
+            </nav>
+        </header>
+
+
+        <main class="responsive">
+            <transition name="slide-fade" mode="out-in">
+
+                <!-- 🏠 HOME -->
+                <section v-if="currentSection === 'home'" key="home">
+
+                    <h3>Verifiche Ispettiva</h3>
+
+                    <!-- Navigation tabbed -->
+                    <div class="grid">
+
+                        <!-- Search -->
+                        <div class="s12 m12 l4">
+                            <div class="row">
+                                <div class="field prefix round fill active max">
+                                    <i class="front">search</i>
+                                    <input>
+                                    <menu class="min">
+                                        <li>
+                                            <div class="field large prefix">
+                                                <i class="front">arrow_back</i>
+                                                <input>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <i>history</i>
+                                            <div>Item 1</div>
+                                        </li>
+                                        <li>
+                                            <i>history</i>
+                                            <div>Item 2</div>
+                                        </li>
+                                        <li>
+                                            <i>history</i>
+                                            <div>Item 3</div>
+                                        </li>
+                                    </menu>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="l l2"></div>
+
+                        <!-- Filter -->
+                        <div class="s12 m12 l6">
+                            <div class="row right-align">
+                                <nav class="tabbed small">
+                                    <a v-for="tab in tabs" :key="tab.id" :class="{ active: activeTab === tab.id }"
+                                        @click="activeTab = tab.id">
+                                        <i>{{ tab.icon }}</i>
+                                        <span>{{ tab.label }}</span>
+                                    </a>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="grid">
+
+                        <!-- CARD WORKSITE -->
+                        <div class="s12 m6 l4" v-for="c in worksites" :key="c.id">
+                            <article class="no-padding">
+                                <img class="responsive"
+                                    src="https://www.impresalevratti.it/wp-content/uploads/2021/12/20211123_092730.jpeg" />
+                                <div class="padding">
+                                    <h5>{{ c.nome }}</h5>
+                                    <p>{{ c.descr }}</p>
+                                    <div class="row">
+                                        <label>{{ c.progress < 100 ? 'Incompleto' : 'Completato' }}</label>
+                                                <progress :value="c.progress" max="100"></progress>
+                                                <label>{{ c.progress }}%</label>
+                                    </div>
+                                    <nav>
+                                        <button @click="openWorksite(c)">Apri</button>
+                                        <div class="max"></div>
+                                        <nav>
+                                            <button class="circle transparent">
+                                                <i>share</i>
+                                            </button>
+                                            <button class="circle transparent">
+                                                <i>download</i>
+                                                <div class="badge no-round">New</div>
+                                            </button>
+                                            <button class="circle transparent"
+                                                @click="addToast('Cantiere ' + n + ' eliminato', 'error', {label:'Annulla', callback:()=>addToast('Annullato', 'primary')})">
+                                                <i>delete</i>
+                                            </button>
+                                        </nav>
+                                        <!--<button class="circle transparent">
+                                        <i>more_vert</i>
+                                    </button>-->
+                                    </nav>
+
+                                </div>
+                            </article>
+                        </div>
+
+                    </div>
+
+
+                </section>
+
+
+                <!-- 🏗️ WORKSITE -->
+                <section v-else-if="currentSection === 'worksite'" key="worksite">
+
+                    <article>
+                        <h3>{{ selectedWorksite?.nome }}</h3>
+                        <p>{{ selectedWorksite?.descr }}</p>
+                        <fieldset>
+                            <legend>Fill all fields</legend>
+                            <div class="field border label">
+                                <input>
+                                <label>Contratto/LCL/Lavoro:</label>
+                            </div>
+                            <div class="field border label">
+                                <select>
+                                    <option>Item 1</option>
+                                    <option>Item 2</option>
+                                    <option>Item 3</option>
+                                </select>
+                                <label>Select</label>
+                            </div>
+                            <div class="field border label textarea">
+                                <textarea></textarea>
+                                <label>Attività svolta:</label>
+                            </div>
+                        </fieldset>
+                    </article>
+
+
+                </section>
+
+
+                <!-- ✅ CHECKLIST -->
+                <!-- ✅ CHECKLIST -->
+                <section v-else-if="currentSection === 'checklist'" key="checklist">
+
+                    <nav class="center-align">
+                        <button class="circle transparent" @click="prevChecklistSection"
+                            :disabled="currentChecklistIndex === 0">
+                            <i>arrow_back</i>
+                        </button>
+                        <h6 class="max">{{ currentChecklist?.title }}</h6>
+                        <button class="circle transparent" @click="nextChecklistSection"
+                            :disabled="currentChecklistIndex >= checklistSections.length - 1">
+                            <i>arrow_forward</i>
+                        </button>
+                    </nav>
+
+                    <transition name="slide-fade" mode="out-in">
+                        <div class="page padding active right" :key="currentChecklistIndex">
+                            <h5>{{ currentChecklist?.title }}</h5>
+                            <article>
+                                <ul class="list border">
+                                    <li v-for="(item, index) in currentChecklist?.questions" :key="index">
+                                        <div class="grid max">
+                                            <div class="s12 m9 l10">
+                                                <div class="row">
+                                                    <i class="m l">{{ item.icon }}</i>
+                                                    <h6 class="max small text-wrap">{{ item.text }}</h6>
+                                                </div>
+                                            </div>
+
+                                            <div class="row s12 m3 l2 right-align">
+                                                <div class="center-align">
+                                                    <h6 class="small">C</h6>
+                                                    <label class="radio icon">
+                                                        <input type="radio" :name="'radio_' + index"
+                                                            v-model="item.value" value="C" />
+                                                        <span><i>circle</i><i>check_circle</i></span>
+                                                    </label>
+                                                </div>
+
+                                                <div class="center-align">
+                                                    <h6 class="small">N.C.</h6>
+                                                    <label class="radio icon">
+                                                        <input type="radio" :name="'radio_' + index"
+                                                            v-model="item.value" value="N.C." />
+                                                        <span><i>circle</i><i class="error">error</i></span>
+                                                    </label>
+                                                </div>
+
+                                                <div class="center-align">
+                                                    <h6 class="small">N.A.</h6>
+                                                    <label class="radio icon">
+                                                        <input type="radio" :name="'radio_' + index"
+                                                            v-model="item.value" value="N.A." />
+                                                        <span><i>circle</i><i>do_not_disturb_on</i></span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+
+                                <div class="field textarea label border round extra">
+                                    <textarea v-model="currentChecklist.note"></textarea>
+                                    <label>Note:</label>
+                                </div>
+                            </article>
+                        </div>
+                    </transition>
+
+                </section>
+
+            </transition>
+        </main>
+
+
+
+        <footer v-if="currentSection === 'home'" class="transparent right-align fixed">
+            <nav>
+                <!--<button class="circle transparent" @click="addToast('Cantiere salvato!', 'primary')">
+                    <i>check_box</i>
+                </button>
+                <button class="circle transparent" @click="addToast('Errore durante il salvataggio', 'error')">
+                    <i>brush</i>
+                </button>
+                <button class="circle transparent" @click="addToast('Operazione completata')">
+                    <i>mic</i>
+                </button>
+                <button class="circle transparent"
+                    @click="addToast('File caricato', 'default', {label:'Annulla', callback:()=>addToast('Annullato', 'error')})">
+                    <i>image</i>
+                </button>
+                <div class="max"></div>-->
+                <button class="square round extra" @click="openDialog">
+                    <i>add</i>
+                </button>
+            </nav>
+        </footer>
+
+        <footer v-if="currentSection === 'worksite'" class="transparent center-align fixed">
+            <div class="raw center-align">
+                <nav class="toolbar secondary-container large-elevate">
+                    <button class="circle transparent" @click="goBack">
+                        <i>arrow_back</i>
+                    </button>
+                    <button class="circle transparent" @click="openChecklist">
+                        <i>checklist</i>
+                    </button>
+                    <button class="circle transparent">
+                        <i>attach_file</i>
+                        <input type="file">
+                    </button>
+                    <button class="circle transparent" @click="openDialog">
+                        <i>signature</i>
+                    </button>
+                </nav>
+            </div>
+        </footer>
+
+        <footer v-if="currentSection === 'checklist'" class="transparent center-align fixed">
+            <div class="raw center-align">
+                <nav class="toolbar secondary-container large-elevate">
+                    <button class="circle transparent" @click="goBack">
+                        <i>arrow_back</i>
+                    </button>
+                    <button class="circle transparent">
+                        <i>attach_file</i>
+                        <input type="file">
+                    </button>
+                    <button class="circle transparent">
+                        <i>arrow_forward</i>
+                    </button>
+                </nav>
+            </div>
+        </footer>
+
+
+
+
+        <!-- DIALOG -->
+        <div class="overlay blur" :class="{ active: showDialog }"></div>
+        <dialog :open="showDialog">
+            <h5>Informazioni</h5>
+            <div>Questa è una finestra modale gestita con Vue + BeerCSS.</div>
+            <article class="medium middle-align center-align">
+                <div>
+                    <i class="extra">mail</i>
+                    <h5>You have no new messages</h5>
+                    <p>Click the button to start a conversation</p>
+                    <div class="space"></div>
+                    <nav class="center-align">
+                        <button>Send a message</button>
+                    </nav>
+                </div>
+            </article>
+            <nav class="right-align no-space mt">
+                <button class="transparent link" @click="closeDialog">Chiudi</button>
+                <button class="transparent link" @click="confirmAction">Conferma</button>
+            </nav>
+        </dialog>
+
+        <div class="overlay blur"></div>
+        <dialog style="min-width: 75vw">
+            <h5>Impostazioni Verificatore</h5>
+            <div class="field label border">
+                <input placeholder="Nome verificatore">
+                <label>Nome verificatore</label>
+            </div>
+
+            <div class="field label border">
+                <input placeholder="Azienda">
+                <label>Azienda</label>
+            </div>
+
+            <div>
+                <label style="display:block; margin-bottom:4px;">Firma:</label>
+                <canvas ref="canvas" style="border:1px solid var(--outline); width:100%; height:150px;"></canvas>
+                <nav class="right-align no-space mt">
+                    <button class="transparent small">Pulisci</button>
+                </nav>
+            </div>
+
+            <nav class="right-align no-space mt">
+                <button class="transparent link">Chiudi</button>
+                <button class="primary">Salva</button>
+            </nav>
+        </dialog>
+
+        <!-- TOAST / SNACKBAR -->
+        <div class="snackbar" :class="[toast.type, { active: toast.active }]">
+            <div class="max">{{ toast.text }}</div>
+            <a v-if="toast.action" class="inverse-link" @click="toast.action.callback">
+                {{ toast.action.label }}
+            </a>
+        </div>
+
+
+    </div>
+
+    <script type="module">
+        import { getAllSites } from "../archive/db.js";
+        const { createApp, ref, reactive, computed, onMounted } = Vue;
+
+        createApp({
+            setup() {
+                const isDark = ref(false);
+                const showDialog = ref(false);
+                const currentSection = ref("checklist");
+                const selectedWorksite = ref(null);
+                const toast = reactive({ active: false, text: "", type: "default" });
+
+                // ---------- MOCK DATI CHECKLIST ----------
+                const checklistSections = ref([
+                    {
+                        id: 1,
+                        title: "1 – DOCUMENTAZIONE GENERALE",
+                        questions: [
+                            { text: "La documentazione è completa?", icon: "description", value: "" },
+                            { text: "Sono presenti le firme richieste?", icon: "edit", value: "" },
+                        ],
+                        note: "",
+                    },
+                    {
+                        id: 2,
+                        title: "2 – FORMAZIONE PERSONALE DI CANTIERE",
+                        questions: [
+                            { text: "Il personale è formato adeguatamente?", icon: "school", value: "" },
+                            { text: "I corsi risultano aggiornati?", icon: "event", value: "" },
+                            { text: "È presente registro formazione?", icon: "assignment", value: "" },
+                        ],
+                        note: "",
+                    },
+                    {
+                        id: 3,
+                        title: "3 – SICUREZZA E DPI",
+                        questions: [
+                            { text: "I DPI sono conformi e disponibili?", icon: "engineering", value: "" },
+                            { text: "Il personale li utilizza correttamente?", icon: "security", value: "" },
+                        ],
+                        note: "",
+                    },
+                ]);
+
+                const currentChecklistIndex = ref(0);
+                const currentChecklist = computed(() => checklistSections.value[currentChecklistIndex.value]);
+
+                // ---------- NAVIGAZIONE TRA SEZIONI ----------
+                function nextChecklistSection() {
+                    if (currentChecklistIndex.value < checklistSections.value.length - 1) {
+                        currentChecklistIndex.value++;
+                    } else {
+                        addToast("Checklist completata!", "primary");
+                    }
+                }
+
+                function prevChecklistSection() {
+                    if (currentChecklistIndex.value > 0) currentChecklistIndex.value--;
+                }
+
+                // ---------- ALTRE FUNZIONI ----------
+                function openChecklist() {
+                    currentSection.value = "checklist";
+                    currentChecklistIndex.value = 0;
+                }
+
+                function goBack() {
+                    if (currentSection.value === "checklist") currentSection.value = "worksite";
+                    else if (currentSection.value === "worksite") currentSection.value = "home";
+                }
+
+                function toggleTheme() {
+                    isDark.value = !isDark.value;
+                    document.body.classList.toggle("dark", isDark.value);
+                }
+
+                function addToast(text, type = "default") {
+                    toast.text = text;
+                    toast.type = type;
+                    toast.active = true;
+                    clearTimeout(toast.timer);
+                    toast.timer = setTimeout(() => (toast.active = false), 3000);
+                }
+
+                onMounted(() => {
+                    document.body.classList.toggle("dark", isDark.value);
+                });
+
+                return {
+                    isDark,
+                    showDialog,
+                    toast,
+                    currentSection,
+                    selectedWorksite,
+                    checklistSections,
+                    currentChecklistIndex,
+                    currentChecklist,
+                    nextChecklistSection,
+                    prevChecklistSection,
+                    openChecklist,
+                    goBack,
+                    toggleTheme,
+                    addToast,
+                };
+            },
+        }).mount("#app");
+
+    </script>
+
+    <script type="module" src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+</body>
+
+</html>
