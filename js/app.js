@@ -1,10 +1,3 @@
-import {
-  getAllSites,
-  addSite,
-  deleteItem,
-  updateSite
-} from "../archive/db.js";
-
 const { createApp, ref, reactive, computed, onMounted } = Vue;
 
 createApp({
@@ -30,12 +23,17 @@ createApp({
       { id: "ncompleti", icon: "indeterminate_check_box", label: "Incompleti" }
     ];
 
-    const worksites = reactive([
+    const worksites = ref(null);
+
+
+    /*
+[
       { id: 1, nome: "Mirandola ENEL", descr: "Linea BT 12kV - tratto A", progress: 70 },
       { id: 2, nome: "Carpi - Via Fossa", descr: "Sostituzione quadro MT", progress: 40 },
       { id: 3, nome: "Modena Nord", descr: "Manutenzione pali", progress: 100 },
       { id: 4, nome: "Camposanto", descr: "Ispezione cabine ENEL", progress: 20 },
-    ]);
+    ]
+    */
 
 
     const cantiere = ref(null);
@@ -46,8 +44,9 @@ createApp({
       try {
         const res = await fetch("./cantiere.json");
         if (!res.ok) throw new Error("Impossibile caricare il file JSON");
-        cantiere.value = await res.json();
-        console.log("✅ Cantiere caricato:", cantiere.value);
+        //cantiere.value = await res.json();
+        worksites.value = await res.json();
+        console.log("✅ Cantiere caricato:", worksites.value);
       } catch (err) {
         alert("Errore: " + err.message);
       } finally {
@@ -71,6 +70,7 @@ createApp({
       else if (currentSection.value === "worksite") currentSection.value = "home";
     }
 
+    //passagio a worksite
     function openWorksite(w) {
       selectedWorksite.value = w;
       currentSection.value = "worksite";
