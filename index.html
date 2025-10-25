@@ -332,11 +332,6 @@
                                 <label>Verificatore</label>
                             </div>
                         </fieldset>
-
-                        <footer class="row justify-end gap mt">
-                            <button type="button" class="chip border" @click="goBack()">Indietro</button>
-                            <button type="submit" class="chip fill primary">Salva e continua</button>
-                        </footer>
                     </form>
                 </article>
 
@@ -476,69 +471,6 @@
             </section>
             <!--</transition>-->
         </main>
-
-
-
-        <!--<footer v-if="currentSection === 'home'" class="transparent right-align fixed">
-            <nav>
-                <button class="circle transparent" @click="addToast('Cantiere salvato!', 'primary')">
-                    <i>check_box</i>
-                </button>
-                <button class="circle transparent" @click="addToast('Errore durante il salvataggio', 'error')">
-                    <i>brush</i>
-                </button>
-                <button class="circle transparent" @click="addToast('Operazione completata')">
-                    <i>mic</i>
-                </button>
-                <button class="circle transparent"
-                    @click="addToast('File caricato', 'default', {label:'Annulla', callback:()=>addToast('Annullato', 'error')})">
-                    <i>image</i>
-                </button>
-                <div class="max"></div>
-                <button class="square round extra" @click="openDialog">
-                    <i>add</i>
-                </button>
-            </nav>
-        </footer>-->
-
-        <!--<footer v-if="currentSection === 'worksite'" class="transparent center-align fixed">
-            <div class="raw center-align">
-                <nav class="toolbar secondary-container large-elevate">
-                    <button class="circle transparent" @click="goBack">
-                        <i>arrow_back</i>
-                    </button>
-                    <button class="circle transparent" @click="openChecklist">
-                        <i>checklist</i>
-                    </button>
-                    <button class="circle transparent">
-                        <i>attach_file</i>
-                        <input type="file">
-                    </button>
-                    <button class="circle transparent" @click="openDialog">
-                        <i>signature</i>
-                    </button>
-                </nav>
-            </div>
-        </footer>-->
-
-        <!--<footer v-if="currentSection === 'checklist'" class="transparent center-align fixed">
-            <div class="raw center-align">
-                <nav class="toolbar secondary-container large-elevate">
-                    <button class="circle transparent" @click="goBack">
-                        <i>arrow_back</i>
-                    </button>
-                    <button class="circle transparent">
-                        <i>attach_file</i>
-                        <input type="file">
-                    </button>
-                    <button class="circle transparent">
-                        <i>arrow_forward</i>
-                    </button>
-                </nav>
-            </div>
-        </footer>-->
-
-
 
 
         <!-- DIALOG -->
