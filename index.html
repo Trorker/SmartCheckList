@@ -138,7 +138,7 @@
                     <i>arrow_back</i>
                 </button>
                 <div class="shape loading-indicator tiny"></div>
-                <h6 class="max">Levratti</h6>
+                <h6 class="max">{{ title }}</h6>
                 <button class="circle transparent" @click="toggleTheme">
                     <i>{{ isDark ? 'light_mode' : 'dark_mode' }}</i>
                 </button>
@@ -251,7 +251,7 @@
 
                 <footer class="transparent right-align" style="position: fixed; inset: auto 0px var(--_padding) 0px;">
                     <nav>
-                        <button class="square round extra" @click="openDialog">
+                        <button class="square round extra" @click="showDialogNewWorksite = true">
                             <i>add</i>
                         </button>
                     </nav>
@@ -264,10 +264,10 @@
             <section v-else-if="currentSection === 'worksite'" key="worksite">
 
                 <article>
-                    <diw class="row">
+                    <div class="row">
                         <h5 class="m-none">Dettagli Cantiere</h5>
                         <span class="chip small primary">ID: {{ selectedWorksite?.id }}</span>
-                    </diw>
+                    </div>
 
                     <form @submit.prevent="saveWorksite()">
                         <fieldset>
@@ -589,6 +589,45 @@
                 <button class="primary">Salva</button>
             </nav>
         </dialog>
+
+        <!-- DIALOG NUOVO CANTIERE -->
+        <div class="overlay blur" :class="{ active: showDialogNewWorksite }"></div>
+        <dialog :open="showDialogNewWorksite" style="min-width: 50vw; max-width: 600px;">
+            <h5>Nuovo Cantiere</h5>
+
+            <form @submit.prevent="addCantiere">
+
+                <!-- Nome (obbligatorio) -->
+                <div class="field label border">
+                    <input v-model="newCantiere.nome" required>
+                    <label>Nome cantiere *</label>
+                </div>
+
+                <!-- Descrizione (opzionale) -->
+                <div class="field label border">
+                    <input v-model="newCantiere.descr">
+                    <label>Descrizione</label>
+                </div>
+
+                <!-- Versione / file JSON prototipo -->
+                <div class="field label border">
+                    <select v-model="newCantiere.version">
+                        <option disabled value="">Seleziona prototipo</option>
+                        <option v-for="proto in prototypes" :key="proto.version" :value="proto.file">
+                            {{ proto.version }} - {{ proto.nome }}
+                        </option>
+                    </select>
+                    <label>Prototipo cantiere</label>
+                </div>
+
+                <nav class="right-align no-space mt">
+                    <button type="button" class="transparent link" @click="showDialogNewWorksite = false">Chiudi</button>
+                    <button type="submit" class="primary">Conferma</button>
+                </nav>
+
+            </form>
+        </dialog>
+
 
         <!-- TOAST / SNACKBAR -->
         <div class="snackbar" :class="[toast.type, { active: toast.active }]">
