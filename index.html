@@ -322,13 +322,12 @@
                                 <label>Attività svolta</label>
                             </div>
 
+                        </fieldset>
+
+                        <fieldset>
+                            <legend>Verificatore</legend>
                             <div class="field border label">
-                                <select v-model="selectedWorksite.luogo.verificatore">
-                                    <option value="">— Seleziona verificatore —</option>
-                                    <option>Mario Rossi</option>
-                                    <option>Luigi Bianchi</option>
-                                    <option>Giulia Verdi</option>
-                                </select>
+                                <input type="text" v-model="selectedWorksite.luogo.verificatore">
                                 <label>Verificatore</label>
                             </div>
                         </fieldset>
@@ -553,7 +552,8 @@
                 </div>
 
                 <nav class="right-align no-space mt">
-                    <button type="button" class="transparent link" @click="showDialogNewWorksite = false">Chiudi</button>
+                    <button type="button" class="transparent link"
+                        @click="showDialogNewWorksite = false">Chiudi</button>
                     <button type="submit" class="primary">Conferma</button>
                 </nav>
 
