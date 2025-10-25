@@ -1,604 +1,301 @@
-[
-  {
-    "id": "CANT001",
-    "nome": "Mirandola ENEL",
-    "descr": "Linea BT 12kV - tratto A",
-    "data": "2025-10-15",
-    "progress": 50,
-    "version": "1.0",
-    "luogo": {
-      "comune": "",
-      "provincia": "",
-      "indirizzo": "",
-      "contratto": "",
-      "impresa": "",
-      "attivita": "",
-      "verificatore": ""
-    },
-    "sections": [
-      {
-        "id": 1,
-        "title": "Verifica personale presente in cantiere",
-        "icon": "group",
-        "type": "table",
-        "notes": "",
-        "attachments": [],
-        "items": [
-          {
-            "icon": "badge",
-            "text": "Anagrafica del personale presente con indicazione profili Enel, PES/PAV/PEI e dotazione DPI",
-            "columns": [
-              "Cognome e Nome",
-              "Profili Enel",
-              "PES",
-              "PAV",
-              "PEI",
-              "PL",
-              "PS",
-              "PI",
-              "GE",
-              "Ci",
-              "C",
-              "R",
-              "A",
-              "I",
-              "S",
-              "G",
-              "g",
-              "M",
-              "O"
-            ],
-            "rows": []
-          }
-        ]
-      },
-      {
-        "id": 2,
-        "title": "Verifica formazione personale di cantiere",
-        "icon": "school",
-        "type": "checklist",
-        "notes": "",
-        "attachments": [],
-        "items": [
-          {
-            "icon": "engineering",
-            "text": "Il preposto ai lavori nel cantiere è individuato e, per i lavori elettrici, in possesso di attestazione PES",
-            "value": null
-          },
-          {
-            "icon": "recent_actors",
-            "text": "Il personale presente ha i profili Enel adeguati all’attività che sta svolgendo o che andrà a svolgere",
-            "value": null
-          },
-          {
-            "icon": "bolt",
-            "text": "In caso di lavori sotto tensione in BT, il personale è in possesso dell’idoneità a svolgere tali lavori rilasciata dal datore di lavoro",
-            "value": null
-          },
-          {
-            "icon": "medical_services",
-            "text": "Il personale presente ha la formazione adeguata per la gestione emergenze (primo soccorso, prevenzione incendi, ecc.)",
-            "value": null
-          },
-          {
-            "icon": "precision_manufacturing",
-            "text": "Il personale presente ha la formazione adeguata all’utilizzo delle macchine e attrezzature (PLE, gru su autocarro, escavatori, ecc.)",
-            "value": null
-          },
-          {
-            "icon": "signpost",
-            "text": "Il personale presente ha la formazione adeguata per addetti e preposti alla segnaletica stradale in presenza di traffico veicolare",
-            "value": null
-          }
-        ]
-      },
-      {
-        "id": 3,
-        "title": "Verifica allestimento del cantiere",
-        "icon": "construction",
-        "type": "checklist",
-        "notes": "",
-        "attachments": [],
-        "items": []
-      },
-      {
-        "id": 4,
-        "title": "Organizzazione del cantiere",
-        "icon": "account_tree",
-        "type": "checklist",
-        "notes": "",
-        "attachments": [],
-        "items": [
-          {
-            "icon": "warning",
-            "text": "Il segnalamento temporaneo del cantiere su sede stradale è conforme al codice",
-            "value": null
-          },
-          {
-            "icon": "place",
-            "text": "Il cantiere è adeguatamente segnalato e delimitato, e le zone pericolose sono protette",
-            "value": null
-          },
-          {
-            "icon": "fire_extinguisher",
-            "text": "I presidi antincendio previsti sono presenti in cantiere e efficienti",
-            "value": null
-          },
-          {
-            "icon": "medical_services",
-            "text": "I presidi per il primo soccorso previsti sono presenti e efficienti",
-            "value": null
-          },
-          {
-            "icon": "checklist_rtl",
-            "text": "È stato correttamente effettuato il Pre Job Check",
-            "value": null
-          },
-          {
-            "icon": "foundation",
-            "text": "È stata effettuata la verifica stabilità sostegno",
-            "value": null
-          },
-          {
-            "icon": "recycling",
-            "text": "Il deposito temporaneo è individuato correttamente",
-            "value": null
-          }
-        ]
-      },
-      {
-        "id": 5,
-        "title": "Verifica mezzi presenti in cantiere",
-        "icon": "local_shipping",
-        "type": "table",
-        "notes": "",
-        "attachments": [],
-        "items": [
-          {
-            "icon": "directions_car",
-            "text": "Verifica stato, revisione, estintori, cassetta pronto soccorso e documentazione mezzi",
-            "columns": [
-              "Marca",
-              "Tipo",
-              "Targa/Telaio",
-              "Proprietà",
-              "Note"
-            ],
-            "rows": []
-          }
-        ]
-      },
-      {
-        "id": 6,
-        "title": "Verifica sicurezza",
-        "icon": "security",
-        "type": "checklist",
-        "notes": "",
-        "attachments": [],
-        "items": [
-          {
-            "icon": "description",
-            "text": "Copia della notifica preliminare alla ASL e alla Dir.Prov. del Lavoro è affissa in cantiere (quando previsto)",
-            "value": null
-          },
-          {
-            "icon": "content_paste_search",
-            "text": "Il cantiere è conforme alle prescrizioni previste dal POS e PSC",
-            "value": null
-          },
-          {
-            "icon": "warning",
-            "text": "Il segnalamento temporaneo su sede stradale risponde alle disposizioni legislative",
-            "value": null
-          },
-          {
-            "icon": "fence",
-            "text": "Le aree di cantiere sono correttamente delimitate e segnalate",
-            "value": null
-          },
-          {
-            "icon": "engineering",
-            "text": "È individuato un dipendente preposto ai lavori",
-            "value": null
-          },
-          {
-            "icon": "bolt",
-            "text": "In caso di lavori elettrici in tensione o fuori tensione sono rispettate le procedure previste",
-            "value": null
-          },
-          {
-            "icon": "handyman",
-            "text": "I DPI presenti e utilizzati sono idonei e in buono stato",
-            "value": null
-          },
-          {
-            "icon": "construction",
-            "text": "Le attrezzature per attività in elevazione sono adeguate e correttamente utilizzate",
-            "value": null
-          },
-          {
-            "icon": "bolt",
-            "text": "I dispositivi di messa a terra ed equipotenzialità sono presenti e correttamente applicati",
-            "value": null
-          },
-          {
-            "icon": "build",
-            "text": "Le attrezzature e utensili isolanti sono in buono stato e utilizzati correttamente",
-            "value": null
-          },
-          {
-            "icon": "directions_car",
-            "text": "Automezzi e macchine operative adeguate, in regola con verifiche e documentazione",
-            "value": null
-          },
-          {
-            "icon": "shield",
-            "text": "Protezione delle parti attive e opere provvisionali integre",
-            "value": null
-          }
-        ]
-      },
-      {
-        "id": 7,
-        "title": "Verifica ambiente",
-        "icon": "eco",
-        "type": "checklist",
-        "notes": "",
-        "attachments": [],
-        "items": [
-          {
-            "icon": "recycling",
-            "text": "I rifiuti e materiali di risulta non riutilizzati sono stoccati correttamente",
-            "value": null
-          },
-          {
-            "icon": "water_drop",
-            "text": "Adeguatezza delle misure di protezione ambientale per apparecchiature in olio",
-            "value": null
-          },
-          {
-            "icon": "inventory",
-            "text": "Identificazione tipologie di rifiuti presenti in deposito temporaneo",
-            "value": null
-          },
-          {
-            "icon": "science",
-            "text": "È presente un kit monouso per la manipolazione di oli",
-            "value": null
-          },
-          {
-            "icon": "cloud",
-            "text": "Sistema per contenere la diffusione delle polveri di materiale di risulta (es. telo copertura)",
-            "value": null
-          }
-        ]
-      },
-      {
-        "id": 8,
-        "title": "Note finali e osservazioni preposto",
-        "icon": "note_alt",
-        "type": "note",
-        "notes": ""
-      },
-      {
-        "id": 9,
-        "title": "Firme",
-        "icon": "edit_document",
-        "type": "signature",
-        "signatures": [
-          {
-            "role": "Verificatore",
-            "name": "",
-            "signature": ""
-          },
-          {
-            "role": "Preposto ai lavori",
-            "name": "",
-            "signature": ""
-          }
-        ]
-      }
-    ]
+{
+  "nome": "",
+  "descr": "",
+  "data": "",
+  "progress": 0,
+  "status": "in_progress",
+  "version": "1.0",
+  "luogo": {
+    "comune": "",
+    "provincia": "",
+    "indirizzo": "",
+    "contratto": "",
+    "impresa": "",
+    "attivita": "",
+    "verificatore": ""
   },
-  {
-    "id": "CANT001",
-    "nome": "Mirandola ENEL",
-    "descr": "Linea BT 12kV - tratto A",
-    "data": "2025-10-15",
-    "progress": 50,
-    "version": "1.0",
-    "luogo": {
-      "comune": "",
-      "provincia": "",
-      "indirizzo": "",
-      "contratto": "",
-      "impresa": "",
-      "attivita": "",
-      "verificatore": ""
+  "sections": [
+    {
+      "id": 1,
+      "title": "Verifica personale presente in cantiere",
+      "icon": "group",
+      "type": "table",
+      "notes": "",
+      "attachments": [],
+      "items": [
+        {
+          "icon": "badge",
+          "text": "Anagrafica del personale presente con indicazione profili Enel, PES/PAV/PEI e dotazione DPI",
+          "columns": [
+            "Cognome e Nome",
+            "Profili Enel",
+            "PES",
+            "PAV",
+            "PEI",
+            "PL",
+            "PS",
+            "PI",
+            "GE",
+            "Ci",
+            "C",
+            "R",
+            "A",
+            "I",
+            "S",
+            "G",
+            "g",
+            "M",
+            "O"
+          ],
+          "rows": []
+        }
+      ]
     },
-    "sections": [
-      {
-        "id": 1,
-        "title": "Verifica personale presente in cantiere",
-        "icon": "group",
-        "type": "table",
-        "notes": "",
-        "attachments": [],
-        "items": [
-          {
-            "icon": "badge",
-            "text": "Anagrafica del personale presente con indicazione profili Enel, PES/PAV/PEI e dotazione DPI",
-            "columns": [
-              "Cognome e Nome",
-              "Profili Enel",
-              "PES",
-              "PAV",
-              "PEI",
-              "PL",
-              "PS",
-              "PI",
-              "GE",
-              "Ci",
-              "C",
-              "R",
-              "A",
-              "I",
-              "S",
-              "G",
-              "g",
-              "M",
-              "O"
-            ],
-            "rows": []
-          }
-        ]
-      },
-      {
-        "id": 2,
-        "title": "Verifica formazione personale di cantiere",
-        "icon": "school",
-        "type": "checklist",
-        "notes": "",
-        "attachments": [],
-        "items": [
-          {
-            "icon": "engineering",
-            "text": "Il preposto ai lavori nel cantiere è individuato e, per i lavori elettrici, in possesso di attestazione PES",
-            "value": null
-          },
-          {
-            "icon": "recent_actors",
-            "text": "Il personale presente ha i profili Enel adeguati all’attività che sta svolgendo o che andrà a svolgere",
-            "value": null
-          },
-          {
-            "icon": "bolt",
-            "text": "In caso di lavori sotto tensione in BT, il personale è in possesso dell’idoneità a svolgere tali lavori rilasciata dal datore di lavoro",
-            "value": null
-          },
-          {
-            "icon": "medical_services",
-            "text": "Il personale presente ha la formazione adeguata per la gestione emergenze (primo soccorso, prevenzione incendi, ecc.)",
-            "value": null
-          },
-          {
-            "icon": "precision_manufacturing",
-            "text": "Il personale presente ha la formazione adeguata all’utilizzo delle macchine e attrezzature (PLE, gru su autocarro, escavatori, ecc.)",
-            "value": null
-          },
-          {
-            "icon": "signpost",
-            "text": "Il personale presente ha la formazione adeguata per addetti e preposti alla segnaletica stradale in presenza di traffico veicolare",
-            "value": null
-          }
-        ]
-      },
-      {
-        "id": 3,
-        "title": "Verifica allestimento del cantiere",
-        "icon": "construction",
-        "type": "checklist",
-        "notes": "",
-        "attachments": [],
-        "items": []
-      },
-      {
-        "id": 4,
-        "title": "Organizzazione del cantiere",
-        "icon": "account_tree",
-        "type": "checklist",
-        "notes": "",
-        "attachments": [],
-        "items": [
-          {
-            "icon": "warning",
-            "text": "Il segnalamento temporaneo del cantiere su sede stradale è conforme al codice",
-            "value": null
-          },
-          {
-            "icon": "place",
-            "text": "Il cantiere è adeguatamente segnalato e delimitato, e le zone pericolose sono protette",
-            "value": null
-          },
-          {
-            "icon": "fire_extinguisher",
-            "text": "I presidi antincendio previsti sono presenti in cantiere e efficienti",
-            "value": null
-          },
-          {
-            "icon": "medical_services",
-            "text": "I presidi per il primo soccorso previsti sono presenti e efficienti",
-            "value": null
-          },
-          {
-            "icon": "checklist_rtl",
-            "text": "È stato correttamente effettuato il Pre Job Check",
-            "value": null
-          },
-          {
-            "icon": "foundation",
-            "text": "È stata effettuata la verifica stabilità sostegno",
-            "value": null
-          },
-          {
-            "icon": "recycling",
-            "text": "Il deposito temporaneo è individuato correttamente",
-            "value": null
-          }
-        ]
-      },
-      {
-        "id": 5,
-        "title": "Verifica mezzi presenti in cantiere",
-        "icon": "local_shipping",
-        "type": "table",
-        "notes": "",
-        "attachments": [],
-        "items": [
-          {
-            "icon": "directions_car",
-            "text": "Verifica stato, revisione, estintori, cassetta pronto soccorso e documentazione mezzi",
-            "columns": [
-              "Marca",
-              "Tipo",
-              "Targa/Telaio",
-              "Proprietà",
-              "Note"
-            ],
-            "rows": []
-          }
-        ]
-      },
-      {
-        "id": 6,
-        "title": "Verifica sicurezza",
-        "icon": "security",
-        "type": "checklist",
-        "notes": "",
-        "attachments": [],
-        "items": [
-          {
-            "icon": "description",
-            "text": "Copia della notifica preliminare alla ASL e alla Dir.Prov. del Lavoro è affissa in cantiere (quando previsto)",
-            "value": null
-          },
-          {
-            "icon": "content_paste_search",
-            "text": "Il cantiere è conforme alle prescrizioni previste dal POS e PSC",
-            "value": null
-          },
-          {
-            "icon": "warning",
-            "text": "Il segnalamento temporaneo su sede stradale risponde alle disposizioni legislative",
-            "value": null
-          },
-          {
-            "icon": "fence",
-            "text": "Le aree di cantiere sono correttamente delimitate e segnalate",
-            "value": null
-          },
-          {
-            "icon": "engineering",
-            "text": "È individuato un dipendente preposto ai lavori",
-            "value": null
-          },
-          {
-            "icon": "bolt",
-            "text": "In caso di lavori elettrici in tensione o fuori tensione sono rispettate le procedure previste",
-            "value": null
-          },
-          {
-            "icon": "handyman",
-            "text": "I DPI presenti e utilizzati sono idonei e in buono stato",
-            "value": null
-          },
-          {
-            "icon": "construction",
-            "text": "Le attrezzature per attività in elevazione sono adeguate e correttamente utilizzate",
-            "value": null
-          },
-          {
-            "icon": "bolt",
-            "text": "I dispositivi di messa a terra ed equipotenzialità sono presenti e correttamente applicati",
-            "value": null
-          },
-          {
-            "icon": "build",
-            "text": "Le attrezzature e utensili isolanti sono in buono stato e utilizzati correttamente",
-            "value": null
-          },
-          {
-            "icon": "directions_car",
-            "text": "Automezzi e macchine operative adeguate, in regola con verifiche e documentazione",
-            "value": null
-          },
-          {
-            "icon": "shield",
-            "text": "Protezione delle parti attive e opere provvisionali integre",
-            "value": null
-          }
-        ]
-      },
-      {
-        "id": 7,
-        "title": "Verifica ambiente",
-        "icon": "eco",
-        "type": "checklist",
-        "notes": "",
-        "attachments": [],
-        "items": [
-          {
-            "icon": "recycling",
-            "text": "I rifiuti e materiali di risulta non riutilizzati sono stoccati correttamente",
-            "value": null
-          },
-          {
-            "icon": "water_drop",
-            "text": "Adeguatezza delle misure di protezione ambientale per apparecchiature in olio",
-            "value": null
-          },
-          {
-            "icon": "inventory",
-            "text": "Identificazione tipologie di rifiuti presenti in deposito temporaneo",
-            "value": null
-          },
-          {
-            "icon": "science",
-            "text": "È presente un kit monouso per la manipolazione di oli",
-            "value": null
-          },
-          {
-            "icon": "cloud",
-            "text": "Sistema per contenere la diffusione delle polveri di materiale di risulta (es. telo copertura)",
-            "value": null
-          }
-        ]
-      },
-      {
-        "id": 8,
-        "title": "Note finali e osservazioni preposto",
-        "icon": "note_alt",
-        "type": "note",
-        "notes": ""
-      },
-      {
-        "id": 9,
-        "title": "Firme",
-        "icon": "edit_document",
-        "type": "signature",
-        "signatures": [
-          {
-            "role": "Verificatore",
-            "name": "",
-            "signature": ""
-          },
-          {
-            "role": "Preposto ai lavori",
-            "name": "",
-            "signature": ""
-          }
-        ]
-      }
-    ]
-  }
-]
+    {
+      "id": 2,
+      "title": "Verifica formazione personale di cantiere",
+      "icon": "school",
+      "type": "checklist",
+      "notes": "",
+      "attachments": [],
+      "items": [
+        {
+          "icon": "engineering",
+          "text": "Il preposto ai lavori nel cantiere è individuato e, per i lavori elettrici, in possesso di attestazione PES",
+          "value": null
+        },
+        {
+          "icon": "recent_actors",
+          "text": "Il personale presente ha i profili Enel adeguati all’attività che sta svolgendo o che andrà a svolgere",
+          "value": null
+        },
+        {
+          "icon": "bolt",
+          "text": "In caso di lavori sotto tensione in BT, il personale è in possesso dell’idoneità a svolgere tali lavori rilasciata dal datore di lavoro",
+          "value": null
+        },
+        {
+          "icon": "medical_services",
+          "text": "Il personale presente ha la formazione adeguata per la gestione emergenze (primo soccorso, prevenzione incendi, ecc.)",
+          "value": null
+        },
+        {
+          "icon": "precision_manufacturing",
+          "text": "Il personale presente ha la formazione adeguata all’utilizzo delle macchine e attrezzature (PLE, gru su autocarro, escavatori, ecc.)",
+          "value": null
+        },
+        {
+          "icon": "signpost",
+          "text": "Il personale presente ha la formazione adeguata per addetti e preposti alla segnaletica stradale in presenza di traffico veicolare",
+          "value": null
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Verifica allestimento del cantiere",
+      "icon": "construction",
+      "type": "checklist",
+      "notes": "",
+      "attachments": [],
+      "items": []
+    },
+    {
+      "id": 4,
+      "title": "Organizzazione del cantiere",
+      "icon": "account_tree",
+      "type": "checklist",
+      "notes": "",
+      "attachments": [],
+      "items": [
+        {
+          "icon": "warning",
+          "text": "Il segnalamento temporaneo del cantiere su sede stradale è conforme al codice",
+          "value": null
+        },
+        {
+          "icon": "place",
+          "text": "Il cantiere è adeguatamente segnalato e delimitato, e le zone pericolose sono protette",
+          "value": null
+        },
+        {
+          "icon": "fire_extinguisher",
+          "text": "I presidi antincendio previsti sono presenti in cantiere e efficienti",
+          "value": null
+        },
+        {
+          "icon": "medical_services",
+          "text": "I presidi per il primo soccorso previsti sono presenti e efficienti",
+          "value": null
+        },
+        {
+          "icon": "checklist_rtl",
+          "text": "È stato correttamente effettuato il Pre Job Check",
+          "value": null
+        },
+        {
+          "icon": "foundation",
+          "text": "È stata effettuata la verifica stabilità sostegno",
+          "value": null
+        },
+        {
+          "icon": "recycling",
+          "text": "Il deposito temporaneo è individuato correttamente",
+          "value": null
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Verifica mezzi presenti in cantiere",
+      "icon": "local_shipping",
+      "type": "table",
+      "notes": "",
+      "attachments": [],
+      "items": [
+        {
+          "icon": "directions_car",
+          "text": "Verifica stato, revisione, estintori, cassetta pronto soccorso e documentazione mezzi",
+          "columns": [
+            "Marca",
+            "Tipo",
+            "Targa/Telaio",
+            "Proprietà",
+            "Note"
+          ],
+          "rows": []
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Verifica sicurezza",
+      "icon": "security",
+      "type": "checklist",
+      "notes": "",
+      "attachments": [],
+      "items": [
+        {
+          "icon": "description",
+          "text": "Copia della notifica preliminare alla ASL e alla Dir.Prov. del Lavoro è affissa in cantiere (quando previsto)",
+          "value": null
+        },
+        {
+          "icon": "content_paste_search",
+          "text": "Il cantiere è conforme alle prescrizioni previste dal POS e PSC",
+          "value": null
+        },
+        {
+          "icon": "warning",
+          "text": "Il segnalamento temporaneo su sede stradale risponde alle disposizioni legislative",
+          "value": null
+        },
+        {
+          "icon": "fence",
+          "text": "Le aree di cantiere sono correttamente delimitate e segnalate",
+          "value": null
+        },
+        {
+          "icon": "engineering",
+          "text": "È individuato un dipendente preposto ai lavori",
+          "value": null
+        },
+        {
+          "icon": "bolt",
+          "text": "In caso di lavori elettrici in tensione o fuori tensione sono rispettate le procedure previste",
+          "value": null
+        },
+        {
+          "icon": "handyman",
+          "text": "I DPI presenti e utilizzati sono idonei e in buono stato",
+          "value": null
+        },
+        {
+          "icon": "construction",
+          "text": "Le attrezzature per attività in elevazione sono adeguate e correttamente utilizzate",
+          "value": null
+        },
+        {
+          "icon": "bolt",
+          "text": "I dispositivi di messa a terra ed equipotenzialità sono presenti e correttamente applicati",
+          "value": null
+        },
+        {
+          "icon": "build",
+          "text": "Le attrezzature e utensili isolanti sono in buono stato e utilizzati correttamente",
+          "value": null
+        },
+        {
+          "icon": "directions_car",
+          "text": "Automezzi e macchine operative adeguate, in regola con verifiche e documentazione",
+          "value": null
+        },
+        {
+          "icon": "shield",
+          "text": "Protezione delle parti attive e opere provvisionali integre",
+          "value": null
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Verifica ambiente",
+      "icon": "eco",
+      "type": "checklist",
+      "notes": "",
+      "attachments": [],
+      "items": [
+        {
+          "icon": "recycling",
+          "text": "I rifiuti e materiali di risulta non riutilizzati sono stoccati correttamente",
+          "value": null
+        },
+        {
+          "icon": "water_drop",
+          "text": "Adeguatezza delle misure di protezione ambientale per apparecchiature in olio",
+          "value": null
+        },
+        {
+          "icon": "inventory",
+          "text": "Identificazione tipologie di rifiuti presenti in deposito temporaneo",
+          "value": null
+        },
+        {
+          "icon": "science",
+          "text": "È presente un kit monouso per la manipolazione di oli",
+          "value": null
+        },
+        {
+          "icon": "cloud",
+          "text": "Sistema per contenere la diffusione delle polveri di materiale di risulta (es. telo copertura)",
+          "value": null
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "Note finali e osservazioni preposto",
+      "icon": "note_alt",
+      "type": "note",
+      "notes": ""
+    },
+    {
+      "id": 9,
+      "title": "Firme",
+      "icon": "edit_document",
+      "type": "signature",
+      "signatures": [
+        {
+          "role": "Verificatore",
+          "name": "",
+          "signature": ""
+        },
+        {
+          "role": "Preposto ai lavori",
+          "name": "",
+          "signature": ""
+        }
+      ]
+    }
+  ]
+}
