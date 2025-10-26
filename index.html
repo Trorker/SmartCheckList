@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="manifest" href="./manifest.json">
+    <!--<link rel="manifest" href="./manifest.json">-->
     <meta name="theme-color" content="#2196f3">
 
     <title>Check List Cantieri - Levratti</title>
@@ -141,7 +141,7 @@
                 <button class="circle transparent" @click="goBack" v-if="currentSection !== 'home'">
                     <i>arrow_back</i>
                 </button>
-                <div class="shape loading-indicator tiny"></div>
+                <div class="shape loading-indicator tiny" v-if="loading"></div>
                 <h6 class="max">{{ title }}</h6>
                 <button class="circle transparent" @click="toggleTheme">
                     <i>{{ isDark ? 'light_mode' : 'dark_mode' }}</i>
@@ -170,26 +170,6 @@
                             <div class="field prefix round fill active max">
                                 <i class="front">search</i>
                                 <input>
-                                <menu class="min">
-                                    <li>
-                                        <div class="field large prefix">
-                                            <i class="front">arrow_back</i>
-                                            <input>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <i>history</i>
-                                        <div>Item 1</div>
-                                    </li>
-                                    <li>
-                                        <i>history</i>
-                                        <div>Item 2</div>
-                                    </li>
-                                    <li>
-                                        <i>history</i>
-                                        <div>Item 3</div>
-                                    </li>
-                                </menu>
                             </div>
                         </div>
                     </div>
@@ -267,9 +247,10 @@
             <!-- 🏗️ WORKSITE -->
             <section v-else-if="currentSection === 'worksite'" key="worksite">
 
-                <article>
+                <header>
                     <h5 class="m-none">Dettagli Cantiere</h5>
-
+                </header>
+                <article class="padding">
                     <form @submit.prevent="saveWorksite()">
                         <fieldset>
                             <legend>Dati generali</legend>
@@ -362,8 +343,70 @@
             </section>
 
 
-            <!-- ✅ CHECKLIST -->
-            <section v-else-if="currentSection === 'checklist'" key="checklist">
+            <!-- ✅ CHECKLIST CON PAGINAZIONE -->
+            <section v-if="currentSection === 'checklist' && selectedWorksite">
+                <div class="padding">
+                    <h5>{{ currentSectionIndex + 1 }} – {{ currentChecklistSections[currentSectionIndex].title }}</h5>
+
+                    <article v-if="currentChecklistSections[currentSectionIndex].type === 'checklist'">
+                        <ul class="list border">
+                            <li v-for="(item, index) in currentChecklistSections[currentSectionIndex].items"
+                                :key="index">
+                                <div class="grid max">
+                                    <div class="s12 m9 l10">
+                                        <div class="row">
+                                            <i class="m l">{{ item.icon }}</i>
+                                            <h6 class="max small text-wrap">{{ item.text }}</h6>
+                                        </div>
+                                    </div>
+
+                                    <div class="row s12 m3 l2 right-align">
+                                        <div class="center-align" v-for="val in ['C','N.C.','N.A.']" :key="val">
+                                            <h6 class="small">{{ val }}</h6>
+                                            <label class="radio icon">
+                                                <input type="radio" :name="'radio_' + currentSectionIndex + '_' + index"
+                                                    v-model="item.value" :value="val">
+                                                <span>
+                                                    <i>circle</i>
+                                                    <i v-if="val==='C'">check_circle</i>
+                                                    <i v-else-if="val==='N.C.'">error</i>
+                                                    <i v-else>do_not_disturb_on</i>
+                                                </span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+
+                        <div class="field textarea label border round extra">
+                            <textarea v-model="currentChecklistSections[currentSectionIndex].notes"></textarea>
+                            <label>Note:</label>
+                        </div>
+                    </article>
+
+                    <footer class="transparent center-align"
+                        style="position: fixed; inset: auto 0px var(--_padding) 0px;">
+                        <div class="raw center-align">
+                            <nav class="toolbar secondary-container large-elevate">
+                                <button class="circle transparent" @click="prevSection"
+                                    :disabled="currentSectionIndex === 0">
+                                    <i>arrow_back</i>
+                                </button>
+                                <span class="max center-align">{{ currentSectionIndex + 1 }} / {{
+                                    currentChecklistSections.length }}</span>
+                                <button class="circle transparent" @click="nextSection"
+                                    :disabled="currentSectionIndex === currentChecklistSections.length - 1">
+                                    <i>arrow_forward</i>
+                                </button>
+                            </nav>
+                        </div>
+                    </footer>
+                </div>
+            </section>
+
+
+            <!--<section v-else-if="currentSection === 'checklist'" key="checklist">
 
                 <nav>
                     <div class="center-align">
@@ -472,7 +515,7 @@
                     </div>
                 </footer>
 
-            </section>
+            </section>-->
             <!--</transition>-->
         </main>
 
