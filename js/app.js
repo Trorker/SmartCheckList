@@ -40,6 +40,9 @@ createApp({
       { id: "ncompleti", icon: "indeterminate_check_box", label: "Incompleti" }
     ];
 
+    const dialogImage = ref(null);
+    const photoDialog = ref(false);
+
     const currentSectionIndex = ref(0);
 
     const currentChecklistSections = computed(() => {
@@ -186,8 +189,6 @@ createApp({
     }
 
     function updateChecklistItem(section, item) {
-      console.log("updateChecklistItem", section, item);
-
       const updatedSection = { ...section };
       updatedSection.items = section.items.map(i =>
         i.text === item.text ? { ...item } : i
@@ -196,18 +197,38 @@ createApp({
     }
 
     function handleFileChange(e, section) {
-      console.log("handleFileChange", e, section);
-
       const file = e.target.files[0];
       if (!file) return;
 
       const reader = new FileReader();
       reader.onload = () => {
-        const updatedSection = { ...section, photo: reader.result };
-        updateSection(updatedSection);
+        // Se non esiste, creo l'array attachments
+        if (!section.attachments) section.attachments = [];
+
+        // Aggiungo la foto come base64 all'array attachments
+        section.attachments.push({
+          id: crypto.randomUUID(), // id univoco per ogni attachment
+          name: file.name,
+          data: reader.result
+        });
+
+        // Salvo la sezione aggiornata nel DB
+        updateSection(section);
       };
       reader.readAsDataURL(file);
     }
+
+    function openAttachment(att) {      
+      dialogImage.value = att.data;
+      photoDialog.value = true;
+    }
+
+    function removeAttachment(index) {
+      const section = currentChecklistSections.value[currentSectionIndex.value];
+      section.attachments.splice(index, 1);
+      updateSection(section); // salva su DB
+    }
+
 
     // ===== Dialog =====
     function openDialog() { showDialog.value = true; }
@@ -222,12 +243,12 @@ createApp({
       title, isDark, showDialog, showDialogNewWorksite, newCantiere, prototypes,
       worksites, loading, currentSection, selectedWorksite,
       activeTab, tabs, currentSectionIndex, currentChecklistSections,
-      toast,
+      toast, dialogImage, photoDialog,
 
       // functions
       addCantiere, toggleTheme, addToast,
       goBack, openWorksite, openChecklist, nextSection, prevSection,
-      updateChecklistItem, handleFileChange,
+      updateChecklistItem, handleFileChange, removeAttachment, openAttachment,
       openDialog, closeDialog, confirmAction
     }
   },
