@@ -1,7 +1,7 @@
 {
   "nome": "",
   "descr": "",
-  "data": "",
+  "data": "25/10/2025",
   "progress": 0,
   "icon": "front_loader",
   "status": "in_progress",
@@ -12,32 +12,76 @@
   "compile": [
     {
       "page": 1,
-      "x": 50,
-      "y": 150,
-      "width": 500,
-      "height": 200,
-      "type": "check",
-      "value": "sections[1].items[3].value"
+      "x": 151.67,
+      "y": 81.33,
+      "width": 0,
+      "height": 0,
+      "type": "text",
+      "value": "data"
     },
     {
       "page": 1,
-      "x": 50,
-      "y": 200,
-      "width": 500,
-      "height": 200,
+      "x": 263.00,
+      "y": 82.00,
+      "width": 0,
+      "height": 0,
       "type": "text",
       "value": "worksite.comune"
+    },
+    {
+      "page": 1,
+      "x": 479.67,
+      "y": 80.67,
+      "width": 0,
+      "height": 0,
+      "type": "text",
+      "value": "worksite.provincia"
+    },
+    {
+      "page": 1,
+      "x": 109.67,
+      "y": 100.00,
+      "width": 0,
+      "height": 0,
+      "type": "text",
+      "value": "worksite.Contratto / LCL / Lavoro"
+    },
+    {
+      "page": 1,
+      "x": 299.00,
+      "y": 98.67,
+      "width": 0,
+      "height": 0,
+      "type": "text",
+      "value": "worksite.impresa"
+    },
+    {
+      "page": 1,
+      "x": 79.67,
+      "y": 116.67,
+      "width": 0,
+      "height": 0,
+      "type": "text",
+      "value": "worksite.attivita"
+    },
+    {
+      "page": 1,
+      "x": 418.33,
+      "y": 115.33,
+      "width": 0,
+      "height": 0,
+      "type": "text",
+      "value": "worksite.verificatore"
     }
   ],
   "worksite": {
-    "Contratto / LCL / Lavoro": "",
-    "comune": "Test",
-    "provincia": "",
+    "Contratto / LCL / Lavoro": "JA453219698",
+    "comune": "Mirandola",
+    "provincia": "Modena",
     "indirizzo": "",
-    "contratto": "",
-    "impresa": "",
-    "attivita": "",
-    "verificatore": ""
+    "impresa": "Levratti",
+    "attivita": "Cambio palo",
+    "verificatore": "Marcello Malagoli"
   },
   "sections": [
     {
