@@ -6,7 +6,7 @@ if ('serviceWorker' in navigator) {
   });*/
 }
 
-const { createApp, ref, reactive, computed, onMounted } = Vue;
+const { createApp, ref, reactive, computed, onMounted, watch } = Vue;
 
 createApp({
   setup() {
@@ -49,6 +49,31 @@ createApp({
       return selectedWorksite.value.sections.filter(s => s.type === 'checklist');
     });
 
+    const checklistProgress = computed(() => {
+      if (!selectedWorksite.value || !selectedWorksite.value.sections) return 0;
+
+      const sezioni = selectedWorksite.value.sections.filter(s => s.type === 'checklist');
+      let totDomande = 0;
+      let risposteDate = 0;
+
+      sezioni.forEach(sezione => {
+        if (!sezione.items) return;
+        sezione.items.forEach(item => {
+          totDomande++;
+          // consideriamo risposta data se ha un valore true/false/testo o note
+          if (
+            item.value !== undefined && item.value !== null && item.value !== '' ||
+            (item.note && item.note.trim() !== '')
+          ) {
+            risposteDate++;
+          }
+        });
+      });
+
+      return totDomande > 0 ? Math.round((risposteDate / totDomande) * 100) : 0;
+    });
+
+
     // ===== Toast =====
     const toast = reactive({
       active: false,
@@ -88,6 +113,18 @@ createApp({
         document.body.classList.add("dark");
       }
       loadWorksites();
+    });
+
+    watch(checklistProgress, async (newVal) => {
+      if (selectedWorksite.value) {
+        selectedWorksite.value.progress = newVal;
+        try {
+          const data = JSON.parse(JSON.stringify(selectedWorksite.value));
+          await db.worksites.put(data);
+        } catch (err) {
+          console.error("Errore aggiornando il progresso:", err);
+        }
+      }
     });
 
     function toggleTheme() {
@@ -174,21 +211,97 @@ createApp({
       URL.revokeObjectURL(url);
     }
 
-    const deleteWorksite = async (worksite) => {
-      if (!confirm(`Eliminare il cantiere "${worksite.nome}"?`)) return;
+    // stato del dialogo generico
+    const dialog = Vue.reactive({
+      visible: false,
+      title: '',
+      message: '',
+      onConfirm: null
+    });
 
-      const tx = this.db.transaction('worksites', 'readwrite');
-      const store = tx.objectStore('worksites');
-      store.delete(worksite.id);
+    // apre il dialog
+    const openDialog = (title, message, onConfirm) => {
+      dialog.title = title;
+      dialog.message = message;
+      dialog.onConfirm = onConfirm;
+      dialog.visible = true;
+    };
 
-      tx.oncomplete = async () => {
-        this.addToast(`Cantiere "${worksite.nome}" eliminato`, 'error', {
-          label: 'Annulla',
-          callback: () => this.addToast('Annullato', 'primary')
-        });
-        await this.loadWorksites(); // aggiorna lista
-      };
-    }
+    // chiude il dialog
+    const closeDialog = () => {
+      dialog.visible = false;
+      dialog.title = '';
+      dialog.message = '';
+      dialog.onConfirm = null;
+    };
+
+    // conferma azione
+    const confirmDialog = async () => {
+      if (dialog.onConfirm) await dialog.onConfirm();
+      closeDialog();
+    };
+
+    // funzione per eliminare cantiere
+    const deleteWorksite = (worksite) => {
+      if (!worksite || !worksite.id) return;
+
+      // apri dialog di conferma
+      openDialog(
+        'Elimina cantiere',
+        `Sei sicuro di voler eliminare il cantiere "${worksite.nome}"?`,
+        async () => {
+          const backup = JSON.parse(JSON.stringify(worksite));
+
+          try {
+            await db.worksites.delete(worksite.id);
+            await loadWorksites();
+
+            addToast(`Cantiere "${worksite.nome}" eliminato`, 'error', {
+              label: 'Annulla',
+              callback: async () => {
+                await db.worksites.put(backup);
+                await loadWorksites();
+                addToast('Eliminazione annullata', 'primary');
+              }
+            });
+          } catch (err) {
+            console.error('Errore eliminazione cantiere:', err);
+            addToast('Errore durante l\'eliminazione', 'error');
+          }
+        }
+      );
+    };
+
+    // funzione per rendere leggibili le chiavi
+    const formatLabel = (key) => {
+      return key
+        .replace(/_/g, ' ')
+        .replace(/\b\w/g, l => l.toUpperCase());
+    };
+
+    // debounce per evitare troppi salvataggi continui
+    let saveTimeout = null;
+    const autoSaveWorksite = () => {
+      clearTimeout(saveTimeout);
+      saveTimeout = setTimeout(() => saveWorksite(), 800);
+    };
+
+    // salva nel DB l'intero cantiere corrente
+    const saveWorksite = async () => {
+      if (!selectedWorksite.value) return;
+      try {
+        // 🔹 crea una copia JSON pura (senza Proxy Vue)
+        const data = JSON.parse(JSON.stringify(selectedWorksite.value));
+
+        await db.worksites.put(data);
+        addToast('Cantiere salvato', 'success');
+      } catch (err) {
+        console.error('Errore salvataggio cantiere:', err);
+        addToast('Errore nel salvataggio', 'error');
+      }
+    };
+
+
 
     // ===== Checklist update =====
     async function updateSection(section) {
@@ -256,26 +369,19 @@ createApp({
     }
 
 
-    // ===== Dialog =====
-    function openDialog() { showDialog.value = true; }
-    function closeDialog() { showDialog.value = false; }
-    function confirmAction() {
-      showDialog.value = false;
-      addToast("Azione confermata", "primary");
-    }
-
     return {
       // refs
       title, isDark, showDialog, showDialogNewWorksite, newCantiere, prototypes,
       worksites, loading, currentSection, selectedWorksite,
-      activeTab, tabs, currentSectionIndex, currentChecklistSections,
-      toast, dialogImage, photoDialog,
+      activeTab, tabs, currentSectionIndex, currentChecklistSections, checklistProgress,
+      toast, dialogImage, photoDialog, dialog,
 
       // functions
       addCantiere, toggleTheme, addToast,
       goBack, openWorksite, openChecklist, nextSection, prevSection,
       updateChecklistItem, handleFileChange, removeAttachment, openAttachment,
-      openDialog, closeDialog, confirmAction, downloadWorksite, deleteWorksite,
+      openDialog, closeDialog, downloadWorksite, deleteWorksite, confirmDialog, formatLabel,
+      autoSaveWorksite, saveWorksite,
     }
   },
 }).mount("#app");
