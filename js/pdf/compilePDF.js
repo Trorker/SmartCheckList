@@ -104,7 +104,7 @@ export const compilePDF = async (prototype) => {
                     font,
                     color,
                 });
-            } else if (field.type === 'check' /*&& (value === 'C' || value === 'N.C.' || value === 'N.A.')*/) {
+            } else if (field.type === 'check' && (value === 'C' || value === 'N.C.' || value === 'N.A.')) {
                 // checkbox per "C", "N.C.", "N.A."
                 let offsetX = 0;
                 if (value === 'C') offsetX = 0;
