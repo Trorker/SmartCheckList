@@ -310,7 +310,7 @@
 
             <!-- ✅ CHECKLIST -->
             <section v-if="currentSection === 'checklist' && selectedWorksite" style="margin-bottom: 5rem;">
-                <div class="padding">
+                <header>
                     <div class="row">
                         <i>{{ currentChecklistSections[currentSectionIndex].icon }}</i>
                         <progress :value="checklistProgress" max="100"></progress>
@@ -319,101 +319,122 @@
                     <h5>
                         {{ currentSectionIndex + 1 }} – {{ currentChecklistSections[currentSectionIndex].title }}
                     </h5>
+                </header>
 
-                    <article v-if="currentChecklistSections[currentSectionIndex].type === 'checklist'">
-                        <ul class="list border">
-                            <li v-for="(item, index) in currentChecklistSections[currentSectionIndex].items"
-                                :key="index">
-                                <div class="grid max">
-                                    <div class="s12 m9 l10">
-                                        <div class="row">
-                                            <i class="m l">{{ item.icon }}</i>
-                                            <h6 class="max small text-wrap">{{ item.text }}</h6>
-                                        </div>
-                                    </div>
-
-                                    <div class="row s12 m3 l2 right-align">
-                                        <div class="center-align" v-for="val in ['C','N.C.','N.A.']" :key="val">
-                                            <h6 class="small">{{ val }}</h6>
-                                            <label class="radio icon">
-                                                <input type="radio" :name="'radio_' + currentSectionIndex + '_' + index"
-                                                    v-model="item.value" :value="val"
-                                                    @change="updateChecklistItem(currentChecklistSections[currentSectionIndex], item)">
-                                                <span>
-                                                    <i>circle</i>
-                                                    <i v-if="val==='C'" class="primary">check_circle</i>
-                                                    <i v-else-if="val==='N.C.'" class="error">error</i>
-                                                    <i v-else>do_not_disturb_on</i>
-                                                </span>
-                                            </label>
-                                        </div>
+                <article v-if="currentChecklistSections[currentSectionIndex].type === 'checklist'">
+                    <ul class="list border">
+                        <li v-for="(item, index) in currentChecklistSections[currentSectionIndex].items" :key="index">
+                            <div class="grid max">
+                                <div class="s12 m9 l10">
+                                    <div class="row">
+                                        <i class="m l">{{ item.icon }}</i>
+                                        <h6 class="max small text-wrap">{{ item.text }}</h6>
                                     </div>
                                 </div>
-                            </li>
-                        </ul>
 
-                        <!-- Note della sezione -->
-                        <div class="field textarea label border round extra">
-                            <textarea v-model="currentChecklistSections[currentSectionIndex].notes"
-                                @input="updateSection(currentChecklistSections[currentSectionIndex])"></textarea>
-                            <label>Note:</label>
-                        </div>
-
-                        <!-- Foto allegati -->
-                        <div class="grid">
-                            <article class="s12 m4 l4 no-padding border"
-                                v-for="(att, idx) in currentChecklistSections[currentSectionIndex].attachments || []"
-                                :key="att.id">
-                                <img class="responsive medium pointer" :src="att.data" @click="openAttachment(att)" />
-                                <div class="absolute bottom left right padding bottom-shadow white-text">
-                                    <nav>
-                                        <small>{{ att.name_ || 'Foto' }}</small>
-                                        <div class="max"></div>
-                                        <button class="circle transparent" @click.stop="removeAttachment(idx)">
-                                            <i>delete</i>
-                                        </button>
-                                    </nav>
+                                <div class="row s12 m3 l2 right-align">
+                                    <div class="center-align" v-for="val in ['C','N.C.','N.A.']" :key="val">
+                                        <h6 class="small">{{ val }}</h6>
+                                        <label class="radio icon">
+                                            <input type="radio" :name="'radio_' + currentSectionIndex + '_' + index"
+                                                v-model="item.value" :value="val"
+                                                @change="updateChecklistItem(currentChecklistSections[currentSectionIndex], item)">
+                                            <span>
+                                                <i>circle</i>
+                                                <i v-if="val==='C'" class="primary">check_circle</i>
+                                                <i v-else-if="val==='N.C.'" class="error">error</i>
+                                                <i v-else>do_not_disturb_on</i>
+                                            </span>
+                                        </label>
+                                    </div>
                                 </div>
-                            </article>
-                        </div>
-                    </article>
+                            </div>
+                        </li>
+                    </ul>
 
-                    <!-- Footer navigazione + aggiungi foto -->
-                    <footer class="fixed-toolbar center-align">
-                        <nav class="toolbar secondary-container large-elevate">
-                            <button class="circle transparent" @click="prevSection"
-                                :disabled="currentSectionIndex === 0">
-                                <i>arrow_back</i>
-                            </button>
+                    <!-- Note della sezione -->
+                    <div class="field textarea label border round extra">
+                        <textarea v-model="currentChecklistSections[currentSectionIndex].notes"
+                            @input="updateSection(currentChecklistSections[currentSectionIndex])"></textarea>
+                        <label>Note:</label>
+                    </div>
 
-                            <span class="max center-align">
-                                {{ currentSectionIndex + 1 }} / {{ currentChecklistSections.length }}
-                            </span>
+                    <!-- Foto allegati -->
+                    <div class="grid">
+                        <article class="s12 m4 l4 no-padding border"
+                            v-for="(att, idx) in currentChecklistSections[currentSectionIndex].attachments || []"
+                            :key="att.id">
+                            <img class="responsive medium pointer" :src="att.data" @click="openAttachment(att)" />
+                            <div class="absolute bottom left right padding bottom-shadow white-text">
+                                <nav>
+                                    <small>{{ att.name_ || 'Foto' }}</small>
+                                    <div class="max"></div>
+                                    <button class="circle transparent" @click.stop="removeAttachment(idx)">
+                                        <i>delete</i>
+                                    </button>
+                                </nav>
+                            </div>
+                        </article>
+                    </div>
+                </article>
 
-                            <button v-show="currentSectionIndex !== currentChecklistSections.length - 1"
-                                class="circle transparent" @click="nextSection">
-                                <i>arrow_forward</i>
-                            </button>
+                <article v-if="currentChecklistSections[currentSectionIndex].type === 'signature'">
+                    <h6>Firme</h6>
 
-                            <button v-show="currentSectionIndex === currentChecklistSections.length - 1"
-                                class="circle transparent">
-                                <i>signature</i>
-                            </button>
+                    <div class="grid">
+                        <article class="s12 m4 l4 no-padding border"
+                            v-for="(sig, idx) in currentChecklistSections[currentSectionIndex].signatures" :key="idx">
+                            <img v-if="sig.signature" :src="sig.signature" class="responsive medium" />
+                            <img v-else src="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22></svg>"
+                                class="responsive medium" />
+                            <div class="absolute bottom left right padding bottom-shadow white-text">
+                                <nav>
+                                    <small>{{ sig.role }}</small>
+                                    <div class="max"></div>
+                                    <button class="circle transparent" @click="openSigDlg(sig, idx)">
+                                        <i>signature</i>
+                                    </button>
+                                </nav>
+                            </div>
+                        </article>
+                    </div>
+                </article>
 
-                            <button class="circle transparent">
-                                <i>attach_file</i>
-                                <input type="file" accept="image/*"
-                                    @change="e => handleFileChange(e, currentChecklistSections[currentSectionIndex])">
-                            </button>
 
-                            <button class="circle transparent">
-                                <i>photo_camera</i>
-                                <input type="file" accept="image/*" capture="environment"
-                                    @change="e => handleFileChange(e, currentChecklistSections[currentSectionIndex])">
-                            </button>
-                        </nav>
-                    </footer>
-                </div>
+                <!-- Footer navigazione + aggiungi foto -->
+                <footer class="fixed-toolbar center-align">
+                    <nav class="toolbar secondary-container large-elevate">
+                        <button class="circle transparent" @click="prevSection" :disabled="currentSectionIndex === 0">
+                            <i>arrow_back</i>
+                        </button>
+
+                        <span class="max center-align">
+                            {{ currentSectionIndex + 1 }} / {{ currentChecklistSections.length }}
+                        </span>
+
+                        <button :disabled="currentSectionIndex === currentChecklistSections.length - 1"
+                            class="circle transparent" @click="nextSection">
+                            <i>arrow_forward</i>
+                        </button>
+
+                        <!--<button v-show="currentSectionIndex === currentChecklistSections.length - 1"
+                            class="circle transparent" @click="openSignaturesDialog">
+                            <i>signature</i>
+                        </button>-->
+
+                        <button class="circle transparent">
+                            <i>attach_file</i>
+                            <input type="file" accept="image/*"
+                                @change="e => handleFileChange(e, currentChecklistSections[currentSectionIndex])">
+                        </button>
+
+                        <button class="circle transparent">
+                            <i>photo_camera</i>
+                            <input type="file" accept="image/*" capture="environment"
+                                @change="e => handleFileChange(e, currentChecklistSections[currentSectionIndex])">
+                        </button>
+                    </nav>
+                </footer>
             </section>
 
 
@@ -429,6 +450,21 @@
                 <button class="transparent link" @click="closeDialog">Annulla</button>
                 <button class="primary" @click="confirmDialog">Conferma</button>
             </nav>
+        </dialog>
+
+        <!-- Signature dialog -->
+        <div class="overlay" :class="{active: sigOpen}" @click="closeSigDlg"></div>
+        <dialog :class="{active: sigOpen}" :open="sigOpen" class="responsive">
+            <header>
+                <h5>Firma</h5>
+            </header>
+            <div>
+                <canvas ref="signCanvas" class="sig-canvas signCanvas" style="margin-top:.5rem;"></canvas>
+                <nav class="right-align no-space mt">
+                    <button class="transparent link" @click="sigClear">Pulisci</button>
+                    <button class="transparent link" @click="sigSave">Salva firma</button>
+                </nav>
+            </div>
         </dialog>
 
         <!-- Dialog fullscreen per le foto -->
