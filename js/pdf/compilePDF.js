@@ -93,6 +93,9 @@ export const compilePDF = async (prototype) => {
             const { width, height } = page.getSize();
             const color = field.color || rgb(0, 0, 1);
 
+            //console.log(field, value)
+            
+
             if (field.type === 'text') {
                 page.drawText(String(value), {
                     x: field.x,
@@ -101,7 +104,7 @@ export const compilePDF = async (prototype) => {
                     font,
                     color,
                 });
-            } else if (field.type === 'check') {
+            } else if (field.type === 'check' && (value === 'C' || value === 'N.C.' || value === 'N.A.')) {
                 // checkbox per "C", "N.C.", "N.A."
                 let offsetX = 0;
                 if (value === 'C') offsetX = 0;
