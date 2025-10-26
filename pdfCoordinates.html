@@ -132,7 +132,7 @@
             const x = event.clientX - rect.left;
             const y = event.clientY - rect.top;
             const pdfX = x / scale;
-            const pdfY = (canvas.height - y) / scale;
+            const pdfY = y / scale;
             coords.textContent = `x: ${pdfX.toFixed(1)}, y: ${pdfY.toFixed(1)}`;
             coords.classList.remove("copied");
         });
@@ -144,8 +144,20 @@
             const x = event.clientX - rect.left;
             const y = event.clientY - rect.top;
             const pdfX = (x / scale).toFixed(2);
-            const pdfY = ((canvas.height - y) / scale).toFixed(2);
-            const coordText = `page: ${currentPage}, x: ${pdfX}, y: ${pdfY}`;
+            const pdfY = (y / scale).toFixed(2);
+            //const coordText = `page: ${currentPage}, x: ${pdfX}, y: ${pdfY}`;
+
+            const coordText = `
+{
+        "page": ${currentPage},
+        "x": ${pdfX},
+        "y": ${pdfY},
+        "width": 0,
+        "height": 0,
+        "type": "",
+        "value": ""
+    },`;
+
             await navigator.clipboard.writeText(coordText);
 
             // feedback
