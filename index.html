@@ -413,6 +413,15 @@
                     </div>
                 </article>
 
+                <article v-if="currentChecklistSections[currentSectionIndex].type === 'note'">
+                    <!-- Note della sezione -->
+                    <div class="field textarea label border round extra">
+                        <textarea v-model="currentChecklistSections[currentSectionIndex].notes"
+                            @input="updateSection(currentChecklistSections[currentSectionIndex])"></textarea>
+                        <label>Note:</label>
+                    </div>
+                </article>
+
 
                 <!-- Footer navigazione + aggiungi foto -->
                 <footer class="fixed-toolbar center-align">
