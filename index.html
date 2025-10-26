@@ -351,22 +351,22 @@
                         </div>
 
                         <!-- Foto allegati -->
-                            <div class="grid">
-                                <article class="s12 m4 l4 no-padding border"
-                                    v-for="(att, idx) in currentChecklistSections[currentSectionIndex].attachments || []"
-                                    :key="att.id">
-                                    <img class="responsive medium pointer" :src="att.data" @click="openAttachment(att)" />
-                                    <div class="absolute bottom left right padding bottom-shadow white-text">
-                                        <nav>
-                                            <small>{{ att.name_ || 'Foto' }}</small>
-                                            <div class="max"></div>
-                                            <button class="circle transparent" @click.stop="removeAttachment(idx)">
-                                                <i>delete</i>
-                                            </button>
-                                        </nav>
-                                    </div>
-                                </article>
-                            </div>
+                        <div class="grid">
+                            <article class="s12 m4 l4 no-padding border"
+                                v-for="(att, idx) in currentChecklistSections[currentSectionIndex].attachments || []"
+                                :key="att.id">
+                                <img class="responsive medium pointer" :src="att.data" @click="openAttachment(att)" />
+                                <div class="absolute bottom left right padding bottom-shadow white-text">
+                                    <nav>
+                                        <small>{{ att.name_ || 'Foto' }}</small>
+                                        <div class="max"></div>
+                                        <button class="circle transparent" @click.stop="removeAttachment(idx)">
+                                            <i>delete</i>
+                                        </button>
+                                    </nav>
+                                </div>
+                            </article>
+                        </div>
                     </article>
 
                     <!-- Footer navigazione + aggiungi foto -->
@@ -389,6 +389,12 @@
                             <button class="circle transparent">
                                 <i>attach_file</i>
                                 <input type="file" accept="image/*"
+                                    @change="e => handleFileChange(e, currentChecklistSections[currentSectionIndex])">
+                            </button>
+
+                            <button class="circle transparent">
+                                <i>photo_camera</i>
+                                <input type="file" accept="image/*" capture="environment"
                                     @change="e => handleFileChange(e, currentChecklistSections[currentSectionIndex])">
                             </button>
                         </nav>
