@@ -390,6 +390,15 @@ createApp({
     const currentSigIndex = ref(null);
 
     function openSigDlg(sig, index) {
+
+
+      // Controllo progresso checklist
+      if (checklistProgress.value < 100) {
+        addToast("Non puoi firmare: tutte le domande della checklist devono essere completate", "error");
+        return;
+      }
+
+
       currentSig.value = sig;
       currentSigIndex.value = index;
       sigOpen.value = true;
