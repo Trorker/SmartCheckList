@@ -1,9 +1,9 @@
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js')
+  /*window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./js/sw.js')
       .then(reg => console.log('Service Worker registrato', reg))
       .catch(err => console.error('Service Worker errore', err));
-  });
+  });*/
 }
 
 const { createApp, ref, reactive, computed, onMounted } = Vue;
@@ -26,7 +26,7 @@ createApp({
       { nome: 'Prototipo ENEL', version: '1.0', file: 'cantiere_enel.json' },
       { nome: 'Prototipo TERNA', version: '1.1', file: 'cantiere_terna.json' },
     ]);
-    // ----- Aggiungi un nuovo cantiere
+
     async function addCantiere() {
       if (!newCantiere.value.nome.trim()) {
         alert('Il nome del cantiere è obbligatorio!');
@@ -35,7 +35,6 @@ createApp({
 
       let prototypeData = {};
       if (newCantiere.value.file) {
-        // Cerca il file del prototipo selezionato
         const proto = prototypes.value.find(p => p.file === newCantiere.value.file);
         if (proto) {
           const res = await fetch(`./prototypes/${proto.file}`);
@@ -53,13 +52,8 @@ createApp({
         progress: 0,
       };
 
-      // Inserimento DB
       await db.worksites.put(cantiere);
-
-      // Aggiorno reactive
       worksites.value.push(cantiere);
-
-      // Reset form
       newCantiere.value = { nome: '', descr: '', version: '' };
       showDialogNewWorksite.value = false;
       console.log("Nuovo cantiere aggiunto:", cantiere);
@@ -76,7 +70,6 @@ createApp({
     const currentSection = ref("home"); // home | worksite | checklist
     const selectedWorksite = ref(null);
 
-
     const activeTab = ref("tutti");
     const tabs = [
       { id: "tutti", icon: "radio_button_unchecked", label: "Tutti" },
@@ -85,42 +78,61 @@ createApp({
     ];
 
     const worksites = ref([]);
-
-
-    const cantiere = ref(null);
     const loading = ref(true);
 
     const loadWorksites = async () => {
       loading.value = true;
-
       worksites.value = await db.worksites.toArray();
-
+      loading.value = false;
     }
 
-    //test checklist
+    // Gestione checklist test
     const checklist = ref([
-      { icon: "engineering", text: "Il preposto ai lavori nel cantiere è individuato e, per i lavori elettrici, in possesso di attestazione PES", value: null },
-      { icon: "recent_actors", text: "Il personale presente ha i profili Enel adeguati all’attività che sta svolgendo o che andrà a svolgere", value: null },
-      { icon: "bolt", text: "In caso di lavori sotto tensione in BT, il personale è in possesso dell’idoneità a svolgere tali lavori rilasciata dal datore di lavoro", value: null },
-      { icon: "medical_services", text: "Il personale presente ha la formazione adeguata per la gestione emergenze (primo soccorso, prevenzione incendi, ecc.)", value: null },
-      { icon: "precision_manufacturing", text: "Il personale presente ha la formazione adeguata all’utilizzo delle macchine e attrezzatura (PLE, gru su autocarro, escavatori, ecc.)", value: null },
-      { icon: "signpost", text: "Il personale presente ha la formazione adeguata per addetti e preposti alle attività di pianificazione, controllo e apposizione della segnaletica stradale destinata alle attività lavorative che si svolgano in presenza di traffico veicolare", value: null }
-    ])
+      { icon: "engineering", text: "Il preposto ai lavori nel cantiere è individuato...", value: null },
+      { icon: "recent_actors", text: "Il personale presente ha i profili Enel adeguati...", value: null },
+      { icon: "bolt", text: "In caso di lavori sotto tensione in BT...", value: null },
+      { icon: "medical_services", text: "Il personale presente ha la formazione adeguata...", value: null },
+      { icon: "precision_manufacturing", text: "Il personale presente ha la formazione adeguata all’utilizzo delle macchine...", value: null },
+      { icon: "signpost", text: "Il personale presente ha la formazione adeguata per addetti e preposti alla segnaletica...", value: null }
+    ]);
 
     // ---- Gestione sezioni
+    const currentSectionIndex = ref(0);
+
+    const currentChecklistSections = computed(() => {
+      if (!selectedWorksite.value || !selectedWorksite.value.sections) return [];
+      return selectedWorksite.value.sections.filter(s => s.type === 'checklist');
+    });
+
+    function nextSection() {
+      if (currentSectionIndex.value < currentChecklistSections.value.length - 1) {
+        currentSectionIndex.value++;
+      }
+    }
+
+    function prevSection() {
+      if (currentSectionIndex.value > 0) {
+        currentSectionIndex.value--;
+      }
+    }
+
     function goBack() {
-      if (currentSection.value === "checklist") currentSection.value = "worksite";
+      if (currentSection.value === "checklist") {
+        currentSection.value = "worksite";
+        currentSectionIndex.value = 0; // resetto indice
+      }
       else if (currentSection.value === "worksite") currentSection.value = "home";
     }
 
-    //passagio a worksite
     function openWorksite(w) {
       selectedWorksite.value = w;
       currentSection.value = "worksite";
+      currentSectionIndex.value = 0; // reset indice checklist
     }
 
     function openChecklist() {
       currentSection.value = "checklist";
+      currentSectionIndex.value = 0;
     }
 
     // 🔹 Tema
@@ -130,7 +142,6 @@ createApp({
         isDark.value = true;
         document.body.classList.add("dark");
       }
-
       loadWorksites();
     });
 
@@ -143,19 +154,14 @@ createApp({
 
     // 🔹 Toast
     function addToast(text, type = "default", action = null) {
-      // Nasconde il toast precedente se presente
       if (toast.timer) {
         clearTimeout(toast.timer);
         toast.timer = null;
       }
-
-      // Mostra il toast
       toast.text = text;
       toast.type = type;
       toast.action = action;
       toast.active = true;
-
-      // Imposta il timer
       toast.timer = setTimeout(() => {
         toast.active = false;
         toast.timer = null;
@@ -163,40 +169,20 @@ createApp({
     }
 
     // 🔹 Dialog
-    function openDialog() {
-      showDialog.value = true;
-    }
-
-    function closeDialog() {
-      showDialog.value = false;
-    }
-
+    function openDialog() { showDialog.value = true; }
+    function closeDialog() { showDialog.value = false; }
     function confirmAction() {
       showDialog.value = false;
       addToast("Azione confermata", "primary");
     }
-    const random = computed(() => {
-      return Math.floor(Math.random() * 100);
-    });
-
-    const Random = () => {
-      return Math.floor(Math.random() * 100);
-    };
 
     return {
       activeTab, tabs,
-
       title,
-
-      isDark,
-      showDialog,
-
+      isDark, showDialog,
+      loading,
       showDialogNewWorksite,
-      addCantiere,
-      newCantiere,
-      prototypes,
-
-
+      addCantiere, newCantiere, prototypes,
       toast,
       currentSection,
       selectedWorksite,
@@ -210,8 +196,10 @@ createApp({
       goBack,
       openWorksite,
       openChecklist,
-      Random,
-      random
+      currentSectionIndex,
+      currentChecklistSections,
+      nextSection,
+      prevSection
     }
   },
 }).mount("#app");
