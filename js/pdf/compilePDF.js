@@ -78,7 +78,7 @@ export const compilePDF = async (prototype) => {
     pdfDoc.registerFontkit(fontkit);
     const urlFont = './resources/font/IndieFlower-Regular.ttf'; // o NanumPenScript-Regular.ttf
     const fontBytes = await fetch(urlFont).then(res => res.arrayBuffer());
-    const font = await pdfDoc.embedFont(fontBytes);
+    const font = await pdfDoc.embedFont(fontBytes);   
 
     const pages = pdfDoc.getPages();
 
@@ -90,14 +90,10 @@ export const compilePDF = async (prototype) => {
             const page = pages[pageIndex] || pages[pages.length - 1];
             const { width, height } = page.getSize();
 
-            // Ottieni dimensioni della pagina
-            console.log('Larghezza:', width, 'Altezza:', height);
-            for (let y = 0; y < height; y += 100) {
-                page.drawText(`${y}`, { x: 5, y, size: 8, color: rgb(0.5, 0.5, 0.5) });
-            }
-            for (let x = 0; x < width; x += 100) {
-                page.drawText(`${x}`, { x, y: 5, size: 8, color: rgb(0.5, 0.5, 0.5) });
-            }
+            const color = field.color || rgb(0, 0, 1);
+
+            console.log(`🖊️ Scrivo sul PDF: "${value}" in (${field.x}, ${field.y}) sulla pagina ${pageIndex + 1}`);
+            
 
             if (field.type === 'text') {
                 page.drawText(String(value), {
@@ -105,7 +101,7 @@ export const compilePDF = async (prototype) => {
                     y: height - field.y,
                     size: field.fontSize || 10,
                     font,
-                    color: rgb(0, 0, 0),
+                    color,
                 });
             } else if (field.type === 'check' && value === true) {
                 page.drawRectangle({
@@ -114,7 +110,7 @@ export const compilePDF = async (prototype) => {
                     width: 8,
                     height: 8,
                     borderWidth: 1,
-                    color: rgb(0, 0, 0),
+                    color,
                 });
             }
         }
