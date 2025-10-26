@@ -147,7 +147,7 @@
             const pdfY = (y / scale).toFixed(2);
             //const coordText = `page: ${currentPage}, x: ${pdfX}, y: ${pdfY}`;
 
-            const coordText = `
+            const coordText = `,
 {
         "page": ${currentPage},
         "x": ${pdfX},
@@ -156,7 +156,7 @@
         "height": 0,
         "type": "",
         "value": ""
-    },`;
+    }`;
 
             await navigator.clipboard.writeText(coordText);
 
