@@ -10,11 +10,6 @@ const { createApp, ref, reactive, computed, onMounted } = Vue;
 
 createApp({
   setup() {
-
-    const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
-    // oppure più moderno
-    const isMobileNew = navigator.maxTouchPoints && navigator.maxTouchPoints > 0;
-
     // ===== Dexie DB =====
     const db = new Dexie("SmartCheckListDB");
     db.version(1).stores({
@@ -247,7 +242,7 @@ createApp({
       title, isDark, showDialog, showDialogNewWorksite, newCantiere, prototypes,
       worksites, loading, currentSection, selectedWorksite,
       activeTab, tabs, currentSectionIndex, currentChecklistSections,
-      toast, dialogImage, photoDialog, isMobile, isMobileNew,
+      toast, dialogImage, photoDialog,
 
       // functions
       addCantiere, toggleTheme, addToast,
