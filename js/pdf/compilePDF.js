@@ -94,7 +94,7 @@ export const compilePDF = async (prototype) => {
             const color = field.color || rgb(0, 0, 1);
 
             //console.log(field, value)
-            
+
 
             if (field.type === 'text') {
                 page.drawText(String(value), {
@@ -104,7 +104,7 @@ export const compilePDF = async (prototype) => {
                     font,
                     color,
                 });
-            } else if (field.type === 'check' && (value === 'C' || value === 'N.C.' || value === 'N.A.')) {
+            } else if (field.type === 'check' /*&& (value === 'C' || value === 'N.C.' || value === 'N.A.')*/) {
                 // checkbox per "C", "N.C.", "N.A."
                 let offsetX = 0;
                 if (value === 'C') offsetX = 0;
@@ -118,6 +118,35 @@ export const compilePDF = async (prototype) => {
                     font,
                     color,
                 });
+            } else if (field.type === 'signature' && value) {
+                try {
+                    // value deve essere un Base64 tipo 'data:image/png;base64,...'
+                    const sigBytes = base64ToArrayBuffer(value);
+                    let sigImage;
+
+                    if (value.startsWith('data:image/png')) {
+                        sigImage = await pdfDoc.embedPng(sigBytes);
+                    } else if (value.startsWith('data:image/jpeg') || value.startsWith('data:image/jpg')) {
+                        sigImage = await pdfDoc.embedJpg(sigBytes);
+                    } else {
+                        console.warn('Formato firma non supportato:', value);
+                        continue;
+                    }
+
+                    // Dimensione firma
+                    const sigWidth = field.width || 150;
+                    const sigHeight = (sigImage.height / sigImage.width) * sigWidth;
+
+                    page.drawImage(sigImage, {
+                        x: field.x,
+                        y: height - field.y - sigHeight, // y parte dal basso
+                        width: sigWidth,
+                        height: sigHeight,
+                    });
+
+                } catch (err) {
+                    console.warn('Errore caricamento firma:', err);
+                }
             }
         }
     }
