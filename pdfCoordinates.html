@@ -19,33 +19,22 @@
         #pdf-canvas {
             cursor: crosshair;
         }
-
-        #coords {
-            margin-top: 10px;
-            font-family: monospace;
-            background: #eee;
-            padding: 6px 12px;
-            border-radius: 6px;
-            transition: 0.2s;
-            color: #000;
-        }
-
-        #coords.copied {
-            color: green;
-        }
     </style>
 </head>
 
 <body>
-
-    <header>
-        <h2>📐 PDF Coordinate Viewer</h2>
+    <header class="fixed transparent center-align min">
+        <div class="margin">
+            <nav class="toolbar primary elevate min">
+                <button class="circle transparent">
+                    <i>attach_file</i>
+                    <input type="file" id="pdf-file" accept="application/pdf">
+                </button>
+                <span id="coords">x: 0, y: 0</span>
+            </nav>
+        </div>
     </header>
     <main class="center-align">
-        <div class="row center-align">
-            <button class="chip" id="coords">x: 0, y: 0</button>
-        </div>
-
         <article>
             <canvas id="pdf-canvas"></canvas>
         </article>
@@ -62,11 +51,6 @@
 
             <button class="circle transparent" id="next">
                 <i>arrow_forward</i>
-            </button>
-
-            <button class="circle">
-                <i>attach_file</i>
-                <input type="file" id="pdf-file" accept="application/pdf">
             </button>
         </nav>
     </footer>
