@@ -307,6 +307,10 @@
             <!-- ✅ CHECKLIST -->
             <section v-if="currentSection === 'checklist' && selectedWorksite" style="margin-bottom: 5rem;">
                 <div class="padding">
+                    <div class="row">
+                        <progress :value="checklistProgress" max="100"></progress>
+                        <label>{{ checklistProgress }}%</label>
+                    </div>
                     <h5>
                         {{ currentSectionIndex + 1 }} – {{ currentChecklistSections[currentSectionIndex].title }}
                     </h5>
