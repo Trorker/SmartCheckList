@@ -5,7 +5,8 @@
   "progress": 0,
   "status": "in_progress",
   "version": "1.0",
-  "luogo": {
+  "worksite": {
+    "Contratto / LCL / Lavoro": "",
     "comune": "",
     "provincia": "",
     "indirizzo": "",
