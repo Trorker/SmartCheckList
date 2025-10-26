@@ -220,36 +220,6 @@ createApp({
       URL.revokeObjectURL(url);
     }
 
-    // stato del dialogo generico
-    const dialog = Vue.reactive({
-      visible: false,
-      title: '',
-      message: '',
-      onConfirm: null
-    });
-
-    // apre il dialog
-    const openDialog = (title, message, onConfirm) => {
-      dialog.title = title;
-      dialog.message = message;
-      dialog.onConfirm = onConfirm;
-      dialog.visible = true;
-    };
-
-    // chiude il dialog
-    const closeDialog = () => {
-      dialog.visible = false;
-      dialog.title = '';
-      dialog.message = '';
-      dialog.onConfirm = null;
-    };
-
-    // conferma azione
-    const confirmDialog = async () => {
-      if (dialog.onConfirm) await dialog.onConfirm();
-      closeDialog();
-    };
-
     // funzione per eliminare cantiere
     const deleteWorksite = (worksite) => {
       if (!worksite || !worksite.id) return;
@@ -336,34 +306,42 @@ createApp({
       if (wsIndex >= 0) worksites.value[wsIndex] = ws;
     }
 
-    function updateChecklistItem(section, item) {
-      const updatedSection = { ...section };
-      updatedSection.items = section.items.map(i =>
-        i.text === item.text ? { ...item } : i
-      );
-      updateSection(updatedSection);
+    // wrapper generico per modifiche a sezioni
+    async function modifySection(section, modifyCallback) {
+      await guardEdit(section, async () => {
+        await modifyCallback(section);
+      });
     }
 
+    // aggiornamento singolo item checklist
+    function updateChecklistItem(section, item) {
+      modifySection(section, async (sec) => {
+        const updatedSection = { ...sec };
+        updatedSection.items = sec.items.map(i =>
+          i.text === item.text ? { ...item } : i
+        );
+        await updateSection(updatedSection);
+      });
+    }
+
+    // gestione file allegati
     function handleFileChange(e, section) {
-      const file = e.target.files[0];
-      if (!file) return;
+      modifySection(section, async (sec) => {
+        const file = e.target.files[0];
+        if (!file) return;
 
-      const reader = new FileReader();
-      reader.onload = () => {
-        // Se non esiste, creo l'array attachments
-        if (!section.attachments) section.attachments = [];
-
-        // Aggiungo la foto come base64 all'array attachments
-        section.attachments.push({
-          id: crypto.randomUUID(), // id univoco per ogni attachment
-          name: file.name,
-          data: reader.result
-        });
-
-        // Salvo la sezione aggiornata nel DB
-        updateSection(section);
-      };
-      reader.readAsDataURL(file);
+        const reader = new FileReader();
+        reader.onload = async () => {
+          if (!sec.attachments) sec.attachments = [];
+          sec.attachments.push({
+            id: crypto.randomUUID(),
+            name: file.name,
+            data: reader.result
+          });
+          await updateSection(sec);
+        };
+        reader.readAsDataURL(file);
+      });
     }
 
     function openAttachment(att) {
@@ -371,37 +349,27 @@ createApp({
       photoDialog.value = true;
     }
 
+    // rimozione allegati
     function removeAttachment(index) {
       const section = currentChecklistSections.value[currentSectionIndex.value];
       if (!section || !section.attachments || !section.attachments[index]) return;
 
       const att = section.attachments[index];
-      const backup = JSON.parse(JSON.stringify(att));
 
-      // apri dialog di conferma
-      openDialog(
-        "Elimina allegato",
-        `Vuoi davvero eliminare l'allegato "${att.name}"?`,
-        async () => {
-          try {
-            // rimuovi l'allegato
-            section.attachments.splice(index, 1);
-            await updateSection(section);
+      modifySection(section, async (sec) => {
+        const backup = JSON.parse(JSON.stringify(att));
+        sec.attachments.splice(index, 1);
+        await updateSection(sec);
 
-            addToast(`Allegato "${att.name}" eliminato`, "error", {
-              label: "Annulla",
-              callback: async () => {
-                section.attachments.splice(index, 0, backup); // ripristina
-                await updateSection(section);
-                addToast("Eliminazione annullata", "primary");
-              },
-            });
-          } catch (err) {
-            console.error("Errore eliminazione allegato:", err);
-            addToast("Errore durante l'eliminazione", "error");
-          }
-        }
-      );
+        addToast(`Allegato "${att.name}" eliminato`, "error", {
+          label: "Annulla",
+          callback: async () => {
+            sec.attachments.splice(index, 0, backup);
+            await updateSection(sec);
+            addToast("Eliminazione annullata", "primary");
+          },
+        });
+      });
     }
 
 
@@ -482,6 +450,90 @@ createApp({
     }
 
 
+
+
+    const allSignaturesDone = computed(() => {
+      if (!selectedWorksite.value || !selectedWorksite.value.sections) return false;
+
+      const sigSection = selectedWorksite.value.sections.find(s => s.type === 'signature');
+      if (!sigSection || !sigSection.signatures) return false;
+
+      return sigSection.signatures.every(sig => sig.signature && sig.signature.trim() !== '');
+    });
+
+    async function guardEdit(section, callback) {
+      if (allSignaturesDone.value) {
+        const backupSection = JSON.parse(JSON.stringify(section));
+
+        openDialog(
+          "Attenzione!",
+          "Se modifichi questo contenuto, tutte le firme presenti saranno eliminate e dovranno essere rifatte.",
+          async () => {
+            const sigSection = selectedWorksite.value.sections.find(s => s.type === 'signature');
+            if (sigSection && sigSection.signatures) {
+              sigSection.signatures.forEach(sig => sig.signature = '');
+              await updateSection(sigSection);
+              addToast("Firme eliminate. Devi rifirmare tutto.", "primary");
+            }
+
+            await callback();
+          },
+          async () => {
+            const ws = await db.worksites.get(selectedWorksite.value.id);
+            selectedWorksite.value.sections = ws.sections; // cambia reference delle sezioni
+
+            addToast("Modifica annullata, firme intatte.", "error");
+          }
+        );
+      } else {
+        await callback();
+      }
+    }
+
+
+
+    const dialog = Vue.reactive({
+      visible: false,
+      title: '',
+      message: '',
+      onConfirm: null,
+      onCancel: null
+    });
+
+    const openDialog = (title, message, onConfirm, onCancel = null) => {
+      dialog.title = title;
+      dialog.message = message;
+      dialog.onConfirm = onConfirm;
+      dialog.onCancel = onCancel;
+      dialog.visible = true;
+    };
+
+    const closeDialog = () => {
+      dialog.visible = false;
+      dialog.title = '';
+      dialog.message = '';
+      dialog.onConfirm = null;
+      dialog.onCancel = null;
+    };
+
+    // funzione conferma
+    const confirmDialog = async () => {
+      if (dialog.onConfirm) await dialog.onConfirm();
+      closeDialog();
+    };
+
+    // funzione annulla
+    const cancelDialog = async () => {
+      if (dialog.onCancel) await dialog.onCancel();
+      closeDialog();
+    };
+
+
+
+
+
+
+
     return {
       // refs
       title, isDark, showDialog, showDialogNewWorksite, newCantiere, prototypes,
@@ -495,7 +547,7 @@ createApp({
       addCantiere, toggleTheme, addToast,
       goBack, openWorksite, openChecklist, nextSection, prevSection,
       updateChecklistItem, handleFileChange, removeAttachment, openAttachment,
-      openDialog, closeDialog, downloadWorksite, deleteWorksite, confirmDialog, formatLabel,
+      openDialog, closeDialog, cancelDialog, downloadWorksite, deleteWorksite, confirmDialog, formatLabel,
       autoSaveWorksite, saveWorksite,
 
       openSigDlg, closeSigDlg, sigClear, sigSave,
