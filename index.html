@@ -225,11 +225,13 @@
                                     <div class="max"></div>
                                     <nav>
                                         <button class="circle transparent"><i>share</i></button>
-                                        <button class="circle transparent"><i>download</i>
+
+                                        <button class="circle transparent" @click="downloadWorksite(c)">
+                                            <i>download</i>
                                             <div class="badge no-round">New</div>
                                         </button>
-                                        <button class="circle transparent"
-                                            @click="addToast('Cantiere eliminato', 'error', {label:'Annulla', callback:()=>addToast('Annullato', 'primary')})">
+
+                                        <button class="circle transparent" @click="deleteWorksite(c)">
                                             <i>delete</i>
                                         </button>
                                     </nav>
