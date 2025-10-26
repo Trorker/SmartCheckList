@@ -249,50 +249,44 @@
             </section>
 
             <!-- 🏗️ WORKSITE -->
-            <section v-else-if="currentSection === 'worksite'">
+            <section v-else-if="currentSection === 'worksite'" style="margin-bottom: 5rem;">
                 <header>
                     <h5 class="m-none">Dettagli Cantiere</h5>
                 </header>
+
                 <article class="padding">
-                    <form @submit.prevent="saveWorksite()">
-                        <fieldset>
-                            <legend>Dati generali</legend>
-                            <div class="field border label">
-                                <input type="text" v-model="selectedWorksite.nome" required>
-                                <label>Nome cantiere</label>
+                    <!-- Campi fissi -->
+                    <fieldset>
+                        <legend>Dati generali</legend>
+                        <div class="field border label">
+                            <input type="text" v-model="selectedWorksite.nome" @input="autoSaveWorksite" required>
+                            <label>Nome cantiere</label>
+                        </div>
+                        <div class="field border label textarea">
+                            <textarea rows="2" v-model="selectedWorksite.descr" @input="autoSaveWorksite"></textarea>
+                            <label>Descrizione</label>
+                        </div>
+                        <div class="field border label">
+                            <input type="date" v-model="selectedWorksite.data" @input="autoSaveWorksite">
+                            <label>Data</label>
+                        </div>
+                    </fieldset>
+
+                    <!-- Campi dinamici -->
+                    <fieldset>
+                        <legend>Dati luogo e impresa</legend>
+                        <template v-for="(val, key) in selectedWorksite.worksite" :key="key">
+                            <div v-if="typeof val === 'string'" class="field border label"
+                                :class="{ textarea: val.length > 60 }">
+                                <textarea v-if="val.length > 60" rows="3" v-model="selectedWorksite.worksite[key]"
+                                    @input="autoSaveWorksite"></textarea>
+                                <input v-else type="text" v-model="selectedWorksite.worksite[key]"
+                                    @input="autoSaveWorksite">
+                                <label>{{ formatLabel(key) }}</label>
                             </div>
-                            <div class="field border label textarea">
-                                <textarea rows="2" v-model="selectedWorksite.descr"></textarea>
-                                <label>Descrizione</label>
-                            </div>
-                            <div class="field border label">
-                                <input type="date" v-model="selectedWorksite.data">
-                                <label>Data</label>
-                            </div>
-                        </fieldset>
-                        <fieldset>
-                            <legend>Dati luogo e impresa</legend>
-                            <div class="field border label"><input type="text"
-                                    v-model="selectedWorksite.luogo.contratto"><label>Contratto / LCL / Lavoro</label>
-                            </div>
-                            <div class="field border label"><input type="text"
-                                    v-model="selectedWorksite.luogo.comune"><label>Comune</label></div>
-                            <div class="field border label"><input type="text"
-                                    v-model="selectedWorksite.luogo.provincia"><label>Provincia</label></div>
-                            <div class="field border label"><input type="text"
-                                    v-model="selectedWorksite.luogo.indirizzo"><label>Indirizzo</label></div>
-                            <div class="field border label"><input type="text"
-                                    v-model="selectedWorksite.luogo.impresa"><label>Impresa esecutrice</label></div>
-                            <div class="field border label textarea"><textarea rows="3"
-                                    v-model="selectedWorksite.luogo.attivita"></textarea><label>Attività svolta</label>
-                            </div>
-                        </fieldset>
-                        <fieldset>
-                            <legend>Verificatore</legend>
-                            <div class="field border label"><input type="text"
-                                    v-model="selectedWorksite.luogo.verificatore"><label>Verificatore</label></div>
-                        </fieldset>
-                    </form>
+                        </template>
+                    </fieldset>
+
                     <span class="chip small margin center">ID: {{ selectedWorksite?.id }}</span>
                 </article>
 
@@ -307,7 +301,7 @@
             </section>
 
             <!-- ✅ CHECKLIST -->
-            <section v-if="currentSection === 'checklist' && selectedWorksite">
+            <section v-if="currentSection === 'checklist' && selectedWorksite" style="margin-bottom: 5rem;">
                 <div class="padding">
                     <h5>
                         {{ currentSectionIndex + 1 }} – {{ currentChecklistSections[currentSectionIndex].title }}
@@ -409,13 +403,13 @@
         </main>
 
         <!-- DIALOG GENERICO -->
-        <div class="overlay blur" :class="{ active: showDialog }"></div>
-        <dialog :open="showDialog">
-            <h5>Informazioni</h5>
-            <div>Questa è una finestra modale gestita con Vue + BeerCSS.</div>
+        <div class="overlay blur" :class="{ active: dialog.visible }"></div>
+        <dialog :open="dialog.visible" class="max-w-sm round elevated">
+            <h5>{{ dialog.title }}</h5>
+            <div>{{ dialog.message }}</div>
             <nav class="right-align no-space mt">
-                <button class="transparent link" @click="closeDialog">Chiudi</button>
-                <button class="transparent link" @click="confirmAction">Conferma</button>
+                <button class="transparent link" @click="closeDialog">Annulla</button>
+                <button class="primary" @click="confirmDialog">Conferma</button>
             </nav>
         </dialog>
 
