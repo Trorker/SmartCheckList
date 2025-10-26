@@ -209,34 +209,35 @@
                 <!-- Lista cantieri -->
                 <div class="grid">
                     <div class="s12 m6 l4" v-for="c in worksites" :key="c.id">
-                        <article class="no-padding">
-                            <img class="responsive"
-                                src="https://www.impresalevratti.it/wp-content/uploads/2021/12/20211123_092730.jpeg" />
-                            <div class="padding">
-                                <h5>{{ c.nome }}</h5>
-                                <p>{{ c.descr }}</p>
-                                <div class="row">
-                                    <label>{{ c.progress < 100 ? 'Incompleto' : 'Completato' }}</label>
-                                            <progress :value="c.progress" max="100"></progress>
-                                            <label>{{ c.progress }}%</label>
+                        <article class="padding">
+                            <div class="row">
+                                <i class="extra">{{c.icon || "handyman"}}</i>
+                                <div class="max">
+                                    <h5>{{ c.nome }}</h5>
+                                    <p>{{ c.descr }}</p>
                                 </div>
-                                <nav>
-                                    <button @click="openWorksite(c)">Apri</button>
-                                    <div class="max"></div>
-                                    <nav>
-                                        <button class="circle transparent"><i>share</i></button>
-
-                                        <button class="circle transparent" @click="downloadWorksite(c)">
-                                            <i>download</i>
-                                            <div class="badge no-round">New</div>
-                                        </button>
-
-                                        <button class="circle transparent" @click="deleteWorksite(c)">
-                                            <i>delete</i>
-                                        </button>
-                                    </nav>
-                                </nav>
                             </div>
+                            <div class="row">
+                                <label>{{ c.progress < 100 ? 'Incompleto' : 'Completato' }}</label>
+                                        <progress :value="c.progress" max="100"></progress>
+                                        <label>{{ c.progress }}%</label>
+                            </div>
+                            <nav>
+                                <button @click="openWorksite(c)">Apri</button>
+                                <div class="max"></div>
+                                <nav>
+                                    <button class="circle transparent"><i>share</i></button>
+
+                                    <button class="circle transparent" @click="downloadWorksite(c)">
+                                        <i>download</i>
+                                        <div class="badge no-round">New</div>
+                                    </button>
+
+                                    <button class="circle transparent" @click="deleteWorksite(c)">
+                                        <i>delete</i>
+                                    </button>
+                                </nav>
+                            </nav>
                         </article>
                     </div>
                 </div>
