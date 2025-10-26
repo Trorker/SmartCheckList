@@ -226,11 +226,14 @@
                                 <button @click="openWorksite(c)">Apri</button>
                                 <div class="max"></div>
                                 <nav>
-                                    <button class="circle transparent"><i>share</i></button>
+                                    <button class="circle transparent" disabled>
+                                        <i>share</i>
+                                        <div class="badge border secondary-border secondary-text">dev</div>
+                                    </button>
 
                                     <button class="circle transparent" @click="downloadWorksite(c)">
                                         <i>download</i>
-                                        <div class="badge no-round">New</div>
+                                        <div class="badge no-round primary">New</div>
                                     </button>
 
                                     <button class="circle transparent" @click="deleteWorksite(c)">
