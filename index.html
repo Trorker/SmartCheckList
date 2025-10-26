@@ -368,8 +368,8 @@
                                                     v-model="item.value" :value="val">
                                                 <span>
                                                     <i>circle</i>
-                                                    <i v-if="val==='C'">check_circle</i>
-                                                    <i v-else-if="val==='N.C.'">error</i>
+                                                    <i v-if="val==='C'" class="primary">check_circle</i>
+                                                    <i v-else-if="val==='N.C.'" class="error">error</i>
                                                     <i v-else>do_not_disturb_on</i>
                                                 </span>
                                             </label>
