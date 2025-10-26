@@ -273,6 +273,11 @@
           "icon": "shield",
           "text": "Protezione delle parti attive e opere provvisionali integre",
           "value": null
+        },
+        {
+          "icon": "wb_incandescent",
+          "text": "I lavoratori usano correttamente il Rilevatore di Tensione Personale (PVD) previsto per l’attività",
+          "value": null
         }
       ]
     },
