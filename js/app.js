@@ -162,6 +162,34 @@ createApp({
       addToast(`Nuovo cantiere "${cantiere.nome}" aggiunto`, "primary");
     }
 
+    // --- Scarica cantiere ---
+    const downloadWorksite = (worksite) => {
+      const dataStr = JSON.stringify(worksite, null, 2);
+      const blob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${worksite.nome.replace(/\s+/g, '_')}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    const deleteWorksite = async (worksite) => {
+      if (!confirm(`Eliminare il cantiere "${worksite.nome}"?`)) return;
+
+      const tx = this.db.transaction('worksites', 'readwrite');
+      const store = tx.objectStore('worksites');
+      store.delete(worksite.id);
+
+      tx.oncomplete = async () => {
+        this.addToast(`Cantiere "${worksite.nome}" eliminato`, 'error', {
+          label: 'Annulla',
+          callback: () => this.addToast('Annullato', 'primary')
+        });
+        await this.loadWorksites(); // aggiorna lista
+      };
+    }
+
     // ===== Checklist update =====
     async function updateSection(section) {
       // Recupero il cantiere dal DB
@@ -216,7 +244,7 @@ createApp({
       reader.readAsDataURL(file);
     }
 
-    function openAttachment(att) {      
+    function openAttachment(att) {
       dialogImage.value = att.data;
       photoDialog.value = true;
     }
@@ -247,7 +275,7 @@ createApp({
       addCantiere, toggleTheme, addToast,
       goBack, openWorksite, openChecklist, nextSection, prevSection,
       updateChecklistItem, handleFileChange, removeAttachment, openAttachment,
-      openDialog, closeDialog, confirmAction
+      openDialog, closeDialog, confirmAction, downloadWorksite, deleteWorksite,
     }
   },
 }).mount("#app");
