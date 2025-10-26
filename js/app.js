@@ -152,7 +152,6 @@ createApp({
         version: newCantiere.value.file || '',
         data: new Date().toISOString().slice(0, 10),
         progress: 0,
-        sections: []
       };
 
       await db.worksites.put(cantiere);
