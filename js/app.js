@@ -586,7 +586,7 @@ createApp({
       goBack, openWorksite, openChecklist, nextSection, prevSection,
       updateChecklistItem, handleFileChange, removeAttachment, openAttachment,
       openDialog, closeDialog, cancelDialog, downloadWorksite, deleteWorksite, confirmDialog, formatLabel,
-      autoSaveWorksite, saveWorksite,
+      autoSaveWorksite, saveWorksite, updateSection,
 
       openSigDlg, sigClear, sigSave, closeSigDlg, goToSignatureSection,
     }
