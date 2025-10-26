@@ -324,6 +324,21 @@ createApp({
       });
     }
 
+    // aggiornamento singolo item della tabella
+    function updateTableItem(section, row, columnName, newValue) {
+      modifySection(section, async (sec) => {
+        const updatedSection = { ...sec };
+        updatedSection.items = sec.items.map(r => {
+          // confronto tramite id se disponibile, altrimenti oggetto r
+          if (r === row) {
+            return { ...r, [columnName]: newValue };
+          }
+          return r;
+        });
+        await updateSection(updatedSection);
+      });
+    }
+
     // gestione file allegati
     function handleFileChange(e, section) {
       modifySection(section, async (sec) => {
@@ -584,7 +599,7 @@ createApp({
       // functions
       addCantiere, toggleTheme, addToast,
       goBack, openWorksite, openChecklist, nextSection, prevSection,
-      updateChecklistItem, handleFileChange, removeAttachment, openAttachment,
+      updateChecklistItem, updateTableItem, handleFileChange, removeAttachment, openAttachment,
       openDialog, closeDialog, cancelDialog, downloadWorksite, deleteWorksite, confirmDialog, formatLabel,
       autoSaveWorksite, saveWorksite, updateSection,
 
