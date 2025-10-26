@@ -364,9 +364,37 @@ createApp({
 
     function removeAttachment(index) {
       const section = currentChecklistSections.value[currentSectionIndex.value];
-      section.attachments.splice(index, 1);
-      updateSection(section); // salva su DB
+      if (!section || !section.attachments || !section.attachments[index]) return;
+
+      const att = section.attachments[index];
+      const backup = JSON.parse(JSON.stringify(att));
+
+      // apri dialog di conferma
+      openDialog(
+        "Elimina allegato",
+        `Vuoi davvero eliminare l'allegato "${att.name}"?`,
+        async () => {
+          try {
+            // rimuovi l'allegato
+            section.attachments.splice(index, 1);
+            await updateSection(section);
+
+            addToast(`Allegato "${att.name}" eliminato`, "error", {
+              label: "Annulla",
+              callback: async () => {
+                section.attachments.splice(index, 0, backup); // ripristina
+                await updateSection(section);
+                addToast("Eliminazione annullata", "primary");
+              },
+            });
+          } catch (err) {
+            console.error("Errore eliminazione allegato:", err);
+            addToast("Errore durante l'eliminazione", "error");
+          }
+        }
+      );
     }
+
 
 
     return {
