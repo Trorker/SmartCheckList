@@ -6,20 +6,21 @@ if ('serviceWorker' in navigator) {
   });*/
 }
 
-const { createApp, ref, reactive, computed, onMounted, watch } = Vue;
+const { createApp, ref, reactive, computed, onMounted } = Vue;
 
 createApp({
   setup() {
 
+    // ===== Dexie DB =====
     const db = new Dexie("SmartCheckListDB");
     db.version(1).stores({
       worksites: 'id, nome, descr, version, data, progress, status, sections',
     });
 
+    // ===== Refs =====
     const title = ref('Levratti');
     const isDark = ref(false);
     const showDialog = ref(false);
-
     const showDialogNewWorksite = ref(false);
     const newCantiere = ref({ nome: '', descr: '', file: '' });
     const prototypes = ref([
@@ -27,6 +28,105 @@ createApp({
       { nome: 'Prototipo TERNA', version: '1.1', file: 'cantiere_terna.json' },
     ]);
 
+    const worksites = ref([]);
+    const loading = ref(true);
+    const currentSection = ref("home"); // home | worksite | checklist
+    const selectedWorksite = ref(null);
+
+    const activeTab = ref("tutti");
+    const tabs = [
+      { id: "tutti", icon: "radio_button_unchecked", label: "Tutti" },
+      { id: "completati", icon: "check_box", label: "Completati" },
+      { id: "ncompleti", icon: "indeterminate_check_box", label: "Incompleti" }
+    ];
+
+    const currentSectionIndex = ref(0);
+
+    const currentChecklistSections = computed(() => {
+      if (!selectedWorksite.value || !selectedWorksite.value.sections) return [];
+      return selectedWorksite.value.sections.filter(s => s.type === 'checklist');
+    });
+
+    // ===== Toast =====
+    const toast = reactive({
+      active: false,
+      text: "",
+      type: "default",
+      action: null,
+      timer: null,
+    });
+
+    function addToast(text, type = "default", action = null) {
+      if (toast.timer) {
+        clearTimeout(toast.timer);
+        toast.timer = null;
+      }
+      toast.text = text;
+      toast.type = type;
+      toast.action = action;
+      toast.active = true;
+      toast.timer = setTimeout(() => {
+        toast.active = false;
+        toast.timer = null;
+      }, 5000);
+    }
+
+    // ===== Load worksites =====
+    const loadWorksites = async () => {
+      loading.value = true;
+      worksites.value = await db.worksites.toArray();
+      loading.value = false;
+    }
+
+    // ===== Theme =====
+    onMounted(() => {
+      const saved = localStorage.getItem("theme");
+      if (saved === "dark") {
+        isDark.value = true;
+        document.body.classList.add("dark");
+      }
+      loadWorksites();
+    });
+
+    function toggleTheme() {
+      isDark.value = !isDark.value;
+      document.body.classList.toggle("dark", isDark.value);
+      localStorage.setItem("theme", isDark.value ? "dark" : "light");
+      addToast(isDark.value ? "Tema scuro attivato" : "Tema chiaro attivato", "primary");
+    }
+
+    // ===== Navigation =====
+    function goBack() {
+      if (currentSection.value === "checklist") {
+        currentSection.value = "worksite";
+        currentSectionIndex.value = 0;
+      } else if (currentSection.value === "worksite") currentSection.value = "home";
+    }
+
+    function openWorksite(w) {
+      selectedWorksite.value = w;
+      currentSection.value = "worksite";
+      currentSectionIndex.value = 0;
+    }
+
+    function openChecklist() {
+      currentSection.value = "checklist";
+      currentSectionIndex.value = 0;
+    }
+
+    function nextSection() {
+      if (currentSectionIndex.value < currentChecklistSections.value.length - 1) {
+        currentSectionIndex.value++;
+      }
+    }
+
+    function prevSection() {
+      if (currentSectionIndex.value > 0) {
+        currentSectionIndex.value--;
+      }
+    }
+
+    // ===== Worksite management =====
     async function addCantiere() {
       if (!newCantiere.value.nome.trim()) {
         alert('Il nome del cantiere è obbligatorio!');
@@ -50,91 +150,33 @@ createApp({
         version: newCantiere.value.file || '',
         data: new Date().toISOString().slice(0, 10),
         progress: 0,
-        sections: [] // <- inizializzo le sezioni vuote
+        sections: []
       };
 
       await db.worksites.put(cantiere);
       worksites.value.push(cantiere);
-      newCantiere.value = { nome: '', descr: '', version: '' };
+
+      newCantiere.value = { nome: '', descr: '', file: '' };
       showDialogNewWorksite.value = false;
-      console.log("Nuovo cantiere aggiunto:", cantiere);
+      addToast(`Nuovo cantiere "${cantiere.nome}" aggiunto`, "primary");
     }
 
-    const toast = reactive({
-      active: false,
-      text: "",
-      type: "default",
-      action: null,
-      timer: null,
-    });
-
-    const currentSection = ref("home"); // home | worksite | checklist
-    const selectedWorksite = ref(null);
-
-    const activeTab = ref("tutti");
-    const tabs = [
-      { id: "tutti", icon: "radio_button_unchecked", label: "Tutti" },
-      { id: "completati", icon: "check_box", label: "Completati" },
-      { id: "ncompleti", icon: "indeterminate_check_box", label: "Incompleti" }
-    ];
-
-    const worksites = ref([]);
-    const loading = ref(true);
-
-    const loadWorksites = async () => {
-      loading.value = true;
-      worksites.value = await db.worksites.toArray();
-      loading.value = false;
-    }
-
-    // ---- Gestione checklist
-    const currentSectionIndex = ref(0);
-
-    const currentChecklistSections = computed(() => {
-      if (!selectedWorksite.value || !selectedWorksite.value.sections) return [];
-      return selectedWorksite.value.sections.filter(s => s.type === 'checklist');
-    });
-
-    function nextSection() {
-      if (currentSectionIndex.value < currentChecklistSections.value.length - 1) {
-        currentSectionIndex.value++;
-      }
-    }
-
-    function prevSection() {
-      if (currentSectionIndex.value > 0) {
-        currentSectionIndex.value--;
-      }
-    }
-
-    function goBack() {
-      if (currentSection.value === "checklist") {
-        currentSection.value = "worksite";
-        currentSectionIndex.value = 0;
-      }
-      else if (currentSection.value === "worksite") currentSection.value = "home";
-    }
-
-    function openWorksite(w) {
-      selectedWorksite.value = w;
-      currentSection.value = "worksite";
-      currentSectionIndex.value = 0;
-    }
-
-    function openChecklist() {
-      currentSection.value = "checklist";
-      currentSectionIndex.value = 0;
-    }
-
-    // ---- Salvataggio checklist + foto
+    // ===== Checklist update =====
     async function updateSection(section) {
-      // Aggiorno DB
+      // Recupero il cantiere dal DB
       const ws = await db.worksites.get(selectedWorksite.value.id);
-      if (!ws.sections) ws.sections = [];
-      const idx = ws.sections.findIndex(s => s.id === section.id);
-      if (idx >= 0) ws.sections[idx] = section;
-      else ws.sections.push(section);
 
+      if (!ws.sections) ws.sections = [];
+
+      const idx = ws.sections.findIndex(s => s.id === section.id);
+
+      // Trasformo section in oggetto normale prima di salvare
+      const plainSection = JSON.parse(JSON.stringify(section));
+
+      if (idx >= 0) ws.sections[idx] = plainSection;
+      else ws.sections.push(plainSection);
+
+      // Salvo in DB
       await db.worksites.put(ws);
 
       // Aggiorno reactive
@@ -143,59 +185,31 @@ createApp({
       if (wsIndex >= 0) worksites.value[wsIndex] = ws;
     }
 
+    function updateChecklistItem(section, item) {
+      console.log("updateChecklistItem", section, item);
+
+      const updatedSection = { ...section };
+      updatedSection.items = section.items.map(i =>
+        i.text === item.text ? { ...item } : i
+      );
+      updateSection(updatedSection);
+    }
+
     function handleFileChange(e, section) {
+      console.log("handleFileChange", e, section);
+
       const file = e.target.files[0];
       if (!file) return;
 
       const reader = new FileReader();
       reader.onload = () => {
-        section.photo = reader.result; // salva base64
-        updateSection(section);
+        const updatedSection = { ...section, photo: reader.result };
+        updateSection(updatedSection);
       };
       reader.readAsDataURL(file);
     }
 
-    function updateChecklistItem(section, item) {
-      // Aggiorna la risposta della checklist
-      const idx = section.items.findIndex(i => i.text === item.text);
-      if (idx >= 0) section.items[idx] = item;
-      updateSection(section);
-    }
-
-    // 🔹 Tema
-    onMounted(() => {
-      const saved = localStorage.getItem("theme");
-      if (saved === "dark") {
-        isDark.value = true;
-        document.body.classList.add("dark");
-      }
-      loadWorksites();
-    });
-
-    function toggleTheme() {
-      isDark.value = !isDark.value;
-      document.body.classList.toggle("dark", isDark.value);
-      localStorage.setItem("theme", isDark.value ? "dark" : "light");
-      addToast(isDark.value ? "Tema scuro attivato" : "Tema chiaro attivato", "primary");
-    }
-
-    // 🔹 Toast
-    function addToast(text, type = "default", action = null) {
-      if (toast.timer) {
-        clearTimeout(toast.timer);
-        toast.timer = null;
-      }
-      toast.text = text;
-      toast.type = type;
-      toast.action = action;
-      toast.active = true;
-      toast.timer = setTimeout(() => {
-        toast.active = false;
-        toast.timer = null;
-      }, 5000);
-    }
-
-    // 🔹 Dialog
+    // ===== Dialog =====
     function openDialog() { showDialog.value = true; }
     function closeDialog() { showDialog.value = false; }
     function confirmAction() {
@@ -204,31 +218,17 @@ createApp({
     }
 
     return {
-      activeTab, tabs,
-      title,
-      isDark, showDialog,
-      loading,
-      showDialogNewWorksite,
-      addCantiere, newCantiere, prototypes,
+      // refs
+      title, isDark, showDialog, showDialogNewWorksite, newCantiere, prototypes,
+      worksites, loading, currentSection, selectedWorksite,
+      activeTab, tabs, currentSectionIndex, currentChecklistSections,
       toast,
-      currentSection,
-      selectedWorksite,
-      worksites,
-      /*checklist,*/
-      toggleTheme,
-      addToast,
-      openDialog,
-      closeDialog,
-      confirmAction,
-      goBack,
-      openWorksite,
-      openChecklist,
-      currentSectionIndex,
-      currentChecklistSections,
-      nextSection,
-      prevSection,
-      handleFileChange,
-      updateChecklistItem
+
+      // functions
+      addCantiere, toggleTheme, addToast,
+      goBack, openWorksite, openChecklist, nextSection, prevSection,
+      updateChecklistItem, handleFileChange,
+      openDialog, closeDialog, confirmAction
     }
   },
 }).mount("#app");
