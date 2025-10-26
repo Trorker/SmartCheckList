@@ -6,14 +6,14 @@ if ('serviceWorker' in navigator) {
   });*/
 }
 
-const { createApp, ref, reactive, computed, onMounted } = Vue;
+const { createApp, ref, reactive, computed, onMounted, watch } = Vue;
 
 createApp({
   setup() {
 
     const db = new Dexie("SmartCheckListDB");
     db.version(1).stores({
-      worksites: 'id, nome, descr, version, data, progress, status',
+      worksites: 'id, nome, descr, version, data, progress, status, sections',
     });
 
     const title = ref('Levratti');
@@ -50,6 +50,7 @@ createApp({
         version: newCantiere.value.file || '',
         data: new Date().toISOString().slice(0, 10),
         progress: 0,
+        sections: [] // <- inizializzo le sezioni vuote
       };
 
       await db.worksites.put(cantiere);
@@ -86,17 +87,7 @@ createApp({
       loading.value = false;
     }
 
-    // Gestione checklist test
-    const checklist = ref([
-      { icon: "engineering", text: "Il preposto ai lavori nel cantiere è individuato...", value: null },
-      { icon: "recent_actors", text: "Il personale presente ha i profili Enel adeguati...", value: null },
-      { icon: "bolt", text: "In caso di lavori sotto tensione in BT...", value: null },
-      { icon: "medical_services", text: "Il personale presente ha la formazione adeguata...", value: null },
-      { icon: "precision_manufacturing", text: "Il personale presente ha la formazione adeguata all’utilizzo delle macchine...", value: null },
-      { icon: "signpost", text: "Il personale presente ha la formazione adeguata per addetti e preposti alla segnaletica...", value: null }
-    ]);
-
-    // ---- Gestione sezioni
+    // ---- Gestione checklist
     const currentSectionIndex = ref(0);
 
     const currentChecklistSections = computed(() => {
@@ -119,7 +110,7 @@ createApp({
     function goBack() {
       if (currentSection.value === "checklist") {
         currentSection.value = "worksite";
-        currentSectionIndex.value = 0; // resetto indice
+        currentSectionIndex.value = 0;
       }
       else if (currentSection.value === "worksite") currentSection.value = "home";
     }
@@ -127,12 +118,48 @@ createApp({
     function openWorksite(w) {
       selectedWorksite.value = w;
       currentSection.value = "worksite";
-      currentSectionIndex.value = 0; // reset indice checklist
+      currentSectionIndex.value = 0;
     }
 
     function openChecklist() {
       currentSection.value = "checklist";
       currentSectionIndex.value = 0;
+    }
+
+    // ---- Salvataggio checklist + foto
+    async function updateSection(section) {
+      // Aggiorno DB
+      const ws = await db.worksites.get(selectedWorksite.value.id);
+      if (!ws.sections) ws.sections = [];
+      const idx = ws.sections.findIndex(s => s.id === section.id);
+      if (idx >= 0) ws.sections[idx] = section;
+      else ws.sections.push(section);
+
+      await db.worksites.put(ws);
+
+      // Aggiorno reactive
+      selectedWorksite.value = ws;
+      const wsIndex = worksites.value.findIndex(w => w.id === ws.id);
+      if (wsIndex >= 0) worksites.value[wsIndex] = ws;
+    }
+
+    function handleFileChange(e, section) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        section.photo = reader.result; // salva base64
+        updateSection(section);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function updateChecklistItem(section, item) {
+      // Aggiorna la risposta della checklist
+      const idx = section.items.findIndex(i => i.text === item.text);
+      if (idx >= 0) section.items[idx] = item;
+      updateSection(section);
     }
 
     // 🔹 Tema
@@ -187,7 +214,7 @@ createApp({
       currentSection,
       selectedWorksite,
       worksites,
-      checklist,
+      /*checklist,*/
       toggleTheme,
       addToast,
       openDialog,
@@ -199,7 +226,9 @@ createApp({
       currentSectionIndex,
       currentChecklistSections,
       nextSection,
-      prevSection
+      prevSection,
+      handleFileChange,
+      updateChecklistItem
     }
   },
 }).mount("#app");
