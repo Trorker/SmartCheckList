@@ -446,7 +446,7 @@
         <dialog :open="dialog.visible" class="max-w-sm round elevated">
             <h5>{{ dialog.title }}</h5>
             <div>{{ dialog.message }}</div>
-            <nav class="right-align no-space mt">
+            <nav class="right-align">
                 <button class="transparent link" @click="cancelDialog()">Annulla</button>
                 <button class="primary" @click="confirmDialog()">Conferma</button>
             </nav>
@@ -460,7 +460,7 @@
             </header>
             <div>
                 <canvas ref="signCanvas" class="sig-canvas signCanvas" style="margin-top:.5rem;"></canvas>
-                <nav class="right-align no-space mt">
+                <nav class="right-align">
                     <button class="transparent link" @click="sigClear">Pulisci</button>
                     <button class="transparent link" @click="sigSave">Salva firma</button>
                 </nav>
