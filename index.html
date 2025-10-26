@@ -105,6 +105,10 @@
             --surface-container-highest: #333531;
         }
 
+        .pointer {
+            cursor: pointer;
+        }
+
         [v-cloak] {
             display: none;
         }
@@ -346,36 +350,83 @@
                             <label>Note:</label>
                         </div>
 
-                        <!-- Foto se presente -->
-                        <div class="field label border round extra">
-                            <label>Foto allegata:</label>
-                            <input type="file"
-                                @change="e => handleFileChange(e, currentChecklistSections[currentSectionIndex])">
-                            <div v-if="currentChecklistSections[currentSectionIndex].photo">
-                                <img :src="currentChecklistSections[currentSectionIndex].photo" class="responsive"
-                                    style="margin-top:10px;">
+                        <!-- Foto allegati -->
+                            <div class="grid">
+                                <article class="s12 m4 l4 no-padding border"
+                                    v-for="(att, idx) in currentChecklistSections[currentSectionIndex].attachments || []"
+                                    :key="att.id">
+                                    <img class="responsive medium pointer" :src="att.data" @click="openAttachment(att)" />
+                                    <div class="absolute bottom left right padding bottom-shadow white-text">
+                                        <nav>
+                                            <div class="max"></div>
+                                            <button class="circle transparent" @click.stop="removeAttachment(idx)">
+                                                <i>delete</i>
+                                            </button>
+                                        </nav>
+                                    </div>
+                                </article>
                             </div>
-                        </div>
+
+                            <!-- Grid allegati -->
+                            <!--<div class="attachments-grid"
+                                style="display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px;">
+
+                                <div class="attachment-add center-align"
+                                    style="border:2px dashed #ccc; border-radius:8px; padding:20px; cursor:pointer;">
+                                    <input type="file" accept="image/*"
+                                        @change="e => handleFileChange(e, currentChecklistSections[currentSectionIndex])"
+                                        style="display:none;" ref="fileInput">
+                                    <button class="circle transparent" @click="$refs.fileInput.click()"
+                                        style="font-size:24px;">+</button>
+                                    <div style="font-size:12px; margin-top:5px;">Aggiungi foto</div>
+                                </div>
+
+                                <div v-for="(att, idx) in currentChecklistSections[currentSectionIndex].attachments || []"
+                                    :key="att.id" class="attachment-item"
+                                    style="position:relative; border-radius:8px; overflow:hidden; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.2);">
+
+                                    <img :src="att.data" class="responsive"
+                                        style="width:100%; height:150px; object-fit:cover;"
+                                        @click="openAttachment(att)">
+
+                                    <button @click.stop="removeAttachment(idx)"
+                                        style="position:absolute; top:5px; right:5px; background:red; color:white; border:none; border-radius:50%; width:24px; height:24px; font-size:14px; line-height:20px; cursor:pointer;">✕</button>
+
+                                    <div class="attachment-title-overlay"
+                                        style="position:absolute; bottom:0; left:0; right:0; background:rgba(0,0,0,0.4); color:white; padding:5px 8px; font-size:12px; text-align:center;">
+                                        {{ att.title || 'Foto' }}
+                                    </div>
+                                </div>
+                            </div>-->
                     </article>
 
-                    <!-- Footer navigazione -->
+                    <!-- Footer navigazione + aggiungi foto -->
                     <footer class="fixed-toolbar center-align">
                         <nav class="toolbar secondary-container large-elevate">
                             <button class="circle transparent" @click="prevSection"
                                 :disabled="currentSectionIndex === 0">
                                 <i>arrow_back</i>
                             </button>
+
                             <span class="max center-align">
                                 {{ currentSectionIndex + 1 }} / {{ currentChecklistSections.length }}
                             </span>
+
                             <button class="circle transparent" @click="nextSection"
                                 :disabled="currentSectionIndex === currentChecklistSections.length - 1">
                                 <i>arrow_forward</i>
+                            </button>
+
+                            <button class="circle transparent">
+                                <i>attach_file</i>
+                                <input type="file" accept="image/*"
+                                    @change="e => handleFileChange(e, currentChecklistSections[currentSectionIndex])">
                             </button>
                         </nav>
                     </footer>
                 </div>
             </section>
+
 
 
         </main>
@@ -388,6 +439,14 @@
             <nav class="right-align no-space mt">
                 <button class="transparent link" @click="closeDialog">Chiudi</button>
                 <button class="transparent link" @click="confirmAction">Conferma</button>
+            </nav>
+        </dialog>
+
+        <!-- Dialog fullscreen per le foto -->
+        <dialog :open="photoDialog" class="max">
+            <img :src="dialogImage" class="responsive" style="max-height:90vh; max-width:90vw;">
+            <nav class="right-align" style="margin-top:10px;">
+                <button class="border" @click="photoDialog = false">Chiudi</button>
             </nav>
         </dialog>
 
