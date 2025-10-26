@@ -420,7 +420,86 @@
                             @input="updateSection(currentChecklistSections[currentSectionIndex])"></textarea>
                         <label>Note:</label>
                     </div>
+                    <!-- Foto allegati -->
+                    <div class="grid">
+                        <article class="s12 m4 l4 no-padding border"
+                            v-for="(att, idx) in currentChecklistSections[currentSectionIndex].attachments || []"
+                            :key="att.id">
+                            <img class="responsive medium pointer" :src="att.data" @click="openAttachment(att)" />
+                            <div class="absolute bottom left right padding bottom-shadow white-text">
+                                <nav>
+                                    <small>{{ att.name_ || 'Foto' }}</small>
+                                    <div class="max"></div>
+                                    <button class="circle transparent" @click.stop="removeAttachment(idx)">
+                                        <i>delete</i>
+                                    </button>
+                                </nav>
+                            </div>
+                        </article>
+                    </div>
                 </article>
+
+                <article v-if="currentChecklistSections[currentSectionIndex].type === 'table'">
+                    <table class="bordered responsive">
+                        <thead>
+                            <tr>
+                                <th v-for="(col, cIndex) in currentChecklistSections[currentSectionIndex].items[0].columns"
+                                    :key="cIndex">
+                                    {{ col.name }}
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(row, rIndex) in currentChecklistSections[currentSectionIndex].items[0].rows"
+                                :key="rIndex">
+                                <td v-for="(col, cIndex) in currentChecklistSections[currentSectionIndex].items[0].columns"
+                                    :key="cIndex">
+
+                                    <!-- se tipo text, input -->
+                                    <div class="field border label" v-if="col.type === 'text'">
+                                        <input type="text" v-model="row[col.name]"
+                                            @input="updateTableItem(currentChecklistSections[currentSectionIndex], row, col.name, $event.target.value)" />
+                                        <label>Text</label>
+                                    </div>
+
+                                    <!-- se tipo checkbox -->
+                                    <label class="checkbox" v-else-if="col.type === 'checkbox'">
+                                        <input type="checkbox" v-model="row[col.name]"
+                                            @change="updateTableItem(currentChecklistSections[currentSectionIndex], row, col.name, row[col.name])">
+                                        <span></span>
+                                    </label>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <small>{{currentChecklistSections[currentSectionIndex].items[0].legend}}</small>
+
+                    <!-- Note della sezione -->
+                    <div class="field textarea label border round extra">
+                        <textarea v-model="currentChecklistSections[currentSectionIndex].notes"
+                            @input="updateSection(currentChecklistSections[currentSectionIndex])"></textarea>
+                        <label>Note:</label>
+                    </div>
+
+                    <!-- Foto allegati -->
+                    <div class="grid">
+                        <article class="s12 m4 l4 no-padding border"
+                            v-for="(att, idx) in currentChecklistSections[currentSectionIndex].attachments || []"
+                            :key="att.id">
+                            <img class="responsive medium pointer" :src="att.data" @click="openAttachment(att)" />
+                            <div class="absolute bottom left right padding bottom-shadow white-text">
+                                <nav>
+                                    <small>{{ att.name_ || 'Foto' }}</small>
+                                    <div class="max"></div>
+                                    <button class="circle transparent" @click.stop="removeAttachment(idx)">
+                                        <i>delete</i>
+                                    </button>
+                                </nav>
+                            </div>
+                        </article>
+                    </div>
+                </article>
+
 
 
                 <!-- Footer navigazione + aggiungi foto -->
@@ -444,15 +523,19 @@
                             <i>signature</i>
                         </button>-->
 
-                        <button class="circle transparent">
+                        <button class="circle transparent"
+                            :disabled="!currentChecklistSections[currentSectionIndex].attachments">
                             <i>attach_file</i>
                             <input type="file" accept="image/*"
+                                :disabled="!currentChecklistSections[currentSectionIndex].attachments"
                                 @change="e => handleFileChange(e, currentChecklistSections[currentSectionIndex])">
                         </button>
 
-                        <button class="circle transparent">
+                        <button class="circle transparent"
+                            :disabled="!currentChecklistSections[currentSectionIndex].attachments">
                             <i>photo_camera</i>
                             <input type="file" accept="image/*" capture="environment"
+                                :disabled="!currentChecklistSections[currentSectionIndex].attachments"
                                 @change="e => handleFileChange(e, currentChecklistSections[currentSectionIndex])">
                         </button>
                     </nav>
