@@ -57,7 +57,7 @@ createApp({
 
       // Includiamo checklist, table e signature
       return selectedWorksite.value.sections.filter(s =>
-        ['checklist', 'table', 'signature'].includes(s.type)
+        ['checklist', 'table', 'note', 'signature'].includes(s.type)
       );
     });
 
