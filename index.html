@@ -25,6 +25,14 @@
     <!-- Dexie.js -->
     <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
 
+    <!-- jsPDF -->
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.debug.js" integrity="sha384-NaWTHo/8YCBYJ59830LTz/P4aQZK1sS0SneOgAvhsIl3zBu8r9RevNg5lHCHAuQ/" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>-->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+
     <style>
         /* Tema personalizzato chiaro e scuro */
         :root {
@@ -303,7 +311,7 @@
                             <div class="badge border secondary-border secondary-text">dev</div>
                             <input type="file" disabled>
                         </button>
-                        <button class="circle transparent" @click="openDialog"><i>signature</i></button>
+                        <button class="circle transparent" @click="goToSignatureSection()"><i>signature</i></button>
                     </nav>
                 </footer>
             </section>
@@ -385,7 +393,8 @@
                         <article class="s12 m4 l4 no-padding border"
                             v-for="(sig, idx) in currentChecklistSections[currentSectionIndex].signatures" :key="idx">
                             <img v-if="sig.signature" :src="sig.signature" class="responsive medium" />
-                            <img v-else src="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22></svg>"
+                            <img v-else
+                                src="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22></svg>"
                                 class="responsive medium" />
                             <div class="absolute bottom left right padding bottom-shadow white-text">
                                 <nav>
