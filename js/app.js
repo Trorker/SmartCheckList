@@ -1,3 +1,6 @@
+//import { genPDF } from './genPDF.js';
+import { downloadWorksite } from './pdf/worksiteHandler.js';
+
 if ('serviceWorker' in navigator) {
   /*window.addEventListener('load', () => {
     navigator.serviceWorker.register('./js/sw.js')
@@ -23,6 +26,7 @@ createApp({
     const showDialogNewWorksite = ref(false);
     const newCantiere = ref({ nome: '', descr: '', file: '' });
     const prototypes = ref([
+      { nome: 'ENEL Precompilato', version: '1.0', file: 'cantiere_enel_pre_filled.json' },
       { nome: 'Prototipo ENEL', version: '1.0', file: 'cantiere_enel.json' },
       { nome: 'Prototipo TERNA', version: '1.1', file: 'cantiere_terna.json' },
     ]);
@@ -209,16 +213,23 @@ createApp({
     }
 
     // --- Scarica cantiere ---
-    const downloadWorksite = (worksite) => {
-      const dataStr = JSON.stringify(worksite, null, 2);
+    /*const downloadWorksite = (worksite) => {
+
+
+      genPDF(worksite);
+
+
+      /*const dataStr = JSON.stringify(worksite, null, 2);
       const blob = new Blob([dataStr], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
       a.download = `${worksite.nome.replace(/\s+/g, '_')}.json`;
       a.click();
-      URL.revokeObjectURL(url);
-    }
+      URL.revokeObjectURL(url);*/
+    //}
+
+
 
     // funzione per eliminare cantiere
     const deleteWorksite = (worksite) => {
@@ -459,6 +470,27 @@ createApp({
     function closeSigDlg() { sigOpen.value = false; }
 
 
+    function goToSignatureSection() {
+      if (!selectedWorksite.value || !currentChecklistSections.value.length) return;
+
+      // trova l'indice della sezione signature
+      const sigIndex = currentChecklistSections.value.findIndex(s => s.type === 'signature');
+
+      if (sigIndex === -1) {
+        addToast("Nessuna sezione firma disponibile", "error");
+        return;
+      }
+
+      // cambia sezione corrente e vai alla checklist
+      currentSection.value = 'checklist';
+      currentSectionIndex.value = sigIndex;
+
+      // opzionale: scroll automatico o focus sul canvas firma
+      nextTick(() => {
+        const canvas = document.querySelector('canvas[ref="signCanvas"]');
+        if (canvas) canvas.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+    }
 
 
 
@@ -575,7 +607,7 @@ createApp({
       openDialog, closeDialog, cancelDialog, downloadWorksite, deleteWorksite, confirmDialog, formatLabel,
       autoSaveWorksite, saveWorksite,
 
-      openSigDlg, sigClear, sigSave, closeSigDlg,
+      openSigDlg, sigClear, sigSave, closeSigDlg, goToSignatureSection,
     }
   },
 }).mount("#app");
