@@ -98,15 +98,6 @@
       "type": "checklist",
       "notes": "",
       "attachments": [],
-      "items": []
-    },
-    {
-      "id": 4,
-      "title": "Organizzazione del cantiere",
-      "icon": "account_tree",
-      "type": "checklist",
-      "notes": "",
-      "attachments": [],
       "items": [
         {
           "icon": "warning",
@@ -141,6 +132,51 @@
         {
           "icon": "recycling",
           "text": "Il deposito temporaneo è individuato correttamente",
+          "value": null
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Organizzazione del cantiere",
+      "icon": "account_tree",
+      "type": "checklist",
+      "notes": "",
+      "attachments": [],
+      "items": [
+        {
+          "icon": "map",
+          "text": "L.C.L. Planimetrie / Permessi Enti",
+          "value": null
+        },
+        {
+          "icon": "description",
+          "text": "POS (Presenza e rispetto prescrizioni)",
+          "value": null
+        },
+        {
+          "icon": "assignment",
+          "text": "MArt26 e/o DUVRI (Presenza e rispetto prescrizioni)",
+          "value": null
+        },
+        {
+          "icon": "security",
+          "text": "PSC (se previsto) (Presenza e rispetto prescrizioni)",
+          "value": null
+        },
+        {
+          "icon": "engineering",
+          "text": "P.d.L.- P.d.I. C.I. EFT / MFT",
+          "value": null
+        },
+        {
+          "icon": "check_circle",
+          "text": "È stato correttamente effettuata la verifica stabilità sostegno",
+          "value": null
+        },
+        {
+          "icon": "eco",
+          "text": "Scheda Ambiente",
           "value": null
         }
       ]
