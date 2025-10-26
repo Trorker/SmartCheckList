@@ -1,30 +1,18 @@
 // compilePDF.js
-
-//import { PDFDocument, rgb, StandardFonts } from './../libs/pdf-lib.min.js';
-//import { PDFDocument, rgb, StandardFonts } from 'https://cdn.skypack.dev/pdf-lib';
 import { PDFDocument, rgb } from 'https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/+esm';
-import fontkit from 'https://cdn.jsdelivr.net/npm/@pdf-lib/fontkit@1.1.1/+esm'
-
-
+import fontkit from 'https://cdn.jsdelivr.net/npm/@pdf-lib/fontkit@1.1.1/+esm';
 
 /**
- * Prende un oggetto e un path tipo 'sections[8].notes' e ritorna il valore.
- * @param {Object} obj - L'oggetto JSON
- * @param {string} path - Il path tipo 'sections[8].notes'
- * @returns valore corrispondente o undefined
+ * Prende un oggetto e un path tipo 'sections[8].items[2].value' e ritorna il valore.
  */
 export const getValueByPath = (obj, path) => {
     if (!obj || !path) return undefined;
-
-    // Trasforma 'sections[8].notes' in ['sections', '8', 'notes']
     const parts = path.replace(/\[(\d+)\]/g, '.$1').split('.');
     let current = obj;
-
     for (let part of parts) {
         if (current[part] === undefined) return undefined;
         current = current[part];
     }
-
     return current;
 };
 
@@ -32,10 +20,16 @@ export const getValueByPath = (obj, path) => {
  * Converte Base64 in ArrayBuffer
  */
 const base64ToArrayBuffer = (base64) => {
-    const binaryString = atob(base64);
+    // Rimuove eventuale prefisso "data:image/...;base64,"
+    const base64Data = base64.includes(',') ? base64.split(',')[1] : base64;
+
+    // Decodifica
+    const binaryString = atob(base64Data);
     const len = binaryString.length;
     const bytes = new Uint8Array(len);
-    for (let i = 0; i < len; i++) bytes[i] = binaryString.charCodeAt(i);
+    for (let i = 0; i < len; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+    }
     return bytes.buffer;
 };
 
@@ -46,23 +40,18 @@ const base64ToArrayBuffer = (base64) => {
 const extractAllImages = (prototype) => {
     const images = [];
     if (!prototype.sections) return images;
-
     for (const section of prototype.sections) {
         if (!section.attachments) continue;
         for (const att of section.attachments) {
-            if (att.data || att.image || att.file) {
-                const base64 = att.data || att.image || att.file;
-                if (base64.startsWith('data:image')) {
-                    images.push(base64);
-                }
-            }
+            const base64 = att.data || att.image || att.file;
+            if (base64 && base64.startsWith('data:image')) images.push(base64);
         }
     }
     return images;
 };
 
 /**
- * Compila PDF: scrive testo e check sul PDF esistente e aggiunge immagini finali
+ * Compila PDF: scrive testo, checkboxes, note e immagini
  */
 export const compilePDF = async (prototype) => {
     if (!prototype.pdfBase64) {
@@ -73,27 +62,36 @@ export const compilePDF = async (prototype) => {
     const pdfBytes = base64ToArrayBuffer(prototype.pdfBase64);
     const pdfDoc = await PDFDocument.load(pdfBytes);
 
-
-    // --- 2. Registra fontkit e carica il tuo font ---
+    // --- font ---
     pdfDoc.registerFontkit(fontkit);
-    const urlFont = './resources/font/IndieFlower-Regular.ttf'; // o NanumPenScript-Regular.ttf
+    const urlFont = './resources/font/IndieFlower-Regular.ttf';
     const fontBytes = await fetch(urlFont).then(res => res.arrayBuffer());
-    const font = await pdfDoc.embedFont(fontBytes);   
+    const font = await pdfDoc.embedFont(fontBytes);
 
     const pages = pdfDoc.getPages();
+    const firstPage = pages[0];
+    const { width: pageWidth, height: pageHeight } = firstPage.getSize();
 
-    // 1️⃣ Scrittura dei campi
+    // --- Logo azienda ---
+    /*try {
+        const logoUrl = './resources/img/LOGO-LEVRATTI.png';
+        const logoBytes = await fetch(logoUrl).then(r => r.arrayBuffer());
+        const logoImage = await pdfDoc.embedPng(logoBytes);
+        const logoWidth = 120;
+        const logoHeight = (logoImage.height / logoImage.width) * logoWidth;
+        firstPage.drawImage(logoImage, { x: 50, y: pageHeight - 80, width: logoWidth, height: logoHeight });
+    } catch (err) {
+        console.warn('⚠️ Errore caricamento logo:', err);
+    }*/
+
+    // --- Campi testuali e checkboxes ---
     if (Array.isArray(prototype.compile)) {
         for (const field of prototype.compile) {
             const value = getValueByPath(prototype, field.value) || '';
             const pageIndex = (field.page || 1) - 1;
             const page = pages[pageIndex] || pages[pages.length - 1];
             const { width, height } = page.getSize();
-
             const color = field.color || rgb(0, 0, 1);
-
-            console.log(`🖊️ Scrivo sul PDF: "${value}" in (${field.x}, ${field.y}) sulla pagina ${pageIndex + 1}`);
-            
 
             if (field.type === 'text') {
                 page.drawText(String(value), {
@@ -103,66 +101,60 @@ export const compilePDF = async (prototype) => {
                     font,
                     color,
                 });
-            } else if (field.type === 'check' && value === true) {
-                page.drawRectangle({
-                    x: field.x,
+            } else if (field.type === 'check') {
+                // checkbox per "C", "N.C.", "N.A."
+                let offsetX = 0;
+                if (value === 'C') offsetX = 0;
+                else if (value === 'N.C.') offsetX = 25; // piccolo scostamento centrale
+                else if (value === 'N.A.') offsetX = 50;
+
+                page.drawText('X', {
+                    x: field.x + offsetX,
                     y: height - field.y,
-                    width: 8,
-                    height: 8,
-                    borderWidth: 1,
+                    size: field.fontSize || 20,
+                    font,
                     color,
                 });
             }
         }
     }
 
-    // 2️⃣ Aggiunta immagini dagli attachments
+    // --- Immagini ---
     const allImages = extractAllImages(prototype);
-    console.log(allImages);
-    
     if (allImages.length > 0) {
         let currentPage = pdfDoc.addPage();
         let { width, height } = currentPage.getSize();
-        let yPos = height - 100;
+        let imgY = height - 100;
 
         for (const imgBase64 of allImages) {
             try {
                 const imgBytes = base64ToArrayBuffer(imgBase64);
                 let image;
-
-                if (imgBase64.startsWith('data:image/png')) {
-                    image = await pdfDoc.embedPng(imgBytes);
-                } else {
-                    image = await pdfDoc.embedJpg(imgBytes);
-                }
+                if (imgBase64.startsWith('data:image/png')) image = await pdfDoc.embedPng(imgBytes);
+                else if (imgBase64.startsWith('data:image/jpeg') || imgBase64.startsWith('data:image/jpg')) image = await pdfDoc.embedJpg(imgBytes);
+                else continue;
 
                 const imgWidth = 200;
                 const imgHeight = (image.height / image.width) * imgWidth;
 
-                currentPage.drawImage(image, {
-                    x: 50,
-                    y: yPos - imgHeight,
-                    width: imgWidth,
-                    height: imgHeight,
-                });
+                currentPage.drawImage(image, { x: 50, y: imgY - imgHeight, width: imgWidth, height: imgHeight });
+                imgY -= imgHeight + 30;
 
-                yPos -= imgHeight + 30;
-                if (yPos < 100) {
+                if (imgY < 100) {
                     currentPage = pdfDoc.addPage();
                     ({ width, height } = currentPage.getSize());
-                    yPos = height - 100;
+                    imgY = height - 100;
                 }
             } catch (err) {
-                console.warn('⚠️ Errore nel caricamento immagine:', err);
+                console.warn('⚠️ Errore caricamento immagine:', err);
             }
         }
     }
 
-    // 3️⃣ Esportazione finale
+    // --- Esportazione PDF ---
     const compiledBytes = await pdfDoc.save();
     const blob = new Blob([compiledBytes], { type: 'application/pdf' });
     const url = URL.createObjectURL(blob);
-
     const a = document.createElement('a');
     a.href = url;
     a.download = `${prototype.nome.replace(/\s+/g, '_')}_compiled.pdf`;
