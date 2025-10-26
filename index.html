@@ -4,8 +4,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!--<link rel="manifest" href="./manifest.json">-->
     <meta name="theme-color" content="#2196f3">
 
     <title>Check List Cantieri - Levratti</title>
@@ -22,13 +20,13 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
     <!-- Vue 3 -->
-    <!--<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>-->
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 
     <!-- Dexie.js -->
     <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
 
     <style>
+        /* Tema personalizzato chiaro e scuro */
         :root {
             --primary: #006e1c;
             --on-primary: #ffffff;
@@ -129,54 +127,64 @@
             opacity: 0;
             transform: translateX(-10px);
         }
+
+        /* Canvas firma */
+        canvas {
+            width: 100%;
+            height: 150px;
+            border: 1px solid var(--outline);
+        }
+
+        /* Overlay dialog */
+        .overlay.blur.active {
+            backdrop-filter: blur(4px);
+            z-index: 9998;
+            position: fixed;
+            inset: 0;
+        }
+
+        /* Footer fisso per pulsanti */
+        footer.fixed-toolbar {
+            position: fixed;
+            inset: auto 0 var(--_padding) 0;
+            z-index: 9999;
+        }
     </style>
 </head>
 
 <body>
     <div id="app" v-cloak>
 
-
+        <!-- HEADER -->
         <header class="fixed" style="box-shadow: var(--elevate1);">
             <nav>
-                <button class="circle transparent" @click="goBack" v-if="currentSection !== 'home'">
-                    <i>arrow_back</i>
-                </button>
+                <button class="circle transparent" @click="goBack"
+                    v-if="currentSection !== 'home'"><i>arrow_back</i></button>
                 <div class="shape loading-indicator tiny" v-if="loading"></div>
                 <h6 class="max">{{ title }}</h6>
-                <button class="circle transparent" @click="toggleTheme">
-                    <i>{{ isDark ? 'light_mode' : 'dark_mode' }}</i>
-                </button>
-                <button class="circle transparent" @click="openDialog">
-                    <i>settings</i>
-                </button>
+                <button class="circle transparent" @click="toggleTheme"><i>{{ isDark ? 'light_mode' : 'dark_mode'
+                        }}</i></button>
+                <button class="circle transparent" @click="openDialog"><i>settings</i></button>
             </nav>
         </header>
 
-
         <main class="responsive">
-            <!--<transition name="slide-fade" mode="out-in">-->
 
             <!-- 🏠 HOME -->
-            <section v-if="currentSection === 'home'" key="home">
-
+            <section v-if="currentSection === 'home'">
                 <h3>Verifiche Ispettiva</h3>
 
-                <!-- Navigation tabbed -->
+                <!-- Ricerca e tab -->
                 <div class="grid">
-
-                    <!-- Search -->
                     <div class="s12 m12 l4">
                         <div class="row">
                             <div class="field prefix round fill active max">
                                 <i class="front">search</i>
-                                <input>
+                                <input placeholder="Cerca cantiere">
                             </div>
                         </div>
                     </div>
-
                     <div class="l l2"></div>
-
-                    <!-- Filter -->
                     <div class="s12 m12 l6">
                         <div class="row right-align">
                             <nav class="tabbed small">
@@ -190,10 +198,8 @@
                     </div>
                 </div>
 
-
+                <!-- Lista cantieri -->
                 <div class="grid">
-
-                    <!-- CARD WORKSITE -->
                     <div class="s12 m6 l4" v-for="c in worksites" :key="c.id">
                         <article class="no-padding">
                             <img class="responsive"
@@ -210,43 +216,30 @@
                                     <button @click="openWorksite(c)">Apri</button>
                                     <div class="max"></div>
                                     <nav>
-                                        <button class="circle transparent">
-                                            <i>share</i>
-                                        </button>
-                                        <button class="circle transparent">
-                                            <i>download</i>
+                                        <button class="circle transparent"><i>share</i></button>
+                                        <button class="circle transparent"><i>download</i>
                                             <div class="badge no-round">New</div>
                                         </button>
                                         <button class="circle transparent"
-                                            @click="addToast('Cantiere ' + n + ' eliminato', 'error', {label:'Annulla', callback:()=>addToast('Annullato', 'primary')})">
+                                            @click="addToast('Cantiere eliminato', 'error', {label:'Annulla', callback:()=>addToast('Annullato', 'primary')})">
                                             <i>delete</i>
                                         </button>
                                     </nav>
-                                    <!--<button class="circle transparent">
-                                        <i>more_vert</i>
-                                    </button>-->
                                 </nav>
-
                             </div>
                         </article>
                     </div>
-
                 </div>
 
-                <footer class="transparent right-align" style="position: fixed; inset: auto 0px var(--_padding) 0px;">
+                <footer class="fixed-toolbar right-align">
                     <nav>
-                        <button class="square round extra" @click="showDialogNewWorksite = true">
-                            <i>add</i>
-                        </button>
+                        <button class="square round extra" @click="showDialogNewWorksite = true"><i>add</i></button>
                     </nav>
                 </footer>
-
             </section>
 
-
             <!-- 🏗️ WORKSITE -->
-            <section v-else-if="currentSection === 'worksite'" key="worksite">
-
+            <section v-else-if="currentSection === 'worksite'">
                 <header>
                     <h5 class="m-none">Dettagli Cantiere</h5>
                 </header>
@@ -254,112 +247,69 @@
                     <form @submit.prevent="saveWorksite()">
                         <fieldset>
                             <legend>Dati generali</legend>
-
                             <div class="field border label">
                                 <input type="text" v-model="selectedWorksite.nome" required>
                                 <label>Nome cantiere</label>
                             </div>
-
                             <div class="field border label textarea">
                                 <textarea rows="2" v-model="selectedWorksite.descr"></textarea>
                                 <label>Descrizione</label>
                             </div>
-
                             <div class="field border label">
                                 <input type="date" v-model="selectedWorksite.data">
                                 <label>Data</label>
                             </div>
                         </fieldset>
-
                         <fieldset>
                             <legend>Dati luogo e impresa</legend>
-
-                            <div class="field border label">
-                                <input type="text" v-model="selectedWorksite.luogo.contratto">
-                                <label>Contratto / LCL / Lavoro</label>
+                            <div class="field border label"><input type="text"
+                                    v-model="selectedWorksite.luogo.contratto"><label>Contratto / LCL / Lavoro</label>
                             </div>
-
-                            <div class="field border label">
-                                <input type="text" v-model="selectedWorksite.luogo.comune">
-                                <label>Comune</label>
+                            <div class="field border label"><input type="text"
+                                    v-model="selectedWorksite.luogo.comune"><label>Comune</label></div>
+                            <div class="field border label"><input type="text"
+                                    v-model="selectedWorksite.luogo.provincia"><label>Provincia</label></div>
+                            <div class="field border label"><input type="text"
+                                    v-model="selectedWorksite.luogo.indirizzo"><label>Indirizzo</label></div>
+                            <div class="field border label"><input type="text"
+                                    v-model="selectedWorksite.luogo.impresa"><label>Impresa esecutrice</label></div>
+                            <div class="field border label textarea"><textarea rows="3"
+                                    v-model="selectedWorksite.luogo.attivita"></textarea><label>Attività svolta</label>
                             </div>
-
-                            <div class="field border label">
-                                <input type="text" v-model="selectedWorksite.luogo.provincia">
-                                <label>Provincia</label>
-                            </div>
-
-                            <div class="field border label">
-                                <input type="text" v-model="selectedWorksite.luogo.indirizzo">
-                                <label>Indirizzo</label>
-                            </div>
-
-                            <div class="field border label">
-                                <input type="text" v-model="selectedWorksite.luogo.impresa">
-                                <label>Impresa esecutrice</label>
-                            </div>
-
-                            <div class="field border label textarea">
-                                <textarea rows="3" v-model="selectedWorksite.luogo.attivita"></textarea>
-                                <label>Attività svolta</label>
-                            </div>
-
                         </fieldset>
-
                         <fieldset>
                             <legend>Verificatore</legend>
-                            <div class="field border label">
-                                <input type="text" v-model="selectedWorksite.luogo.verificatore">
-                                <label>Verificatore</label>
-                            </div>
+                            <div class="field border label"><input type="text"
+                                    v-model="selectedWorksite.luogo.verificatore"><label>Verificatore</label></div>
                         </fieldset>
-
-
                     </form>
                     <span class="chip small margin center">ID: {{ selectedWorksite?.id }}</span>
                 </article>
 
-
-                <footer class="transparent center-align"
-                    style="position: fixed; inset: auto 0px var(--_padding) 0px; z-index: 999999;">
-                    <div class="raw center-align">
-                        <nav class="toolbar secondary-container large-elevate">
-                            <button class="circle transparent" @click="goBack">
-                                <i>arrow_back</i>
-                            </button>
-                            <button class="circle transparent" @click="openChecklist">
-                                <i>checklist</i>
-                            </button>
-                            <button class="circle transparent">
-                                <i>attach_file</i>
-                                <input type="file">
-                            </button>
-                            <button class="circle transparent" @click="openDialog">
-                                <i>signature</i>
-                            </button>
-                        </nav>
-                    </div>
+                <footer class="fixed-toolbar center-align">
+                    <nav class="toolbar secondary-container large-elevate">
+                        <button class="circle transparent" @click="goBack"><i>arrow_back</i></button>
+                        <button class="circle transparent" @click="openChecklist"><i>checklist</i></button>
+                        <button class="circle transparent"><i>attach_file</i><input type="file"></button>
+                        <button class="circle transparent" @click="openDialog"><i>signature</i></button>
+                    </nav>
                 </footer>
             </section>
 
-
-            <!-- ✅ CHECKLIST CON PAGINAZIONE -->
+            <!-- ✅ CHECKLIST -->
             <section v-if="currentSection === 'checklist' && selectedWorksite">
                 <div class="padding">
                     <h5>{{ currentSectionIndex + 1 }} – {{ currentChecklistSections[currentSectionIndex].title }}</h5>
-
                     <article v-if="currentChecklistSections[currentSectionIndex].type === 'checklist'">
                         <ul class="list border">
-                            <li v-for="(item, index) in currentChecklistSections[currentSectionIndex].items"
+                            <li v-for="(item,index) in currentChecklistSections[currentSectionIndex].items"
                                 :key="index">
                                 <div class="grid max">
                                     <div class="s12 m9 l10">
-                                        <div class="row">
-                                            <i class="m l">{{ item.icon }}</i>
+                                        <div class="row"><i class="m l">{{ item.icon }}</i>
                                             <h6 class="max small text-wrap">{{ item.text }}</h6>
                                         </div>
                                     </div>
-
                                     <div class="row s12 m3 l2 right-align">
                                         <div class="center-align" v-for="val in ['C','N.C.','N.A.']" :key="val">
                                             <h6 class="small">{{ val }}</h6>
@@ -378,194 +328,34 @@
                                 </div>
                             </li>
                         </ul>
-
-                        <div class="field textarea label border round extra">
-                            <textarea v-model="currentChecklistSections[currentSectionIndex].notes"></textarea>
-                            <label>Note:</label>
+                        <div class="field textarea label border round extra"><textarea
+                                v-model="currentChecklistSections[currentSectionIndex].notes"></textarea><label>Note:</label>
                         </div>
                     </article>
 
-                    <footer class="transparent center-align"
-                        style="position: fixed; inset: auto 0px var(--_padding) 0px; z-index: 999999;">
-                        <div class="raw center-align">
-                            <nav class="toolbar secondary-container large-elevate">
-                                <button class="circle transparent" @click="prevSection"
-                                    :disabled="currentSectionIndex === 0">
-                                    <i>arrow_back</i>
-                                </button>
-                                <span class="max center-align">{{ currentSectionIndex + 1 }} / {{
-                                    currentChecklistSections.length }}</span>
-                                <button class="circle transparent" @click="nextSection"
-                                    :disabled="currentSectionIndex === currentChecklistSections.length - 1">
-                                    <i>arrow_forward</i>
-                                </button>
-                            </nav>
-                        </div>
+                    <footer class="fixed-toolbar center-align">
+                        <nav class="toolbar secondary-container large-elevate">
+                            <button class="circle transparent" @click="prevSection"
+                                :disabled="currentSectionIndex === 0"><i>arrow_back</i></button>
+                            <span class="max center-align">{{ currentSectionIndex + 1 }} / {{
+                                currentChecklistSections.length }}</span>
+                            <button class="circle transparent" @click="nextSection"
+                                :disabled="currentSectionIndex === currentChecklistSections.length - 1"><i>arrow_forward</i></button>
+                        </nav>
                     </footer>
                 </div>
             </section>
 
-
-            <!--<section v-else-if="currentSection === 'checklist'" key="checklist">
-
-                <nav>
-                    <div class="center-align">
-                        <button class="circle small">
-                            <i>done</i>
-                        </button>
-                        <div class="small-margin">Previous</div>
-                    </div>
-                    <hr class="max">
-                    <div class="center-align">
-                        <button class="circle small">2</button>
-                        <div class="small-margin">Current</div>
-                    </div>
-                    <hr class="max">
-                    <div class="center-align">
-                        <button class="circle small" disabled>3</button>
-                        <div class="small-margin">Next</div>
-                    </div>
-                </nav>
-                <div class="page padding active right">
-                    <h5>2– VERIFICA FORMAZIONE PERSONALE DI CANTIERE</h5>
-                    <article>
-                        <ul class="list border">
-
-                            <li v-for="(item, index) in checklist" :key="index">
-                                <div class="grid max">
-                                    <div class="s12 m9 l10">
-                                        <div class="row">
-                                            <i class="m l">{{ item.icon }}</i>
-                                            <h6 class="max small text-wrap">{{ item.text }}</h6>
-                                        </div>
-                                    </div>
-
-                                    <div class="row s12 m3 l2 right-align">
-                                        <div class="center-align">
-                                            <h6 class="small">C</h6>
-                                            <label class="radio icon">
-                                                <input type="radio" :name="'radio_' + index" v-model="item.value"
-                                                    value="C">
-                                                <span>
-                                                    <i>circle</i>
-                                                    <i>check_circle</i>
-                                                </span>
-                                            </label>
-                                        </div>
-
-                                        <div class="center-align">
-                                            <h6 class="small">N.C.</h6>
-                                            <label class="radio icon">
-                                                <input type="radio" :name="'radio_' + index" v-model="item.value"
-                                                    value="N.C.">
-                                                <span>
-                                                    <i>circle</i>
-                                                    <i class="error">error</i>
-                                                </span>
-                                            </label>
-                                        </div>
-
-                                        <div class="center-align">
-                                            <h6 class="small">N.A.</h6>
-                                            <label class="radio icon">
-                                                <input type="radio" :name="'radio_' + index" v-model="item.value"
-                                                    value="N.A.">
-                                                <span>
-                                                    <i>circle</i>
-                                                    <i>do_not_disturb_on</i>
-                                                </span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </li>
-
-                        </ul>
-                        <div class="field textarea label border round extra">
-                            <textarea></textarea>
-                            <label>Note:</label>
-                        </div>
-                    </article>
-
-                    <pre>{{ checklist }}</pre>
-
-                </div>
-                <div class="page padding right">
-                    <h5>Tab 2</h5>
-                </div>
-                <div class="page padding right">
-                    <h5>Tab 3</h5>
-                </div>
-
-
-                <footer class="transparent center-align" style="position: fixed; inset: auto 0px var(--_padding) 0px;">
-                    <div class="raw center-align">
-                        <nav class="toolbar secondary-container large-elevate">
-                            <button class="circle transparent" @click="goBack">
-                                <i>arrow_back</i>
-                            </button>
-                            <button class="circle transparent">
-                                <i>attach_file</i>
-                                <input type="file">
-                            </button>
-                            <button class="circle transparent">
-                                <i>arrow_forward</i>
-                            </button>
-                        </nav>
-                    </div>
-                </footer>
-
-            </section>-->
-            <!--</transition>-->
         </main>
 
-
-        <!-- DIALOG -->
+        <!-- DIALOG GENERICO -->
         <div class="overlay blur" :class="{ active: showDialog }"></div>
         <dialog :open="showDialog">
             <h5>Informazioni</h5>
             <div>Questa è una finestra modale gestita con Vue + BeerCSS.</div>
-            <article class="medium middle-align center-align">
-                <div>
-                    <i class="extra">mail</i>
-                    <h5>You have no new messages</h5>
-                    <p>Click the button to start a conversation</p>
-                    <div class="space"></div>
-                    <nav class="center-align">
-                        <button>Send a message</button>
-                    </nav>
-                </div>
-            </article>
             <nav class="right-align no-space mt">
                 <button class="transparent link" @click="closeDialog">Chiudi</button>
                 <button class="transparent link" @click="confirmAction">Conferma</button>
-            </nav>
-        </dialog>
-
-        <div class="overlay blur"></div>
-        <dialog style="min-width: 75vw">
-            <h5>Impostazioni Verificatore</h5>
-            <div class="field label border">
-                <input placeholder="Nome verificatore">
-                <label>Nome verificatore</label>
-            </div>
-
-            <div class="field label border">
-                <input placeholder="Azienda">
-                <label>Azienda</label>
-            </div>
-
-            <div>
-                <label style="display:block; margin-bottom:4px;">Firma:</label>
-                <canvas ref="canvas" style="border:1px solid var(--outline); width:100%; height:150px;"></canvas>
-                <nav class="right-align no-space mt">
-                    <button class="transparent small">Pulisci</button>
-                </nav>
-            </div>
-
-            <nav class="right-align no-space mt">
-                <button class="transparent link">Chiudi</button>
-                <button class="primary">Salva</button>
             </nav>
         </dialog>
 
@@ -573,50 +363,31 @@
         <div class="overlay blur" :class="{ active: showDialogNewWorksite }"></div>
         <dialog :open="showDialogNewWorksite" class="responsive">
             <h5>Nuovo Cantiere</h5>
-
             <form @submit.prevent="addCantiere">
-
-                <!-- Nome (obbligatorio) -->
-                <div class="field label border">
-                    <input v-model="newCantiere.nome" required>
-                    <label>Nome cantiere *</label>
-                </div>
-
-                <!-- Descrizione (opzionale) -->
-                <div class="field label border">
-                    <input v-model="newCantiere.descr">
-                    <label>Descrizione</label>
-                </div>
-
-                <!-- Versione / file JSON prototipo -->
+                <div class="field label border"><input v-model="newCantiere.nome" required><label>Nome cantiere
+                        *</label></div>
+                <div class="field label border"><input v-model="newCantiere.descr"><label>Descrizione</label></div>
                 <div class="field label border">
                     <select v-model="newCantiere.file" required>
                         <option disabled value="">Seleziona prototipo</option>
-                        <option v-for="proto in prototypes" :key="proto.version" :value="proto.file">
-                            {{ proto.version }} - {{ proto.nome }}
-                        </option>
+                        <option v-for="proto in prototypes" :key="proto.version" :value="proto.file">{{ proto.version }}
+                            - {{ proto.nome }}</option>
                     </select>
                     <label>Prototipo cantiere</label>
                 </div>
-
                 <nav class="right-align no-space mt">
                     <button type="button" class="transparent link"
                         @click="showDialogNewWorksite = false">Chiudi</button>
                     <button type="submit" class="primary">Conferma</button>
                 </nav>
-
             </form>
         </dialog>
 
-
-        <!-- TOAST / SNACKBAR -->
+        <!-- TOAST -->
         <div class="snackbar" :class="[toast.type, { active: toast.active }]">
             <div class="max">{{ toast.text }}</div>
-            <a v-if="toast.action" class="inverse-link" @click="toast.action.callback">
-                {{ toast.action.label }}
-            </a>
+            <a v-if="toast.action" class="inverse-link" @click="toast.action.callback">{{ toast.action.label }}</a>
         </div>
-
 
     </div>
 
