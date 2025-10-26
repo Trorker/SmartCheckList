@@ -298,7 +298,11 @@
                     <nav class="toolbar secondary-container large-elevate">
                         <button class="circle transparent" @click="goBack"><i>arrow_back</i></button>
                         <button class="circle transparent" @click="openChecklist"><i>checklist</i></button>
-                        <button class="circle transparent"><i>attach_file</i><input type="file"></button>
+                        <button class="circle transparent" disabled>
+                            <i>attach_file</i>
+                            <div class="badge border secondary-border secondary-text">dev</div>
+                            <input type="file" disabled>
+                        </button>
                         <button class="circle transparent" @click="openDialog"><i>signature</i></button>
                     </nav>
                 </footer>
@@ -308,6 +312,7 @@
             <section v-if="currentSection === 'checklist' && selectedWorksite" style="margin-bottom: 5rem;">
                 <div class="padding">
                     <div class="row">
+                        <i>{{ currentChecklistSections[currentSectionIndex].icon }}</i>
                         <progress :value="checklistProgress" max="100"></progress>
                         <label>{{ checklistProgress }}%</label>
                     </div>
@@ -385,9 +390,14 @@
                                 {{ currentSectionIndex + 1 }} / {{ currentChecklistSections.length }}
                             </span>
 
-                            <button class="circle transparent" @click="nextSection"
-                                :disabled="currentSectionIndex === currentChecklistSections.length - 1">
+                            <button v-show="currentSectionIndex !== currentChecklistSections.length - 1"
+                                class="circle transparent" @click="nextSection">
                                 <i>arrow_forward</i>
+                            </button>
+
+                            <button v-show="currentSectionIndex === currentChecklistSections.length - 1"
+                                class="circle transparent">
+                                <i>signature</i>
                             </button>
 
                             <button class="circle transparent">
