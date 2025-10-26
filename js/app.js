@@ -268,17 +268,25 @@ createApp({
     // salva nel DB l'intero cantiere corrente
     const saveWorksite = async () => {
       if (!selectedWorksite.value) return;
-      try {
-        // 🔹 crea una copia JSON pura (senza Proxy Vue)
-        const data = JSON.parse(JSON.stringify(selectedWorksite.value));
 
-        await db.worksites.put(data);
-        addToast('Cantiere salvato', 'success');
-      } catch (err) {
-        console.error('Errore salvataggio cantiere:', err);
-        addToast('Errore nel salvataggio', 'error');
-      }
+      await guardEdit(
+        // come “sezione” possiamo passare l’intero worksite
+        selectedWorksite.value,
+        async () => {
+          // callback → salva effettivamente il worksite
+          try {
+            const data = JSON.parse(JSON.stringify(selectedWorksite.value));
+            await db.worksites.put(data);
+            addToast("Cantiere salvato", "success");
+          } catch (err) {
+            console.error("Errore salvataggio cantiere:", err);
+            addToast("Errore nel salvataggio", "error");
+          }
+        }
+      );
     };
+
+
 
 
 
@@ -472,8 +480,10 @@ createApp({
             await callback();
           },
           async () => {
-            const ws = await db.worksites.get(selectedWorksite.value.id);
-            selectedWorksite.value.sections = ws.sections; // cambia reference delle sezioni
+            //const ws = await db.worksites.get(selectedWorksite.value.id);
+            //selectedWorksite.value.sections = ws.sections; // cambia reference delle sezioni
+
+            restoreWorksiteFromDB();
 
             addToast("Modifica annullata, firme intatte.", "error");
           }
@@ -481,6 +491,19 @@ createApp({
       } else {
         await callback();
       }
+    }
+
+    async function restoreWorksiteFromDB() {
+      if (!selectedWorksite.value) return;
+
+      // recupera l'ultimo stato salvato sul DB
+      const ws = await db.worksites.get(selectedWorksite.value.id);
+      if (!ws) return;
+
+      // aggiorna tutte le proprietà del reactive object
+      Object.keys(ws).forEach(key => {
+        selectedWorksite.value[key] = JSON.parse(JSON.stringify(ws[key]));
+      });
     }
 
 
