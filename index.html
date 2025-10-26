@@ -338,7 +338,7 @@
                                         <label class="radio icon">
                                             <input type="radio" :name="'radio_' + currentSectionIndex + '_' + index"
                                                 v-model="item.value" :value="val"
-                                                @change="updateChecklistItem(currentChecklistSections[currentSectionIndex], item)">
+                                                @change="updateChecklistItem(currentChecklistSections[currentSectionIndex], item, $event)">
                                             <span>
                                                 <i>circle</i>
                                                 <i v-if="val==='C'" class="primary">check_circle</i>
@@ -447,8 +447,8 @@
             <h5>{{ dialog.title }}</h5>
             <div>{{ dialog.message }}</div>
             <nav class="right-align no-space mt">
-                <button class="transparent link" @click="closeDialog">Annulla</button>
-                <button class="primary" @click="confirmDialog">Conferma</button>
+                <button class="transparent link" @click="cancelDialog()">Annulla</button>
+                <button class="primary" @click="confirmDialog()">Conferma</button>
             </nav>
         </dialog>
 
