@@ -118,6 +118,8 @@ export const compilePDF = async (prototype) => {
 
     // 2️⃣ Aggiunta immagini dagli attachments
     const allImages = extractAllImages(prototype);
+    console.log(allImages);
+    
     if (allImages.length > 0) {
         let currentPage = pdfDoc.addPage();
         let { width, height } = currentPage.getSize();
