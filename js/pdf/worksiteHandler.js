@@ -10,9 +10,9 @@ export const downloadWorksite = async (prototype) => {
     const res = await fetch(`./prototypes/cantiere_enel_pre_filled.json`);
     let prototypeData = null;
     if (res.ok) prototypeData = await res.json();
-    compilePDF(prototypeData);
+    //compilePDF(prototypeData);
 
-    //compilePDF(prototype);
+    compilePDF(prototype);
   } else {
     console.warn('Tipo prototipo non riconosciuto');
   }
