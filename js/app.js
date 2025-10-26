@@ -6,7 +6,7 @@ if ('serviceWorker' in navigator) {
   });*/
 }
 
-const { createApp, ref, reactive, computed, onMounted, watch } = Vue;
+const { createApp, ref, reactive, computed, onMounted, watch, nextTick } = Vue;
 
 createApp({
   setup() {
@@ -44,10 +44,19 @@ createApp({
 
     const currentSectionIndex = ref(0);
 
-    const currentChecklistSections = computed(() => {
+    /*const currentChecklistSections = computed(() => {
       if (!selectedWorksite.value || !selectedWorksite.value.sections) return [];
       return selectedWorksite.value.sections.filter(s => s.type === 'checklist');
+    });*/
+    const currentChecklistSections = computed(() => {
+      if (!selectedWorksite.value || !selectedWorksite.value.sections) return [];
+
+      // Includiamo checklist, table e signature
+      return selectedWorksite.value.sections.filter(s =>
+        ['checklist', 'table', 'signature'].includes(s.type)
+      );
     });
+
 
     const checklistProgress = computed(() => {
       if (!selectedWorksite.value || !selectedWorksite.value.sections) return 0;
@@ -397,6 +406,82 @@ createApp({
 
 
 
+    // ===== SignaturePad =====
+    const sigOpen = ref(false);
+    const signCanvas = ref(null);
+    let signaturePad = null; // istanza SignaturePad
+    const currentSig = ref(null);
+    const currentSigIndex = ref(null);
+
+    function openSigDlg(sig, index) {
+      currentSig.value = sig;
+      currentSigIndex.value = index;
+      sigOpen.value = true;
+
+      // Attendi che il DOM sia aggiornato
+      nextTick(() => {
+        if (!signCanvas.value) return;
+        const strokeOptions = {
+          size: 16,
+          thinning: 0.7,
+          smoothing: 0.4,
+          streamline: 0.1,
+          simulatePressure: true,
+          start: {
+            taper: 0,
+            cap: true,
+          },
+          end: {
+            taper: 20,
+            cap: true,
+          },
+        };
+        signaturePad = new SignaturePad(signCanvas.value, {
+          penColor: "blue",
+        });
+
+        // Se c'è già una firma, caricala
+        if (currentSig.value.signature) {
+          const img = new Image();
+          img.onload = () => signaturePad.fromDataURL(currentSig.value.signature);
+          img.src = currentSig.value.signature;
+        }
+      });
+    }
+
+    function closeSigDlg() {
+      sigOpen.value = false;
+      signaturePad = null;
+      currentSig.value = null;
+      currentSigIndex.value = null;
+    }
+
+    function sigClear() {
+      if (signaturePad) signaturePad.clear();
+      if (currentSig.value) currentSig.value.signature = '';
+    }
+
+    async function sigSave() {
+      if (!signaturePad || !currentSig.value) return;
+      if (signaturePad.isEmpty()) {
+        addToast("Firma vuota, nulla da salvare", "error");
+        return;
+      }
+
+      const dataUrl = signaturePad.toDataURL("image/png");
+      currentSig.value.signature = dataUrl;
+
+      // Aggiorna la sezione nel DB
+      const section = currentChecklistSections.value[currentSectionIndex.value];
+      if (section && section.signatures && currentSigIndex.value !== null) {
+        section.signatures[currentSigIndex.value] = currentSig.value;
+        await updateSection(section);
+      }
+
+      sigOpen.value = false;
+    }
+
+
     return {
       // refs
       title, isDark, showDialog, showDialogNewWorksite, newCantiere, prototypes,
@@ -404,12 +489,16 @@ createApp({
       activeTab, tabs, currentSectionIndex, currentChecklistSections, checklistProgress,
       toast, dialogImage, photoDialog, dialog,
 
+      sigOpen, signCanvas, currentSig,
+
       // functions
       addCantiere, toggleTheme, addToast,
       goBack, openWorksite, openChecklist, nextSection, prevSection,
       updateChecklistItem, handleFileChange, removeAttachment, openAttachment,
       openDialog, closeDialog, downloadWorksite, deleteWorksite, confirmDialog, formatLabel,
       autoSaveWorksite, saveWorksite,
+
+      openSigDlg, closeSigDlg, sigClear, sigSave,
     }
   },
 }).mount("#app");
