@@ -386,42 +386,33 @@ createApp({
       currentSigIndex.value = index;
       sigOpen.value = true;
 
-      // Attendi che il DOM sia aggiornato
       nextTick(() => {
         if (!signCanvas.value) return;
-        const strokeOptions = {
-          size: 16,
-          thinning: 0.7,
-          smoothing: 0.4,
-          streamline: 0.1,
-          simulatePressure: true,
-          start: {
-            taper: 0,
-            cap: true,
-          },
-          end: {
-            taper: 20,
-            cap: true,
-          },
-        };
-        signaturePad = new SignaturePad(signCanvas.value, {
+
+        // 🔹 Ridimensiona il canvas per la risoluzione del dispositivo
+        const canvas = signCanvas.value;
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        canvas.width = canvas.offsetWidth * ratio;
+        canvas.height = canvas.offsetHeight * ratio;
+        const ctx = canvas.getContext('2d');
+        ctx.scale(ratio, ratio);
+
+        // 🔹 Inizializza SignaturePad
+        signaturePad = new SignaturePad(canvas, {
           penColor: "blue",
+          minWidth: 0.5,
+          maxWidth: 2.5,
+          throttle: 16,
+          smoothing: 0.5,
         });
 
-        // Se c'è già una firma, caricala
+        // 🔹 Carica firma esistente
         if (currentSig.value.signature) {
           const img = new Image();
           img.onload = () => signaturePad.fromDataURL(currentSig.value.signature);
           img.src = currentSig.value.signature;
         }
       });
-    }
-
-    function closeSigDlg() {
-      sigOpen.value = false;
-      signaturePad = null;
-      currentSig.value = null;
-      currentSigIndex.value = null;
     }
 
     function sigClear() {
@@ -439,7 +430,6 @@ createApp({
       const dataUrl = signaturePad.toDataURL("image/png");
       currentSig.value.signature = dataUrl;
 
-      // Aggiorna la sezione nel DB
       const section = currentChecklistSections.value[currentSectionIndex.value];
       if (section && section.signatures && currentSigIndex.value !== null) {
         section.signatures[currentSigIndex.value] = currentSig.value;
@@ -448,6 +438,9 @@ createApp({
 
       sigOpen.value = false;
     }
+
+    function closeSigDlg() { sigOpen.value = false; }
+
 
 
 
@@ -550,7 +543,7 @@ createApp({
       openDialog, closeDialog, cancelDialog, downloadWorksite, deleteWorksite, confirmDialog, formatLabel,
       autoSaveWorksite, saveWorksite,
 
-      openSigDlg, closeSigDlg, sigClear, sigSave,
+      openSigDlg, sigClear, sigSave, closeSigDlg,
     }
   },
 }).mount("#app");
