@@ -212,25 +212,6 @@ createApp({
       addToast(`Nuovo cantiere "${cantiere.nome}" aggiunto`, "primary");
     }
 
-    // --- Scarica cantiere ---
-    /*const downloadWorksite = (worksite) => {
-
-
-      genPDF(worksite);
-
-
-      /*const dataStr = JSON.stringify(worksite, null, 2);
-      const blob = new Blob([dataStr], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${worksite.nome.replace(/\s+/g, '_')}.json`;
-      a.click();
-      URL.revokeObjectURL(url);*/
-    //}
-
-
-
     // funzione per eliminare cantiere
     const deleteWorksite = (worksite) => {
       if (!worksite || !worksite.id) return;
