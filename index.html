@@ -19,6 +19,9 @@
     <!-- Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
+    <!-- animate.css -->
+    <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />-->
+
     <!-- Vue 3 -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 
@@ -202,6 +205,86 @@
             position: fixed !important;
             bottom: 0;
             top: auto !important;
+        }
+    </style>
+
+    <style>
+        /* bounceIn semplice */
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+
+            70% {
+                transform: scale(0.9);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* bounceOut semplice */
+        @keyframes bounceOut {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            20% {
+                transform: scale(0.9);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.1);
+            }
+
+            100% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+        }
+
+        /* Classe animazione */
+        .animate-bounceIn {
+            animation: bounceIn 0.7s both;
+            /* durata e mantenimento finale */
+        }
+
+        .animate-bounceOut {
+            animation: bounceOut 0.5s both;
+        }
+
+        /* Delay a cascata */
+        nav.large-elevate>*:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        nav.large-elevate>*:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        nav.large-elevate>*:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+        nav.large-elevate>*:nth-child(4) {
+            animation-delay: 0.3s;
+        }
+
+        nav.large-elevate>*:nth-child(5) {
+            animation-delay: 0.4s;
+        }
+
+        nav.large-elevate>*:nth-child(6) {
+            animation-delay: 0.5s;
         }
     </style>
 </head>
@@ -579,52 +662,56 @@
         <footer class="fixed transparent footer-transition"
             :class="currentSection === 'home' ? 'right-align' : 'center-align'">
             <nav class="large-elevate" :class="{'toolbar secondary-container': currentSection !== 'home'}">
-                <!-- Pulsanti comuni -->
-                <button class="circle transparent" v-if="currentSection !== 'home'" @click="goBack">
-                    <i>arrow_back</i>
-                </button>
-
                 <!-- HOME -->
                 <template v-if="currentSection === 'home'">
-                    <button class="square round extra" @click="showDialogNewWorksite = true">
+                    <button class="square round extra animate-bounceIn" @click="showDialogNewWorksite = true">
                         <i>add</i>
                     </button>
                 </template>
 
                 <!-- WORKSITE -->
                 <template v-else-if="currentSection === 'worksite'">
-                    <button class="circle transparent" @click="openChecklist"><i>checklist</i></button>
-                    <button class="circle transparent" @click="downloadWorksite(selectedWorksite)">
-                        <i>download</i>
-                        <div class="badge no-round primary">New</div>
+                    <button class="circle transparent animate-bounceIn" @click="goBack">
+                        <i>arrow_back</i>
                     </button>
-                    <button class="circle transparent" @click="goToSignatureSection()"><i>signature</i></button>
+                    <button class="circle transparent animate-bounceIn" @click="openChecklist"><i>checklist</i></button>
+                    <button class="circle transparent animate-bounceIn" @click="downloadWorksite(selectedWorksite)">
+                        <i>download</i>
+                        <div class="badge no-round primary ">New</div>
+                    </button>
+                    <button class="circle transparent animate-bounceIn"
+                        @click="goToSignatureSection()"><i>signature</i></button>
                 </template>
 
                 <!-- CHECKLIST -->
                 <template v-else-if="currentSection === 'checklist' && selectedWorksite">
-                    <button class="circle transparent" @click="prevSection" :disabled="currentSectionIndex === 0">
+                    <button class="circle transparent animate-bounceIn" @click="goBack">
+                        <i>arrow_back</i>
+                    </button>
+
+                    <button class="circle transparent animate-bounceIn" @click="prevSection"
+                        :disabled="currentSectionIndex === 0">
                         <i>chevron_backward</i>
                     </button>
 
-                    <span class="max center-align">
+                    <span class="max center-align animate-bounceIn">
                         {{ currentSectionIndex + 1 }} / {{ currentChecklistSections.length }}
                     </span>
 
-                    <button class="circle transparent" @click="nextSection"
+                    <button class="circle transparent animate-bounceIn" @click="nextSection"
                         :disabled="currentSectionIndex === currentChecklistSections.length - 1">
                         <i>chevron_forward</i>
                     </button>
 
                     <template v-if="currentChecklistSections[currentSectionIndex].attachments">
-                        <button class="circle transparent">
+                        <button class="circle transparent animate-bounceIn">
                             <i>attach_file</i>
-                            <input type="file" accept="image/*"
+                            <input class="pointer" type="file" accept="image/*"
                                 @change="e => handleFileChange(e, currentChecklistSections[currentSectionIndex])">
                         </button>
-                        <button class="circle transparent">
+                        <button class="circle transparent animate-bounceIn">
                             <i>photo_camera</i>
-                            <input type="file" accept="image/*" capture="environment"
+                            <input class="pointer" type="file" accept="image/*" capture="environment"
                                 @change="e => handleFileChange(e, currentChecklistSections[currentSectionIndex])">
                         </button>
                     </template>
