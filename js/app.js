@@ -208,7 +208,7 @@ createApp({
         id: crypto.randomUUID(),
         nome: newCantiere.value.nome,
         descr: newCantiere.value.descr || '',
-        prototypes: newCantiere.value.file || '',
+        prototype: newCantiere.value.file || '',
         archived: false,
         //version: newCantiere.value.file || '',
         data: new Date().toISOString().slice(0, 10),
@@ -225,12 +225,32 @@ createApp({
 
     // Archivia un cantiere
     const showArchived = ref(false); // stato dello switch
+    const searchQuery = ref('');
 
-    // Filtra in base allo switch
-    const visibleWorksites = computed(() => {
-      return showArchived.value
-        ? worksites.value  // mostra tutti
-        : worksites.value.filter(w => !w.archived); // mostra solo attivi
+
+    const filteredWorksites = computed(() => {
+      let list = worksites.value;
+
+      // 🔹 Filtra archiviati
+      list = showArchived.value ? list : list.filter(w => !w.archived);
+
+      // 🔹 Filtra per tab (tutti | completati | incompleti)
+      if (activeTab.value === "completati") {
+        list = list.filter(w => w.progress === 100);
+      } else if (activeTab.value === "ncompleti") {
+        list = list.filter(w => w.progress < 100);
+      }
+
+      // 🔹 Filtra per ricerca testuale
+      if (searchQuery.value.trim()) {
+        const q = searchQuery.value.toLowerCase();
+        list = list.filter(w =>
+          (w.nome && w.nome.toLowerCase().includes(q)) ||
+          (w.descr && w.descr.toLowerCase().includes(q))
+        );
+      }
+
+      return list;
     });
 
     // Archivia / ripristina un cantiere
@@ -659,14 +679,16 @@ createApp({
 
       sigOpen, signCanvas, currentSig,
 
-      showArchived, toggleArchive, visibleWorksites,
+      showArchived, toggleArchive,
+
+      searchQuery, filteredWorksites,
 
       // functions
       addCantiere, toggleTheme, addToast,
       goBack, openWorksite, openChecklist, nextSection, prevSection,
       updateChecklistItem, updateTableItem, handleFileChange, removeAttachment, openAttachment, downloadAttachment,
       openDialog, closeDialog, cancelDialog, downloadWorksite, deleteWorksite, confirmDialog, formatLabel,
-      autoSaveWorksite, saveWorksite, updateSection, worksiteHasNC,
+      autoSaveWorksite, saveWorksite, updateSection, worksiteHasNC, 
 
       openSigDlg, sigClear, sigSave, closeSigDlg, goToSignatureSection,
     }
