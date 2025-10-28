@@ -3,17 +3,17 @@ import { genPDF } from './genPDF.js';
 import { compilePDF } from './compilePDF.js';
 
 export const downloadWorksite = async (prototype) => {
-  if (prototype.prototypeType === 'generate') {
-    genPDF(prototype);
-  } else if (prototype.prototypeType === 'pre_filled') {
+  switch (prototype.prototypeType) {
+    case 'generate':
+      genPDF(prototype);
+      break;
 
-    const res = await fetch(`./prototypes/cantiere_enel_pre_filled.json`);
-    let prototypeData = null;
-    if (res.ok) prototypeData = await res.json();
-    //compilePDF(prototypeData);
+    case 'pre_filled':
+      compilePDF(prototype);
+      break;
 
-    compilePDF(prototype);
-  } else {
-    console.warn('Tipo prototipo non riconosciuto');
+    default:
+      console.warn('Tipo prototipo non riconosciuto');
+      break;
   }
 };
