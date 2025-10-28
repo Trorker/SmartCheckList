@@ -113,6 +113,10 @@
             --surface-container-highest: #333531;
         }
 
+        .row.wrap {
+            flex-wrap: wrap;
+        }
+
         .pointer {
             cursor: pointer;
         }
@@ -210,19 +214,25 @@
                                     <span>{{ tab.label }}</span>
                                 </a>
                             </nav>
+                            <label class="switch icon">
+                                <input type="checkbox" v-model="showArchived">
+                                <span>
+                                    <i>archive</i>
+                                </span>
+                            </label>
                         </div>
                     </div>
                 </div>
 
                 <!-- Lista cantieri -->
                 <div class="grid">
-                    <div class="s12 m6 l4" v-for="c in worksites" :key="c.id">
-                        <article class="padding">
+                    <div class="s12 m6 l4" v-for="c in visibleWorksites" :key="c.id">
+                        <article class="padding" :class="{ 'border tertiary-border': c.archived }">
                             <div class="row">
                                 <i class="extra">{{c.icon || "handyman"}}</i>
                                 <div class="max">
                                     <h5>{{ c.nome }}</h5>
-                                    <p>{{ c.descr }}</p>
+                                    <p class="no-margin">{{ c.descr }}</p>
                                 </div>
                             </div>
                             <div class="row">
@@ -237,6 +247,11 @@
                                     <button class="circle transparent" disabled>
                                         <i>share</i>
                                         <div class="badge border secondary-border secondary-text">dev</div>
+                                    </button>
+
+                                    <button class="circle transparent"
+                                        @click="toggleArchive(c)">
+                                        <i>{{ c?.archived ? 'restore' : 'archive' }}</i>
                                     </button>
 
                                     <button class="circle transparent" @click="downloadWorksite(c)">
@@ -299,7 +314,12 @@
                         </template>
                     </fieldset>
 
-                    <span class="chip small margin center">ID: {{ selectedWorksite?.id }}</span>
+                    <div class="row wrap">
+                        <span class="chip"><strong>ID:</strong> {{ selectedWorksite?.id }}</span>
+                        <span class="chip"><strong>Version:</strong> {{selectedWorksite?.version}}</span>
+                        <span class="chip"><strong>Prototype:</strong> {{selectedWorksite?.Prototype}}</span>
+                        <span class="chip"><strong>Type:</strong> {{selectedWorksite?.prototypeType}}</span>
+                    </div>
                 </article>
 
                 <footer class="fixed-toolbar center-align">
@@ -381,6 +401,10 @@
                                 <nav>
                                     <small>{{ att.name_ || 'Foto' }}</small>
                                     <div class="max"></div>
+                                    <button class="circle transparent" @click="downloadAttachment(att)">
+                                        <i>download</i>
+                                        <div class="badge no-round primary">New</div>
+                                    </button>
                                     <button class="circle transparent" @click.stop="removeAttachment(idx)">
                                         <i>delete</i>
                                     </button>
@@ -430,6 +454,10 @@
                                 <nav>
                                     <small>{{ att.name_ || 'Foto' }}</small>
                                     <div class="max"></div>
+                                    <button class="circle transparent" @click="downloadAttachment(att)">
+                                        <i>download</i>
+                                        <div class="badge no-round primary">New</div>
+                                    </button>
                                     <button class="circle transparent" @click.stop="removeAttachment(idx)">
                                         <i>delete</i>
                                     </button>
@@ -440,38 +468,40 @@
                 </article>
 
                 <article v-if="currentChecklistSections[currentSectionIndex].type === 'table'">
-                    <table class="bordered responsive">
-                        <thead>
-                            <tr>
-                                <th v-for="(col, cIndex) in currentChecklistSections[currentSectionIndex].items[0].columns"
-                                    :key="cIndex">
-                                    {{ col.name }}
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="(row, rIndex) in currentChecklistSections[currentSectionIndex].items[0].rows"
-                                :key="rIndex">
-                                <td v-for="(col, cIndex) in currentChecklistSections[currentSectionIndex].items[0].columns"
-                                    :key="cIndex">
+                    <div class="row scroll">
+                        <table class="bordered">
+                            <thead>
+                                <tr>
+                                    <th v-for="(col, cIndex) in currentChecklistSections[currentSectionIndex].items[0].columns"
+                                        :key="cIndex">
+                                        {{ col.name }}
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(row, rIndex) in currentChecklistSections[currentSectionIndex].items[0].rows"
+                                    :key="rIndex">
+                                    <td v-for="(col, cIndex) in currentChecklistSections[currentSectionIndex].items[0].columns"
+                                        :key="cIndex">
 
-                                    <!-- se tipo text, input -->
-                                    <div class="field border label" v-if="col.type === 'text'">
-                                        <input type="text" v-model="row[col.name]"
-                                            @input="updateTableItem(currentChecklistSections[currentSectionIndex], row, col.name, $event.target.value)" />
-                                        <label>Text</label>
-                                    </div>
+                                        <!-- se tipo text, input -->
+                                        <div class="field border label" v-if="col.type === 'text'">
+                                            <input type="text" v-model="row[col.name]"
+                                                @input="updateTableItem(currentChecklistSections[currentSectionIndex], row, col.name, $event.target.value)" />
+                                            <label>Text</label>
+                                        </div>
 
-                                    <!-- se tipo checkbox -->
-                                    <label class="checkbox" v-else-if="col.type === 'checkbox'">
-                                        <input type="checkbox" v-model="row[col.name]"
-                                            @change="updateTableItem(currentChecklistSections[currentSectionIndex], row, col.name, row[col.name])">
-                                        <span></span>
-                                    </label>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                                        <!-- se tipo checkbox -->
+                                        <label class="checkbox" v-else-if="col.type === 'checkbox'">
+                                            <input type="checkbox" v-model="row[col.name]"
+                                                @change="updateTableItem(currentChecklistSections[currentSectionIndex], row, col.name, row[col.name])">
+                                            <span></span>
+                                        </label>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                     <small>{{currentChecklistSections[currentSectionIndex].items[0].legend}}</small>
 
                     <!-- Note della sezione -->
@@ -491,6 +521,10 @@
                                 <nav>
                                     <small>{{ att.name_ || 'Foto' }}</small>
                                     <div class="max"></div>
+                                    <button class="circle transparent" @click="downloadAttachment(att)">
+                                        <i>download</i>
+                                        <div class="badge no-round primary">New</div>
+                                    </button>
                                     <button class="circle transparent" @click.stop="removeAttachment(idx)">
                                         <i>delete</i>
                                     </button>
