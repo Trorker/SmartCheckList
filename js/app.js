@@ -194,12 +194,17 @@ createApp({
         }
       }
 
+      console.log(newCantiere);
+
+
       const cantiere = {
         ...prototypeData,
         id: crypto.randomUUID(),
         nome: newCantiere.value.nome,
         descr: newCantiere.value.descr || '',
-        version: newCantiere.value.file || '',
+        prototypes: newCantiere.value.file || '',
+        archived: false,
+        //version: newCantiere.value.file || '',
         data: new Date().toISOString().slice(0, 10),
         progress: 0,
       };
@@ -210,6 +215,46 @@ createApp({
       newCantiere.value = { nome: '', descr: '', file: '' };
       showDialogNewWorksite.value = false;
       addToast(`Nuovo cantiere "${cantiere.nome}" aggiunto`, "primary");
+    }
+
+    // Archivia un cantiere
+    const showArchived = ref(false); // stato dello switch
+
+    // Filtra in base allo switch
+    const visibleWorksites = computed(() => {
+      return showArchived.value
+        ? worksites.value  // mostra tutti
+        : worksites.value.filter(w => !w.archived); // mostra solo attivi
+    });
+
+    // Archivia / ripristina un cantiere
+    async function toggleArchive(worksite) {
+      const updated = { ...worksite, archived: !worksite.archived };
+      await updateWorksite(updated);
+    }
+
+    // ===== Aggiorna un cantiere nel DB =====
+    async function updateWorksite(worksite) {
+      if (!worksite || !worksite.id) return;
+
+      try {
+        const data = JSON.parse(JSON.stringify(worksite));
+        await db.worksites.put(data);
+
+        // Aggiorna anche il reactive array
+        const idx = worksites.value.findIndex(w => w.id === data.id);
+        if (idx >= 0) worksites.value[idx] = data;
+
+        addToast(
+          data.archived
+            ? `Cantiere "${data.nome}" archiviato`
+            : `Cantiere "${data.nome}" ripristinato`,
+          "primary"
+        );
+      } catch (err) {
+        console.error("Errore aggiornando il cantiere:", err);
+        addToast("Errore durante l'aggiornamento", "error");
+      }
     }
 
     // funzione per eliminare cantiere
@@ -362,6 +407,18 @@ createApp({
     function openAttachment(att) {
       dialogImage.value = att.data;
       photoDialog.value = true;
+    }
+
+    function downloadAttachment(att) {
+      if (!att || !att.data) return;
+
+      // Crea un link temporaneo per scaricare il file
+      const a = document.createElement('a');
+      a.href = att.data;
+      a.download = att.name || 'allegato';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     }
 
     // rimozione allegati
@@ -596,10 +653,12 @@ createApp({
 
       sigOpen, signCanvas, currentSig,
 
+      showArchived, toggleArchive, visibleWorksites,
+
       // functions
       addCantiere, toggleTheme, addToast,
       goBack, openWorksite, openChecklist, nextSection, prevSection,
-      updateChecklistItem, updateTableItem, handleFileChange, removeAttachment, openAttachment,
+      updateChecklistItem, updateTableItem, handleFileChange, removeAttachment, openAttachment, downloadAttachment,
       openDialog, closeDialog, cancelDialog, downloadWorksite, deleteWorksite, confirmDialog, formatLabel,
       autoSaveWorksite, saveWorksite, updateSection,
 
