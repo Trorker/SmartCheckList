@@ -29,30 +29,236 @@
       "attachments": [],
       "items": [
         {
+          "legend": "Legenda: Profili Enel=B, C, CI, D, E, F, G, H, QSA, R, RG, CE, V; PL= Preposto ai Lavori; PS = Primo soccorso, PI= Prevenzione incendi; GE =Gestione emergenze; Ci= Cart. Identif. - C= Casco - R= Prot. Rumore - A= Abbigl. Catar. - I= Imbragatura- S= Scarpe - G = Guanti isolati - g= guanti prot. Meccanica - M= mascherina - O= Occhiali/Visiera",
           "icon": "badge",
           "text": "Anagrafica del personale presente con indicazione profili Enel, PES/PAV/PEI e dotazione DPI",
           "columns": [
-            "Cognome e Nome",
-            "Profili Enel",
-            "PES",
-            "PAV",
-            "PEI",
-            "PL",
-            "PS",
-            "PI",
-            "GE",
-            "Ci",
-            "C",
-            "R",
-            "A",
-            "I",
-            "S",
-            "G",
-            "g",
-            "M",
-            "O"
+            {
+              "name": "Cognome e Nome",
+              "type": "text"
+            },
+            {
+              "name": "Profili Enel",
+              "type": "text"
+            },
+            {
+              "name": "PES",
+              "type": "checkbox"
+            },
+            {
+              "name": "PAV",
+              "type": "checkbox"
+            },
+            {
+              "name": "PEI",
+              "type": "checkbox"
+            },
+            {
+              "name": "PL",
+              "type": "checkbox"
+            },
+            {
+              "name": "PS",
+              "type": "checkbox"
+            },
+            {
+              "name": "PI",
+              "type": "checkbox"
+            },
+            {
+              "name": "GE",
+              "type": "checkbox"
+            },
+            {
+              "name": "Ci",
+              "type": "checkbox"
+            },
+            {
+              "name": "C",
+              "type": "checkbox"
+            },
+            {
+              "name": "R",
+              "type": "checkbox"
+            },
+            {
+              "name": "A",
+              "type": "checkbox"
+            },
+            {
+              "name": "I",
+              "type": "checkbox"
+            },
+            {
+              "name": "S",
+              "type": "checkbox"
+            },
+            {
+              "name": "G",
+              "type": "checkbox"
+            },
+            {
+              "name": "g",
+              "type": "checkbox"
+            },
+            {
+              "name": "M",
+              "type": "checkbox"
+            },
+            {
+              "name": "O",
+              "type": "checkbox"
+            }
           ],
-          "rows": []
+          "rows": [
+            {
+              "Cognome e Nome": "",
+              "Profili Enel": "",
+              "PES": false,
+              "PAV": false,
+              "PEI": false,
+              "PL": false,
+              "PS": false,
+              "PI": false,
+              "GE": false,
+              "Ci": false,
+              "C": false,
+              "R": false,
+              "A": false,
+              "I": false,
+              "S": false,
+              "G": false,
+              "g": false,
+              "M": false,
+              "O": false
+            },
+            {
+              "Cognome e Nome": "",
+              "Profili Enel": "",
+              "PES": false,
+              "PAV": false,
+              "PEI": false,
+              "PL": false,
+              "PS": false,
+              "PI": false,
+              "GE": false,
+              "Ci": false,
+              "C": false,
+              "R": false,
+              "A": false,
+              "I": false,
+              "S": false,
+              "G": false,
+              "g": false,
+              "M": false,
+              "O": false
+            },
+            {
+              "Cognome e Nome": "",
+              "Profili Enel": "",
+              "PES": false,
+              "PAV": false,
+              "PEI": false,
+              "PL": false,
+              "PS": false,
+              "PI": false,
+              "GE": false,
+              "Ci": false,
+              "C": false,
+              "R": false,
+              "A": false,
+              "I": false,
+              "S": false,
+              "G": false,
+              "g": false,
+              "M": false,
+              "O": false
+            },
+            {
+              "Cognome e Nome": "",
+              "Profili Enel": "",
+              "PES": false,
+              "PAV": false,
+              "PEI": false,
+              "PL": false,
+              "PS": false,
+              "PI": false,
+              "GE": false,
+              "Ci": false,
+              "C": false,
+              "R": false,
+              "A": false,
+              "I": false,
+              "S": false,
+              "G": false,
+              "g": false,
+              "M": false,
+              "O": false
+            },
+            {
+              "Cognome e Nome": "",
+              "Profili Enel": "",
+              "PES": false,
+              "PAV": false,
+              "PEI": false,
+              "PL": false,
+              "PS": false,
+              "PI": false,
+              "GE": false,
+              "Ci": false,
+              "C": false,
+              "R": false,
+              "A": false,
+              "I": false,
+              "S": false,
+              "G": false,
+              "g": false,
+              "M": false,
+              "O": false
+            },
+            {
+              "Cognome e Nome": "",
+              "Profili Enel": "",
+              "PES": false,
+              "PAV": false,
+              "PEI": false,
+              "PL": false,
+              "PS": false,
+              "PI": false,
+              "GE": false,
+              "Ci": false,
+              "C": false,
+              "R": false,
+              "A": false,
+              "I": false,
+              "S": false,
+              "G": false,
+              "g": false,
+              "M": false,
+              "O": false
+            },
+            {
+              "Cognome e Nome": "",
+              "Profili Enel": "",
+              "PES": false,
+              "PAV": false,
+              "PEI": false,
+              "PL": false,
+              "PS": false,
+              "PI": false,
+              "GE": false,
+              "Ci": false,
+              "C": false,
+              "R": false,
+              "A": false,
+              "I": false,
+              "S": false,
+              "G": false,
+              "g": false,
+              "M": false,
+              "O": false
+            }
+          ]
         }
       ]
     },
@@ -190,6 +396,7 @@
       "id": 5,
       "title": "Verifica mezzi presenti in cantiere",
       "icon": "local_shipping",
+      "legend": "Legenda: V = Verifica ISPESL, E = Estintore, S = Cassetta pronto soccorso, R = Revisione, G = stato Generale del mezzo, K = Kit sversamento oli",
       "type": "table",
       "notes": "",
       "attachments": [],
@@ -198,13 +405,121 @@
           "icon": "directions_car",
           "text": "Verifica stato, revisione, estintori, cassetta pronto soccorso e documentazione mezzi",
           "columns": [
-            "Marca",
-            "Tipo",
-            "Targa/Telaio",
-            "Proprietà",
-            "Note"
+            {
+              "name": "Marca",
+              "type": "text"
+            },
+            {
+              "name": "Tipo",
+              "type": "text"
+            },
+            {
+              "name": "Targa/Telaio",
+              "type": "text"
+            },
+            {
+              "name": "Proprietà",
+              "type": "checkbox"
+            },
+            {
+              "name": "V",
+              "type": "checkbox"
+            },
+            {
+              "name": "E",
+              "type": "checkbox"
+            },
+            {
+              "name": "S",
+              "type": "checkbox"
+            },
+            {
+              "name": "R",
+              "type": "checkbox"
+            },
+            {
+              "name": "G",
+              "type": "checkbox"
+            },
+            {
+              "name": "K",
+              "type": "checkbox"
+            }
           ],
-          "rows": []
+          "rows": [
+            {
+              "Marca": "",
+              "Tipo": "",
+              "Targa/Telaio": "",
+              "Proprietà": false,
+              "V": false,
+              "E": false,
+              "S": false,
+              "R": false,
+              "G": false,
+              "K": false
+            },
+            {
+              "Marca": "",
+              "Tipo": "",
+              "Targa/Telaio": "",
+              "Proprietà": false,
+              "V": false,
+              "E": false,
+              "S": false,
+              "R": false,
+              "G": false,
+              "K": false
+            },
+            {
+              "Marca": "",
+              "Tipo": "",
+              "Targa/Telaio": "",
+              "Proprietà": false,
+              "V": false,
+              "E": false,
+              "S": false,
+              "R": false,
+              "G": false,
+              "K": false
+            },
+            {
+              "Marca": "",
+              "Tipo": "",
+              "Targa/Telaio": "",
+              "Proprietà": false,
+              "V": false,
+              "E": false,
+              "S": false,
+              "R": false,
+              "G": false,
+              "K": false
+            },
+            {
+              "Marca": "",
+              "Tipo": "",
+              "Targa/Telaio": "",
+              "Proprietà": false,
+              "V": false,
+              "E": false,
+              "S": false,
+              "R": false,
+              "G": false,
+              "K": false
+            },
+            {
+              "Marca": "",
+              "Tipo": "",
+              "Targa/Telaio": "",
+              "Proprietà": false,
+              "V": false,
+              "E": false,
+              "S": false,
+              "R": false,
+              "G": false,
+              "K": false
+            }
+          ]
         }
       ]
     },
