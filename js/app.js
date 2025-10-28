@@ -128,6 +128,12 @@ createApp({
       loadWorksites();
     });
 
+    function worksiteHasNC(worksite) {
+      return worksite.sections?.some(section =>
+        section.items?.some(ans => ans.value === 'N.C.')
+      );
+    }
+
     watch(checklistProgress, async (newVal) => {
       if (selectedWorksite.value) {
         selectedWorksite.value.progress = newVal;
@@ -660,7 +666,7 @@ createApp({
       goBack, openWorksite, openChecklist, nextSection, prevSection,
       updateChecklistItem, updateTableItem, handleFileChange, removeAttachment, openAttachment, downloadAttachment,
       openDialog, closeDialog, cancelDialog, downloadWorksite, deleteWorksite, confirmDialog, formatLabel,
-      autoSaveWorksite, saveWorksite, updateSection,
+      autoSaveWorksite, saveWorksite, updateSection, worksiteHasNC,
 
       openSigDlg, sigClear, sigSave, closeSigDlg, goToSignatureSection,
     }
