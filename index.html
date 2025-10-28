@@ -200,7 +200,7 @@
                         <div class="row">
                             <div class="field prefix round fill active max">
                                 <i class="front">search</i>
-                                <input placeholder="Cerca cantiere">
+                                <input v-model="searchQuery" placeholder="Cerca cantieri...">
                             </div>
                         </div>
                     </div>
@@ -228,7 +228,7 @@
                 <div class="grid">
                     <article class=" s12 m6 l4 padding border"
                         :class="{ 'tertiary-border': c.archived, 'error-border': (worksiteHasNC(c) && !c.archived), 'primary-border': (c.progress >= 100) }"
-                        v-for="c in visibleWorksites" :key="c.id">
+                        v-for="c in filteredWorksites" :key="c.id">
                         <div class="row">
                             <i class="extra">{{c.icon || "handyman"}}</i>
                             <div class="max">
@@ -267,7 +267,7 @@
                     </article>
                 </div>
                 <div class="center-align">
-                    <em class="secondary-text" v-if="visibleWorksites.length === 0">Non ci sono cantieri da
+                    <em class="secondary-text" v-if="filteredWorksites.length === 0">Non ci sono cantieri da
                         visualizzare...
                         (-.-)</em>
                 </div>
@@ -321,7 +321,7 @@
                     <div class="row wrap">
                         <span class="chip"><strong>ID:</strong> {{ selectedWorksite?.id }}</span>
                         <span class="chip"><strong>Version:</strong> {{selectedWorksite?.version}}</span>
-                        <span class="chip"><strong>Prototype:</strong> {{selectedWorksite?.Prototype}}</span>
+                        <span class="chip"><strong>Prototype:</strong> {{selectedWorksite?.prototype}}</span>
                         <span class="chip"><strong>Type:</strong> {{selectedWorksite?.prototypeType}}</span>
                     </div>
                 </article>
