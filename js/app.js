@@ -22,7 +22,7 @@ createApp({
 
     // ===== Refs =====
     const title = ref('Levratti');
-    const isDark = ref(false);
+    const isDark = ref(true);
     const showDialog = ref(false);
     const showDialogNewWorksite = ref(false);
     const newCantiere = ref({ nome: '', descr: '', file: '' });
@@ -125,13 +125,24 @@ createApp({
 
     // ===== Theme =====
     onMounted(() => {
-      const saved = localStorage.getItem("theme");
-      if (saved === "dark") {
-        isDark.value = true;
-        document.body.classList.add("dark");
-      }
+      const saved = localStorage.getItem("theme") || "dark"; // se null, default dark
+      isDark.value = saved === "dark";
+      document.body.classList.toggle("dark", isDark.value);
+
+
       loadWorksites();
     });
+
+    // Sincronizza automaticamente con body e localStorage quando cambia
+    watch(isDark, (val) => {
+      document.body.classList.toggle("dark", val);
+      localStorage.setItem("theme", val ? "dark" : "light");
+      addToast(val ? "Tema scuro attivato" : "Tema chiaro attivato", "primary");
+    });
+
+    function toggleTheme() {
+      isDark.value = !isDark.value;
+    }
 
     function worksiteHasNC(worksite) {
       return worksite.sections?.some(section =>
@@ -150,13 +161,6 @@ createApp({
         }
       }
     });
-
-    function toggleTheme() {
-      isDark.value = !isDark.value;
-      document.body.classList.toggle("dark", isDark.value);
-      localStorage.setItem("theme", isDark.value ? "dark" : "light");
-      addToast(isDark.value ? "Tema scuro attivato" : "Tema chiaro attivato", "primary");
-    }
 
     // ===== Navigation =====
     function goBack() {
