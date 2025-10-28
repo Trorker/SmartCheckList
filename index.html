@@ -226,46 +226,50 @@
 
                 <!-- Lista cantieri -->
                 <div class="grid">
-                    <div class="s12 m6 l4" v-for="c in visibleWorksites" :key="c.id">
-                        <article class="padding" :class="{ 'border tertiary-border': c.archived }">
-                            <div class="row">
-                                <i class="extra">{{c.icon || "handyman"}}</i>
-                                <div class="max">
-                                    <h5>{{ c.nome }}</h5>
-                                    <p class="no-margin">{{ c.descr }}</p>
-                                </div>
+                    <article class=" s12 m6 l4 padding border"
+                        :class="{ 'tertiary-border': c.archived, 'error-border': (worksiteHasNC(c) && !c.archived), 'primary-border': (c.progress >= 100) }"
+                        v-for="c in visibleWorksites" :key="c.id">
+                        <div class="row">
+                            <i class="extra">{{c.icon || "handyman"}}</i>
+                            <div class="max">
+                                <h5>{{ c.nome }}</h5>
+                                <p class="no-margin">{{ c.descr }}</p>
                             </div>
-                            <div class="row">
-                                <label>{{ c.progress < 100 ? 'Incompleto' : 'Completato' }}</label>
-                                        <progress :value="c.progress" max="100"></progress>
-                                        <label>{{ c.progress }}%</label>
-                            </div>
+                        </div>
+                        <div class="row">
+                            <label>{{ c.progress < 100 ? 'Incompleto' : 'Completato' }}</label>
+                                    <progress :value="c.progress" max="100"></progress>
+                                    <label>{{ c.progress }}%</label>
+                        </div>
+                        <nav>
+                            <button @click="openWorksite(c)">Apri</button>
+                            <div class="max"></div>
                             <nav>
-                                <button @click="openWorksite(c)">Apri</button>
-                                <div class="max"></div>
-                                <nav>
-                                    <button class="circle transparent" disabled>
-                                        <i>share</i>
-                                        <div class="badge border secondary-border secondary-text">dev</div>
-                                    </button>
+                                <button class="circle transparent" disabled>
+                                    <i>share</i>
+                                    <div class="badge border secondary-border secondary-text">dev</div>
+                                </button>
 
-                                    <button class="circle transparent"
-                                        @click="toggleArchive(c)">
-                                        <i>{{ c?.archived ? 'restore' : 'archive' }}</i>
-                                    </button>
+                                <button class="circle transparent" @click="toggleArchive(c)">
+                                    <i>{{ c?.archived ? 'restore' : 'archive' }}</i>
+                                </button>
 
-                                    <button class="circle transparent" @click="downloadWorksite(c)">
-                                        <i>download</i>
-                                        <div class="badge no-round primary">New</div>
-                                    </button>
+                                <button class="circle transparent" @click="downloadWorksite(c)">
+                                    <i>download</i>
+                                    <div class="badge no-round primary">New</div>
+                                </button>
 
-                                    <button class="circle transparent" @click="deleteWorksite(c)">
-                                        <i>delete</i>
-                                    </button>
-                                </nav>
+                                <button class="circle transparent" @click="deleteWorksite(c)">
+                                    <i>delete</i>
+                                </button>
                             </nav>
-                        </article>
-                    </div>
+                        </nav>
+                    </article>
+                </div>
+                <div class="center-align">
+                    <em class="secondary-text" v-if="visibleWorksites.length === 0">Non ci sono cantieri da
+                        visualizzare...
+                        (-.-)</em>
                 </div>
 
                 <footer class="fixed-toolbar right-align">
