@@ -111,11 +111,15 @@ createApp({
       }, 5000);
     }
 
+    function randomInteger(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
     // ===== Load worksites =====
     const loadWorksites = async () => {
       loading.value = true;
       worksites.value = await db.worksites.toArray();
-      loading.value = false;
+      setTimeout(() => { loading.value = false; }, randomInteger(700, 1500));
     }
 
     // ===== Theme =====
@@ -162,14 +166,22 @@ createApp({
     }
 
     function openWorksite(w) {
+      loading.value = true;
+
       selectedWorksite.value = w;
       currentSection.value = "worksite";
       currentSectionIndex.value = 0;
+
+      setTimeout(() => { loading.value = false; }, randomInteger(700, 1500));
     }
 
     function openChecklist() {
+      loading.value = false;
+
       currentSection.value = "checklist";
       currentSectionIndex.value = 0;
+
+      setTimeout(() => { loading.value = false; }, randomInteger(700, 1500));
     }
 
     function nextSection() {
@@ -688,7 +700,7 @@ createApp({
       goBack, openWorksite, openChecklist, nextSection, prevSection,
       updateChecklistItem, updateTableItem, handleFileChange, removeAttachment, openAttachment, downloadAttachment,
       openDialog, closeDialog, cancelDialog, downloadWorksite, deleteWorksite, confirmDialog, formatLabel,
-      autoSaveWorksite, saveWorksite, updateSection, worksiteHasNC, 
+      autoSaveWorksite, saveWorksite, updateSection, worksiteHasNC,
 
       openSigDlg, sigClear, sigSave, closeSigDlg, goToSignatureSection,
     }
