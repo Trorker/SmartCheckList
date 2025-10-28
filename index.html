@@ -576,9 +576,9 @@
         </transition>
 
         <!-- FOOTER GLOBALE -->
-        <footer class="fixed transparent" :class="currentSection === 'home' ? 'right-align' : 'center-align'">
+        <footer class="fixed transparent footer-transition"
+            :class="currentSection === 'home' ? 'right-align' : 'center-align'">
             <nav class="large-elevate" :class="{'toolbar secondary-container': currentSection !== 'home'}">
-
                 <!-- Pulsanti comuni -->
                 <button class="circle transparent" v-if="currentSection !== 'home'" @click="goBack">
                     <i>arrow_back</i>
@@ -629,7 +629,6 @@
                         </button>
                     </template>
                 </template>
-
             </nav>
         </footer>
 
