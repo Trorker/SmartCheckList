@@ -13,6 +13,7 @@ const { createApp, ref, reactive, computed, onMounted, watch, nextTick } = Vue;
 
 createApp({
   setup() {
+
     // ===== Dexie DB =====
     const db = new Dexie("SmartCheckListDB");
     db.version(1).stores({
@@ -678,7 +679,7 @@ createApp({
 
 
 
-
+    // funzione per controllare se lo scrollbar è visibile
 
 
 
