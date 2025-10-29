@@ -139,8 +139,9 @@
         /* Canvas firma */
         canvas {
             width: 100%;
-            height: 150px;
-            border: 1px solid var(--outline);
+            height: 250px;
+            border-radius: .25rem;
+            cursor: crosshair;
         }
 
         /* Overlay dialog */
@@ -733,13 +734,17 @@
         </dialog>
 
         <!-- Signature dialog -->
-        <div class="overlay" :class="{active: sigOpen}" @click="closeSigDlg"></div>
-        <dialog :class="{active: sigOpen}" :open="sigOpen" class="responsive">
+        <div class="overlay" :class="{active: signatureState.open}" @click="closeSigDlg"></div>
+        <dialog :class="{active: signatureState.open}" :open="signatureState.open" class="responsive">
             <header>
                 <h5>Firma</h5>
             </header>
             <div>
-                <canvas ref="signCanvas" class="sig-canvas signCanvas" style="margin-top:.5rem;"></canvas>
+                <div class="field border label">
+                    <input v-model="signatureState.currentSig.signerName">
+                    <label>Nome firmatario</label>
+                </div>
+                <canvas ref="signCanvas" class="sig-canvas signCanvas border"></canvas>
                 <nav class="right-align">
                     <button class="transparent link" @click="sigClear">Pulisci</button>
                     <button class="transparent link" @click="sigSave">Salva firma</button>
