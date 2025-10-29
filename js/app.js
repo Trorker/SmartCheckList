@@ -502,7 +502,13 @@ createApp({
       currentSigIndex: null,
     });
 
-    function openSigDlg(sig, index) {
+    function openSigDlg(sig, index) {     
+      if (checklistProgress.value < 100) {
+        addToast(" Completa prima tutta la checklist!", "error");
+        return;
+      }
+
+      
       if (!sig) {
         signatureState.currentSig = { signature: '', name: '', date: new Date().toISOString() };
       } else {
@@ -543,10 +549,6 @@ createApp({
     }
 
     async function sigSave() {
-
-      console.log(signatureState);
-
-
       if (!signatureState.pad || !signatureState.currentSig) return;
       if (signatureState.pad.isEmpty()) {
         addToast("Firma vuota, nulla da salvare", "error");
@@ -704,7 +706,7 @@ createApp({
       title, isDark, showDialog, showDialogNewWorksite, newCantiere, prototypes,
       worksites, loading, currentSection, selectedWorksite,
       activeTab, tabs, currentSectionIndex, currentChecklistSections, checklistProgress,
-      toast, dialogImage, photoDialog, dialog,
+      toast, dialogImage, photoDialog, dialog, allSignaturesDone,
 
       showArchived, toggleArchive,
 
