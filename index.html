@@ -372,6 +372,14 @@
 
                                     <button class="circle transparent" @click="toggleArchive(c)">
                                         <i>{{ c?.archived ? 'restore' : 'archive' }}</i>
+                                        <div class="tooltip max">
+                                            <b>Title</b>
+                                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+                                                tempor incididunt ut labore et dolore magna aliqua.</p>
+                                            <nav>
+                                                <a class="inverse-link">Action</a>
+                                            </nav>
+                                        </div>
                                     </button>
 
                                     <button class="circle transparent" @click="downloadWorksite(c)">
@@ -539,7 +547,10 @@
                                         class="responsive medium" />
                                     <div class="absolute bottom left right padding bottom-shadow white-text">
                                         <nav>
-                                            <small>{{ sig.role }}</small>
+                                            <div>
+                                                <h5>{{ sig.name }}</h5>
+                                                <small>{{ sig.role }}</small>
+                                            </div>
                                             <div class="max"></div>
                                             <button class="circle transparent" @click="openSigDlg(sig, idx)">
                                                 <i>signature</i>
@@ -741,7 +752,7 @@
             </header>
             <div>
                 <div class="field border label">
-                    <input v-model="signatureState.currentSig.signerName">
+                    <input v-model="signatureState.currentSig.name">
                     <label>Nome firmatario</label>
                 </div>
                 <canvas ref="signCanvas" class="sig-canvas signCanvas border"></canvas>
