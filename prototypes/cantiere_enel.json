@@ -649,12 +649,14 @@
         {
           "role": "Verificatore",
           "name": "",
-          "signature": ""
+          "signature": "",
+          "date": ""
         },
         {
           "role": "Preposto ai lavori",
           "name": "",
-          "signature": ""
+          "signature": "",
+          "date": ""
         }
       ]
     }
