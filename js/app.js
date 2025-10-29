@@ -9,7 +9,7 @@ if ('serviceWorker' in navigator) {
   });*/
 }
 
-const { createApp, ref, reactive, computed, onMounted, watch, nextTick } = Vue;
+const { createApp, ref, reactive, computed, onMounted, watch, nextTick, useTemplateRef } = Vue;
 
 createApp({
   setup() {
@@ -490,39 +490,43 @@ createApp({
 
 
     // ===== SignaturePad =====
-    const sigOpen = ref(false);
-    const signCanvas = ref(null);
-    let signaturePad = null; // istanza SignaturePad
-    const currentSig = ref(null);
-    const currentSigIndex = ref(null);
+    const signatureState = reactive({
+      open: false,
+      canvas: useTemplateRef("signCanvas"),
+      pad: null,
+      currentSig: {
+        signature: '',
+        signerName: '',
+        date: new Date().toISOString(),
+      },
+      currentSigIndex: null,
+    });
 
     function openSigDlg(sig, index) {
-
-
-      // Controllo progresso checklist
-      if (checklistProgress.value < 100) {
-        addToast("Non puoi firmare: tutte le domande della checklist devono essere completate", "error");
-        return;
+      if (!sig) {
+        signatureState.currentSig = { signature: '', signerName: '', date: new Date().toISOString() };
+      } else {
+        // assicuriamoci che ci siano tutte le proprietà
+        signatureState.currentSig = {
+          signature: sig.signature || '',
+          signerName: sig.signerName || '',
+          date: sig.date || new Date().toISOString(),
+        };
       }
-
-
-      currentSig.value = sig;
-      currentSigIndex.value = index;
-      sigOpen.value = true;
+      signatureState.currentSigIndex = index;
+      signatureState.open = true;
 
       nextTick(() => {
-        if (!signCanvas.value) return;
+        if (!signatureState.canvas) return;
 
-        // 🔹 Ridimensiona il canvas per la risoluzione del dispositivo
-        const canvas = signCanvas.value;
+        const canvas = signatureState.canvas;
         const ratio = Math.max(window.devicePixelRatio || 1, 1);
         canvas.width = canvas.offsetWidth * ratio;
         canvas.height = canvas.offsetHeight * ratio;
         const ctx = canvas.getContext('2d');
         ctx.scale(ratio, ratio);
 
-        // 🔹 Inizializza SignaturePad
-        signaturePad = new SignaturePad(canvas, {
+        signatureState.pad = new SignaturePad(canvas, {
           penColor: "blue",
           minWidth: 0.5,
           maxWidth: 2.5,
@@ -530,41 +534,42 @@ createApp({
           smoothing: 0.5,
         });
 
-        // 🔹 Carica firma esistente
-        if (currentSig.value.signature) {
+        if (signatureState.currentSig.signature) {
           const img = new Image();
-          img.onload = () => signaturePad.fromDataURL(currentSig.value.signature);
-          img.src = currentSig.value.signature;
+          img.onload = () => signatureState.pad.fromDataURL(signatureState.currentSig.signature);
+          img.src = signatureState.currentSig.signature;
         }
       });
     }
 
-    function sigClear() {
-      if (signaturePad) signaturePad.clear();
-      if (currentSig.value) currentSig.value.signature = '';
-    }
-
     async function sigSave() {
-      if (!signaturePad || !currentSig.value) return;
-      if (signaturePad.isEmpty()) {
+
+      console.log(signatureState);
+      
+
+      if (!signatureState.pad || !signatureState.currentSig) return;
+      if (signatureState.pad.isEmpty()) {
         addToast("Firma vuota, nulla da salvare", "error");
         return;
       }
 
-      const dataUrl = signaturePad.toDataURL("image/png");
-      currentSig.value.signature = dataUrl;
+      signatureState.currentSig.signature = signatureState.pad.toDataURL("image/png");
 
       const section = currentChecklistSections.value[currentSectionIndex.value];
-      if (section && section.signatures && currentSigIndex.value !== null) {
-        section.signatures[currentSigIndex.value] = currentSig.value;
+      if (section && section.signatures && signatureState.currentSigIndex !== null) {
+        section.signatures[signatureState.currentSigIndex] = signatureState.currentSig;
         await updateSection(section);
       }
 
-      sigOpen.value = false;
+      signatureState.open = false;
     }
 
-    function closeSigDlg() { sigOpen.value = false; }
+    function sigClear() {
+      if (signatureState.pad) signatureState.pad.clear();
+      if (signatureState.currentSig) signatureState.currentSig.signature = '';
+    }
 
+    function closeSigDlg() { signatureState.open = false; }
 
     function goToSignatureSection() {
       if (!selectedWorksite.value || !currentChecklistSections.value.length) return;
@@ -588,8 +593,6 @@ createApp({
       });
     }
 
-
-
     const allSignaturesDone = computed(() => {
       if (!selectedWorksite.value || !selectedWorksite.value.sections) return false;
 
@@ -598,6 +601,12 @@ createApp({
 
       return sigSection.signatures.every(sig => sig.signature && sig.signature.trim() !== '');
     });
+
+
+
+
+
+
 
     async function guardEdit(section, callback) {
       if (allSignaturesDone.value) {
@@ -694,8 +703,6 @@ createApp({
       activeTab, tabs, currentSectionIndex, currentChecklistSections, checklistProgress,
       toast, dialogImage, photoDialog, dialog,
 
-      sigOpen, signCanvas, currentSig,
-
       showArchived, toggleArchive,
 
       searchQuery, filteredWorksites,
@@ -707,7 +714,7 @@ createApp({
       openDialog, closeDialog, cancelDialog, downloadWorksite, deleteWorksite, confirmDialog, formatLabel,
       autoSaveWorksite, saveWorksite, updateSection, worksiteHasNC,
 
-      openSigDlg, sigClear, sigSave, closeSigDlg, goToSignatureSection,
+      openSigDlg, sigClear, sigSave, closeSigDlg, goToSignatureSection, signatureState,
     }
   },
 }).mount("#app");
