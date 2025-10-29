@@ -326,12 +326,19 @@
                         </div>
                         <div class="l l2"></div>
                         <div class="s12 m12 l6">
-                            <div class="row right-align">
-                                <nav class="tabbed small">
+                            <div class="row wrap right-align">
+                                <nav class="l tabbed small"> <!--style="block-size: 2.1rem;"-->
                                     <a v-for="tab in tabs" :key="tab.id" :class="{ active: activeTab === tab.id }"
                                         @click="activeTab = tab.id">
                                         <i>{{ tab.icon }}</i>
-                                        <span>{{ tab.label }}</span>
+                                        <small>{{ tab.label }}</small>
+                                    </a>
+                                </nav>
+                                <nav class="s m tabbed small" style="block-size: 2rem;"> 
+                                    <a v-for="tab in tabs" :key="tab.id" :class="{ active: activeTab === tab.id }"
+                                        @click="activeTab = tab.id">
+                                        <i>{{ tab.icon }}</i>
+                                        <small>{{ tab.label }}</small>
                                     </a>
                                 </nav>
                                 <label class="switch icon">
