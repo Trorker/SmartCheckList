@@ -496,7 +496,7 @@ createApp({
       pad: null,
       currentSig: {
         signature: '',
-        signerName: '',
+        name: '',
         date: new Date().toISOString(),
       },
       currentSigIndex: null,
@@ -504,12 +504,12 @@ createApp({
 
     function openSigDlg(sig, index) {
       if (!sig) {
-        signatureState.currentSig = { signature: '', signerName: '', date: new Date().toISOString() };
+        signatureState.currentSig = { signature: '', name: '', date: new Date().toISOString() };
       } else {
         // assicuriamoci che ci siano tutte le proprietà
         signatureState.currentSig = {
           signature: sig.signature || '',
-          signerName: sig.signerName || '',
+          name: sig.name || '',
           date: sig.date || new Date().toISOString(),
         };
       }
@@ -545,7 +545,7 @@ createApp({
     async function sigSave() {
 
       console.log(signatureState);
-      
+
 
       if (!signatureState.pad || !signatureState.currentSig) return;
       if (signatureState.pad.isEmpty()) {
@@ -557,7 +557,10 @@ createApp({
 
       const section = currentChecklistSections.value[currentSectionIndex.value];
       if (section && section.signatures && signatureState.currentSigIndex !== null) {
-        section.signatures[signatureState.currentSigIndex] = signatureState.currentSig;
+        section.signatures[signatureState.currentSigIndex] = {
+          ...section.signatures[signatureState.currentSigIndex],
+          ...signatureState.currentSig,
+        };
         await updateSection(section);
       }
 
