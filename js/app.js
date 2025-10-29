@@ -130,6 +130,13 @@ createApp({
       document.body.classList.toggle("dark", isDark.value);
 
 
+
+      var mc = new Hammer(document.getElementById('app'));
+      mc.on("panleft panright panup pandown tap press", function (ev) {
+        addToast(ev.type + " gesture detected.");
+      });
+
+
       loadWorksites();
     });
 
@@ -502,13 +509,13 @@ createApp({
       currentSigIndex: null,
     });
 
-    function openSigDlg(sig, index) {     
+    function openSigDlg(sig, index) {
       if (checklistProgress.value < 100) {
         addToast(" Completa prima tutta la checklist!", "error");
         return;
       }
 
-      
+
       if (!sig) {
         signatureState.currentSig = { signature: '', name: '', date: new Date().toISOString() };
       } else {
