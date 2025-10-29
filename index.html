@@ -374,7 +374,7 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <label>{{ c.progress < 100 ? 'Incompleto' : 'Completato' }}</label>
+                                <label>{{ (c.progress < 100 ? 'Incompleto' : (allSignaturesDone) ? "Firmato" : "Completato") }}</label>
                                         <progress :value="c.progress" max="100"></progress>
                                         <label>{{ c.progress }}%</label>
                             </div>
