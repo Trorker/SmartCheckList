@@ -180,14 +180,20 @@
 
         html,
         body {
-            height: 100%;
-            margin: 0;
+            overflow: hidden;
         }
 
         #app {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+
+            overflow: hidden;
+
             display: flex;
             flex-direction: column;
-            height: 100%;
         }
 
         /* HEADER */
@@ -334,7 +340,7 @@
                                         <small>{{ tab.label }}</small>
                                     </a>
                                 </nav>
-                                <nav class="s m tabbed small" style="block-size: 2rem;"> 
+                                <nav class="s m tabbed small" style="block-size: 2rem;">
                                     <a v-for="tab in tabs" :key="tab.id" :class="{ active: activeTab === tab.id }"
                                         @click="activeTab = tab.id">
                                         <i>{{ tab.icon }}</i>
