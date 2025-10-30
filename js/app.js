@@ -134,7 +134,8 @@ createApp({
 
 
       // === Navigazione tramite swipe (Hammer.js) ===
-      const appElement = document.getElementById('app');
+      //const appElement = document.getElementById('app');
+      const appElement = document.querySelector("#app > main > section")
       if (appElement) {
         const mc = new Hammer(appElement);
 
