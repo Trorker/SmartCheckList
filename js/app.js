@@ -32,6 +32,8 @@ createApp({
       { nome: 'Prototipo TERNA', version: '1.1', file: 'cantiere_terna.json' },
     ]);
 
+    const TooltipInfo = ref(true);
+
     const worksites = ref([]);
     const loading = ref(true);
     const currentSection = ref("home"); // home | worksite | checklist
@@ -748,7 +750,7 @@ createApp({
       activeTab, tabs, currentSectionIndex, currentChecklistSections, checklistProgress,
       toast, dialogImage, photoDialog, dialog, allSignaturesDone,
 
-      showArchived, toggleArchive,
+      showArchived, toggleArchive, TooltipInfo,
 
       searchQuery, filteredWorksites,
 
