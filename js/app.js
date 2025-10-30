@@ -131,9 +131,42 @@ createApp({
 
 
 
-      var mc = new Hammer(document.getElementById('app'));
-      mc.on("panleft panright panup pandown tap press", function (ev) {
-        addToast(ev.type + " gesture detected.");
+      // === Navigazione tramite swipe (Hammer.js) ===
+      const appElement = document.getElementById('app');
+      if (appElement) {
+        const mc = new Hammer(appElement);
+
+        mc.on('swipeleft', () => {
+          // Vai avanti nella checklist
+          if (currentSection.value === "checklist") {
+            nextSection();
+          } else if (currentSection.value === "worksite") {
+            openChecklist();
+          }
+        });
+
+        mc.on('swiperight', () => {
+          // Torna indietro
+          if (currentSection.value === "checklist" && currentSectionIndex.value === 0) {
+            currentSection.value = "worksite";
+          } else if (currentSection.value === "checklist") {
+            prevSection();
+          } else if (currentSection.value === "worksite") {
+            currentSection.value = "home";
+          }
+        });
+      }
+
+
+      // === Avviso prima di uscire o ricaricare la pagina ===
+      window.addEventListener("beforeunload", (e) => {
+        // Previeni la chiusura involontaria solo se ci sono modifiche in corso
+        if (selectedWorksite.value) {
+          const message = "Hai delle modifiche non salvate. Sei sicuro di voler uscire?";
+          e.preventDefault();
+          e.returnValue = message;
+          return message;
+        }
       });
 
 
