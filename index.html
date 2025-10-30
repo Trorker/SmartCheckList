@@ -180,6 +180,12 @@
             transform: translateX(-30px);
         }
 
+        .snack {
+            inline-size: 50%;
+            border-radius: 50px;
+            text-align: center;
+        }
+
 
         html,
         body {
@@ -301,7 +307,7 @@
 
 <body>
     <div id="app" v-cloak>
-        
+
         <!-- HEADER -->
         <header class="fixed" style="box-shadow: var(--elevate1);">
             <nav>
@@ -808,7 +814,7 @@
         </dialog>
 
         <!-- TOAST -->
-        <div class="snackbar" :class="[toast.type, { active: toast.active }]">
+        <div class="snackbar snack" :class="[toast.type, { active: toast.active }]">
             <div class="max">{{ toast.text }}</div>
             <a v-if="toast.action" class="inverse-link" @click="toast.action.callback">{{ toast.action.label }}</a>
         </div>
