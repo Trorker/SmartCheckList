@@ -180,12 +180,17 @@
             transform: translateX(-30px);
         }
 
+        /*da riguardare*/
         .snack {
             inline-size: 50%;
             border-radius: 50px;
             text-align: center;
         }
 
+        .tooltip.info.active {
+            visibility: visible;
+            opacity: 1;
+        }
 
         html,
         body {
@@ -315,8 +320,18 @@
                     v-if="currentSection !== 'home'"><i>arrow_back</i></button>
                 <div class="shape loading-indicator tiny" v-if="loading"></div>
                 <h6 class="max">{{ title }}</h6>
-                <button class="circle transparent" @click="toggleTheme"><i>{{ isDark ? 'light_mode' : 'dark_mode'
-                        }}</i></button>
+                <button class="circle transparent" :class="{primary : TooltipInfo}"
+                    @click="TooltipInfo = !TooltipInfo"><i>question_mark</i></button>
+                <button class="circle transparent" @click="toggleTheme">
+                    <i>{{ isDark ? 'light_mode' : 'dark_mode' }}</i>
+                </button>
+                <label class="switch icon">
+                    <input type="checkbox" v-model="isDark">
+                    <span>
+                        <i>light_mode</i>
+                        <i>dark_mode</i>
+                    </span>
+                </label>
                 <button class="circle transparent" @click="openDialog"><i>settings</i></button>
             </nav>
         </header>
@@ -361,8 +376,14 @@
                                     <span>
                                         <i>archive</i>
                                     </span>
-                                    <div class="tooltip left">
-                                        <small>Qui trovi i cantieri archiviati.</small>
+                                    <div class="tooltip info left max" :class="{ 'active' : TooltipInfo}">
+                                        <div class="row">
+                                            <i class="extra">info</i>
+                                            <div>
+                                                <b>Archive</b>
+                                                <p>Qui trovi i cantieri archiviati.</p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </label>
                             </div>
