@@ -165,6 +165,36 @@ createApp({
       swipeEvent();
 
 
+
+      // apri dialog di conferma
+      if(!localStorage.getItem("cookieConsent")) openDialog(
+        'Cookie',
+        `Questo sito utilizza cookie tecnici e di terze parti per migliorare l’esperienza.\nContinuando la navigazione accetti la nostra informativa.`,
+        async () => {
+          try {
+            localStorage.setItem("cookieConsent","true");
+            addToast('Accetta', 'primary');
+
+            /*addToast(`Cantiere "${worksite.nome}" eliminato`, 'error', {
+              label: 'Annulla',
+              callback: async () => {
+                await db.worksites.put(backup);
+                await loadWorksites();
+                addToast('Eliminazione annullata', 'primary');
+              }
+            });*/
+          } catch (err) {
+            console.error('Errore eliminazione cantiere:', err);
+            addToast('Errore durante l\'eliminazione', 'error');
+          }
+        },
+        async () => {
+          addToast("Modifica annullata, firme intatte.", "error");
+          document.body.innerHTML = "Cookies rifiutati"
+        }
+      );
+
+
       // === Avviso prima di uscire o ricaricare la pagina ===
       window.addEventListener("beforeunload", (e) => {
         // Previeni la chiusura involontaria solo se ci sono modifiche in corso
