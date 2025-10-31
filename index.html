@@ -64,7 +64,7 @@
                         <i>dark_mode</i>
                     </span>
                 </label>
-                <button class="circle transparent" @click="openDialog"><i>settings</i></button>
+                <button class="circle transparent" @click="openDialog('Impostazioni')"><i>settings</i></button>
             </nav>
         </header>
 
@@ -93,14 +93,14 @@
                                     <a v-for="tab in tabs" :key="tab.id" :class="{ active: activeTab === tab.id }"
                                         @click="activeTab = tab.id">
                                         <i>{{ tab.icon }}</i>
-                                        <small>{{ tab.label }}</small>
+                                        <!--<small>{{ tab.label }}</small>-->
                                     </a>
                                 </nav>
                                 <nav class="s m tabbed small" style="block-size: 2rem;">
                                     <a v-for="tab in tabs" :key="tab.id" :class="{ active: activeTab === tab.id }"
                                         @click="activeTab = tab.id">
                                         <i>{{ tab.icon }}</i>
-                                        <small>{{ tab.label }}</small>
+                                        <!--<small>{{ tab.label }}</small>-->
                                     </a>
                                 </nav>
                                 <label class="switch icon">
