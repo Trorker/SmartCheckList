@@ -125,17 +125,11 @@ createApp({
       setTimeout(() => { loading.value = false; }, randomInteger(700, 1500));
     }
 
-    // ===== Theme =====
-    onMounted(() => {
-      const saved = localStorage.getItem("theme") || "dark"; // se null, default dark
-      isDark.value = saved === "dark";
-      document.body.classList.toggle("dark", isDark.value);
-
-
+    const swipeEvent = () => {
 
       // === Navigazione tramite swipe (Hammer.js) ===
       //const appElement = document.getElementById('app');
-      const appElement = document.querySelector("#app")
+      const appElement = document.querySelector("#app > footer > nav");
       if (appElement) {
         const mc = new Hammer(appElement);
 
@@ -159,6 +153,16 @@ createApp({
           }
         });
       }
+    }
+
+    // ===== Theme =====
+    onMounted(() => {
+      const saved = localStorage.getItem("theme") || "dark"; // se null, default dark
+      isDark.value = saved === "dark";
+      document.body.classList.toggle("dark", isDark.value);
+
+
+      swipeEvent();
 
 
       // === Avviso prima di uscire o ricaricare la pagina ===
