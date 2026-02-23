@@ -444,7 +444,7 @@
         <!-- FOOTER GLOBALE -->
         <footer class="fixed transparent footer-transition"
             :class="currentSection === 'home' ? 'right-align' : 'center-align'">
-            <nav class="large-elevate" :class="{'toolbar secondary-container': currentSection !== 'home'}">
+            <nav :class="{'large-elevate toolbar secondary-container': currentSection !== 'home'}">
                 <!-- HOME -->
                 <template v-if="currentSection === 'home'">
                     <button class="square round extra animate-bounceIn" @click="showDialogNewWorksite = true">
@@ -577,5 +577,6 @@
     <script type="module" src="./js/app.js"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
 </body>
+
 
 </html>
