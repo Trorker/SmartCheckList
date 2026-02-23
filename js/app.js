@@ -32,7 +32,7 @@ createApp({
       { nome: 'Prototipo TERNA', version: '1.1', file: 'cantiere_terna.json' },
     ]);
 
-    const TooltipInfo = ref(true);
+    const TooltipInfo = ref(false);
 
     const worksites = ref([]);
     const loading = ref(true);
@@ -800,3 +800,4 @@ createApp({
     }
   },
 }).mount("#app");
+
